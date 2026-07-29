@@ -1,0 +1,129 @@
+@import './tokens.css';
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  color: var(--color-ink);
+  background-color: var(--color-ground);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  line-height: 1.05;
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Shared eyebrow / mono metadata */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* Layout helpers */
+.wrap {
+  width: 100%;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: clamp(4.5rem, 9vw, 8.125rem);
+}
+
+/* Pill buttons */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 2.1rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.pill--accent {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.pill--accent:hover {
+  background-color: var(--color-accent-deep);
+}
+
+.pill--outline {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.pill--outline:hover {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.pill--ghost {
+  border: 1px solid rgba(247, 244, 238, 0.55);
+  color: var(--color-on-accent);
+}
+.pill--ghost:hover {
+  border-color: var(--color-on-accent);
+  background-color: rgba(247, 244, 238, 0.08);
+}
+
+.pill--sand {
+  background-color: var(--color-sand);
+  color: var(--color-ink);
+}
+.pill--sand:hover {
+  filter: brightness(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

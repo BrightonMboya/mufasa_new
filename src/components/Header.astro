@@ -1,0 +1,161 @@
+---
+import { site, nav } from '../data/site';
+---
+
+<header class="header">
+  <a href="/" class="brand" aria-label={`${site.name} — home`}>
+    <img src={site.logo} alt={site.name} width="1263" height="350" />
+  </a>
+
+  <nav class="nav" aria-label="Primary">
+    <ul class="nav__links" data-nav-links>
+      {nav.map((item) => (
+        <li><a href={item.href}>{item.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+
+  <div class="actions">
+    <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="callus">
+      <svg class="callus__icon" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M5.2 2.5 6.4 5 5 6.3a8 8 0 0 0 3.7 3.7L10 8.6l2.5 1.2v2.4c0 .7-.6 1.2-1.3 1.1A10.8 10.8 0 0 1 2.7 4.3C2.6 3.6 3.1 3 3.8 3l1.4-.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+      <span class="callus__number">{site.phone}</span>
+    </a>
+    <a href="/#enquiry" class="pill pill--accent actions__cta">Contact Us</a>
+    <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .header {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    padding: 0.7rem var(--gutter);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    border-bottom: 1px solid var(--color-hairline);
+    position: relative;
+    z-index: 20;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    flex-shrink: 0;
+    margin-right: auto; /* push nav + actions to the right */
+  }
+  .brand img {
+    height: clamp(42px, 5vw, 52px);
+    width: auto;
+  }
+
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.9rem);
+    list-style: none;
+  }
+  .nav__links a {
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    padding-block: 0.4rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .nav__links a:hover {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.875rem, 1.8vw, 1.5rem);
+    flex-shrink: 0;
+  }
+  .callus {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-ink);
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+  .callus:hover { color: var(--color-accent); }
+  .callus__icon { flex-shrink: 0; color: var(--color-accent); }
+  .callus__number {
+    font-size: 0.9375rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.01em;
+  }
+  .actions__cta {
+    padding: 0.8rem 1.7rem;
+  }
+
+  .nav__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    width: 26px;
+  }
+  .nav__toggle span {
+    height: 2px;
+    background-color: var(--color-ink);
+    border-radius: 2px;
+  }
+
+  /* Tablet: hide the phone text to make room */
+  @media (max-width: 1100px) {
+    .callus__number { display: none; }
+  }
+
+  /* Mobile: collapse nav into a dropdown */
+  @media (max-width: 920px) {
+    .nav__toggle { display: flex; }
+    .callus { display: none; }
+    .nav__links {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-hairline);
+      padding: 0 var(--gutter);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      z-index: 30;
+    }
+    .nav__links[data-open='true'] {
+      max-height: 70vh;
+      padding-block: 0.75rem;
+    }
+    .nav__links li { padding-block: 0.7rem; }
+    .nav__links a { border-bottom: none; }
+  }
+
+  @media (max-width: 480px) {
+    .actions__cta { display: none; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('[data-nav-toggle]');
+  const links = document.querySelector('[data-nav-links]');
+  toggle?.addEventListener('click', () => {
+    const open = links?.getAttribute('data-open') === 'true';
+    links?.setAttribute('data-open', String(!open));
+    toggle.setAttribute('aria-expanded', String(!open));
+  });
+</script>

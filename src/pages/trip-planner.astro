@@ -1,0 +1,610 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { planner, site, forms } from '../data/site';
+
+const title = `Trip Planner — ${site.shortName}`;
+const description = planner.intro.body;
+const totalSteps = planner.steps.length;
+---
+
+<Base title={title} description={description}>
+  <Header />
+  <main class="planner" data-planner>
+    <!-- Progress rail -->
+    <div class="pl-progress" data-progress hidden>
+      <div class="pl-progress__inner wrap">
+        <span class="pl-progress__count"><span data-progress-current>1</span> / {totalSteps}</span>
+        <div class="pl-progress__track"><span class="pl-progress__bar" data-progress-bar></span></div>
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <section class="pl-screen pl-intro" data-screen="intro" data-active>
+      <img class="pl-intro__img" src={planner.intro.heroImage} alt="" fetchpriority="high" />
+      <div class="pl-intro__scrim"></div>
+      <div class="wrap pl-intro__inner">
+        <span class="eyebrow">{planner.intro.eyebrow}</span>
+        <h1>{planner.intro.title}</h1>
+        <p>{planner.intro.body}</p>
+        <button type="button" class="pill pill--accent pl-start" data-go-next>{planner.intro.cta}</button>
+      </div>
+    </section>
+
+    <!-- Steps -->
+    {planner.steps.map((step, i) => (
+      <section
+        class="pl-screen pl-step"
+        data-screen="step"
+        data-step-id={step.id}
+        data-step-kind={step.kind}
+        data-step-index={i}
+      >
+        <div class="wrap pl-step__inner">
+          <h2 class="pl-step__title">{step.title}</h2>
+          <p class="pl-step__hint">{step.hint}</p>
+          <div class={`pl-options ${step.id === 'occasion' ? 'pl-options--list' : ''} ${step.id === 'months' ? 'pl-options--months' : ''}`}>
+            {step.options.map((opt) => (
+              <button
+                type="button"
+                class="pl-chip"
+                data-option
+                data-step={step.id}
+                data-value={opt.value}
+                aria-pressed="false"
+              >
+                <span class="pl-chip__dot" aria-hidden="true"></span>
+                <span class="pl-chip__label">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+          {step.skip && (
+            <button type="button" class="pl-skip" data-go-next data-skip>{step.skip}</button>
+          )}
+          <div class="pl-nav">
+            <button type="button" class="pl-back" data-go-back>Previous</button>
+            <button type="button" class="pill pill--accent pl-next" data-go-next disabled>
+              {i === totalSteps - 1 ? 'Continue' : 'Next step'}
+            </button>
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <!-- Contact -->
+    <section class="pl-screen pl-contact" data-screen="contact">
+      <div class="wrap pl-contact__inner">
+        <h2 class="pl-step__title">Where should we send your ideas?</h2>
+        <p class="pl-step__hint">Leave your details and a guide — not a call centre — will come back with routes that fit.</p>
+
+        <form class="pl-form" data-form novalidate>
+          <!-- Honeypot: hidden from people, tempting to bots. -->
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
+
+          <div class="pl-form__row">
+            <label class="pl-field">
+              <span>Your name</span>
+              <input type="text" name="name" autocomplete="name" required />
+            </label>
+            <label class="pl-field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+          </div>
+          <label class="pl-field">
+            <span>Phone / WhatsApp <em>(optional)</em></span>
+            <input type="tel" name="phone" autocomplete="tel" />
+          </label>
+          <label class="pl-field">
+            <span>Anything else we should know? <em>(optional)</em></span>
+            <textarea name="note" rows="3"></textarea>
+          </label>
+
+          <p class="pl-form__error" data-form-error hidden></p>
+
+          <div class="pl-nav pl-nav--form">
+            <button type="button" class="pl-back" data-go-back>Previous</button>
+            <button type="submit" class="pill pill--accent pl-submit" data-submit>Send my enquiry</button>
+          </div>
+          <p class="pl-form__fineprint">We reply within a day, and never share your details.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Thank you -->
+    <section class="pl-screen pl-thanks" data-screen="thanks">
+      <div class="wrap pl-thanks__inner">
+        <span class="eyebrow">Enquiry received</span>
+        <h2 data-thanks-title>Thank you — it's on its way to us.</h2>
+        <p>A guide will read what you've shared and reply personally, usually within a day. If you'd rather talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
+        <div class="pl-thanks__cta">
+          <a href="/" class="pill pill--accent">Back to home</a>
+          <button type="button" class="pill pill--ghost" data-restart>Plan another trip</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<script define:vars={{ steps: planner.steps, formsKey: forms.web3formsKey, endpoint: forms.endpoint }}>
+  const root = document.querySelector('[data-planner]');
+  if (root) {
+    const screens = Array.from(root.querySelectorAll('[data-screen]'));
+    const stepScreens = screens.filter((s) => s.dataset.screen === 'step');
+    const progress = root.querySelector('[data-progress]');
+    const progressBar = root.querySelector('[data-progress-bar]');
+    const progressCurrent = root.querySelector('[data-progress-current]');
+    const form = root.querySelector('[data-form]');
+    const formError = root.querySelector('[data-form-error]');
+    const submitBtn = root.querySelector('[data-submit]');
+    const thanksTitle = root.querySelector('[data-thanks-title]');
+    const total = stepScreens.length;
+
+    const answers = { see: [], interests: [], occasion: [], months: [] };
+
+    // index: 0 = intro, 1..total = steps, total+1 = contact, total+2 = thanks
+    const CONTACT = total + 1;
+    const THANKS = total + 2;
+    let index = 0;
+
+    function show(i) {
+      index = i;
+      const isIntro = i === 0;
+      const isContact = i === CONTACT;
+      const isThanks = i === THANKS;
+      const isStep = i >= 1 && i <= total;
+      const stepPos = i - 1;
+
+      screens.forEach((s) => delete s.dataset.active);
+      if (isIntro) root.querySelector('[data-screen="intro"]').dataset.active = '';
+      else if (isContact) root.querySelector('[data-screen="contact"]').dataset.active = '';
+      else if (isThanks) root.querySelector('[data-screen="thanks"]').dataset.active = '';
+      else {
+        stepScreens[stepPos].dataset.active = '';
+        syncNext(stepScreens[stepPos]);
+      }
+
+      progress.hidden = !isStep;
+      if (isStep) {
+        progressCurrent.textContent = String(stepPos + 1);
+        progressBar.style.width = ((stepPos + 1) / total) * 100 + '%';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Option chips
+    root.querySelectorAll('[data-option]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const stepId = chip.dataset.step;
+        const value = chip.dataset.value;
+        const screen = chip.closest('[data-screen="step"]');
+        const kind = screen.dataset.stepKind;
+
+        if (kind === 'single') {
+          answers[stepId] = [value];
+          screen.querySelectorAll('[data-option]').forEach((c) => {
+            const on = c === chip;
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+            if (on) c.dataset.selected = '';
+            else delete c.dataset.selected;
+          });
+          setTimeout(() => go(1), 180);
+          return;
+        }
+
+        const set = new Set(answers[stepId]);
+        if (set.has(value)) set.delete(value);
+        else set.add(value);
+        answers[stepId] = Array.from(set);
+        const on = set.has(value);
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (on) chip.dataset.selected = '';
+        else delete chip.dataset.selected;
+        syncNext(screen);
+      });
+    });
+
+    function syncNext(screen) {
+      const next = screen.querySelector('.pl-next');
+      if (!next) return;
+      const stepId = screen.dataset.stepId;
+      const hasAny = answers[stepId] && answers[stepId].length > 0;
+      // the months step can always proceed (skip link covers the empty case)
+      next.disabled = stepId === 'months' ? false : !hasAny;
+    }
+
+    function go(dir) {
+      const target = index + dir;
+      if (target < 0 || target > THANKS) return;
+      show(target);
+    }
+
+    root.querySelectorAll('[data-go-next]').forEach((b) =>
+      b.addEventListener('click', () => {
+        if (b.dataset.skip !== undefined) answers.months = [];
+        go(1);
+      })
+    );
+    root.querySelectorAll('[data-go-back]').forEach((b) =>
+      b.addEventListener('click', () => go(-1))
+    );
+    root.querySelectorAll('[data-restart]').forEach((b) =>
+      b.addEventListener('click', () => {
+        answers.see = []; answers.interests = []; answers.occasion = []; answers.months = [];
+        root.querySelectorAll('[data-option]').forEach((c) => {
+          delete c.dataset.selected;
+          c.setAttribute('aria-pressed', 'false');
+        });
+        if (form) form.reset();
+        stepScreens.forEach((s) => syncNext(s));
+        show(0);
+      })
+    );
+
+    // Map a stored value back to its human label for the email.
+    function labelFor(stepId, value) {
+      const step = steps.find((s) => s.id === stepId);
+      const opt = step && step.options.find((o) => o.value === value);
+      return opt ? opt.label : value;
+    }
+    const labels = (stepId) =>
+      (answers[stepId] || []).map((v) => labelFor(stepId, v)).join(', ');
+
+    // Submit → Web3Forms → info@kingmufasaexpeditions.com
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const name = (data.get('name') || '').toString().trim();
+        const email = (data.get('email') || '').toString().trim();
+        const phone = (data.get('phone') || '').toString().trim();
+        const note = (data.get('note') || '').toString().trim();
+
+        formError.hidden = true;
+        if (!name || !email) {
+          formError.textContent = 'Please add your name and email so we can reply.';
+          formError.hidden = false;
+          return;
+        }
+
+        const seeL = labels('see') || '—';
+        const interestsL = labels('interests') || '—';
+        const occasionL = answers.occasion.length ? labelFor('occasion', answers.occasion[0]) : '—';
+        const monthsL = answers.months.length ? labels('months') : 'Not decided yet';
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              access_key: formsKey,
+              subject: `New trip-planner enquiry — ${name}`,
+              from_name: 'King Mufasa · Trip Planner',
+              replyto: email,
+              botcheck: data.get('botcheck') ? true : false,
+              Name: name,
+              Email: email,
+              Phone: phone || '—',
+              'Would like to see': seeL,
+              'Interested in': interestsL,
+              'Travelling as': occasionL,
+              'Preferred timing': monthsL,
+              Notes: note || '—',
+            }),
+          });
+          const json = await res.json();
+          if (json && json.success) {
+            const first = name.split(' ')[0];
+            thanksTitle.textContent = `Thank you, ${first} — it's on its way to us.`;
+            show(THANKS);
+          } else {
+            throw new Error((json && json.message) || 'Submission failed');
+          }
+        } catch (err) {
+          formError.textContent =
+            'Something went wrong sending that. Please try again, or email us directly at ' +
+            'info@kingmufasaexpeditions.com.';
+          formError.hidden = false;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send my enquiry';
+        }
+      });
+    }
+
+    show(0);
+  }
+</script>
+
+<style>
+  .planner {
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
+    min-height: 100vh;
+  }
+
+  .pl-screen { display: none; }
+  .pl-screen[data-active] { display: block; }
+
+  /* Progress rail */
+  .pl-progress {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background-color: rgba(20, 24, 21, 0.9);
+    backdrop-filter: blur(6px);
+    padding-block: 1rem;
+    border-bottom: 1px solid rgba(247, 244, 238, 0.1);
+  }
+  .pl-progress__inner { display: flex; align-items: center; gap: 1.25rem; }
+  .pl-progress__count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--color-accent-soft);
+    white-space: nowrap;
+  }
+  .pl-progress__track {
+    flex: 1;
+    height: 2px;
+    background-color: rgba(247, 244, 238, 0.15);
+    overflow: hidden;
+  }
+  .pl-progress__bar {
+    display: block;
+    height: 100%;
+    width: 25%;
+    background-color: var(--color-accent-soft);
+    transition: width 0.4s ease;
+  }
+
+  /* Intro */
+  .pl-intro { position: relative; overflow: hidden; isolation: isolate; }
+  .pl-intro__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .pl-intro__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(20, 24, 21, 0.35) 0%, rgba(20, 24, 21, 0.72) 100%),
+      linear-gradient(180deg, rgba(20, 24, 21, 0.55) 0%, rgba(20, 24, 21, 0.5) 40%, rgba(20, 24, 21, 0.8) 100%);
+  }
+  .pl-intro__inner {
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.5rem;
+    padding-block: 5rem;
+  }
+  .pl-intro .eyebrow { color: var(--color-accent-soft); }
+  .pl-intro h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: var(--fw-light);
+    line-height: 1.08;
+    max-width: 14ch;
+  }
+  .pl-intro p {
+    max-width: 52ch;
+    color: rgba(247, 244, 238, 0.72);
+    line-height: 1.7;
+  }
+  .pl-start { margin-top: 1rem; }
+
+  /* Steps */
+  .pl-step__inner {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding-block: 4rem;
+  }
+  .pl-step__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    line-height: 1.1;
+  }
+  .pl-step__hint {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.55);
+    margin-bottom: 2.5rem;
+    max-width: 44ch;
+  }
+
+  /* Option chips */
+  .pl-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    max-width: 860px;
+  }
+  .pl-options--months { max-width: 620px; }
+  .pl-options--list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 480px;
+    gap: 0.6rem;
+  }
+  .pl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.35rem;
+    background-color: transparent;
+    border: 1px solid rgba(247, 244, 238, 0.28);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-on-accent);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+  .pl-options--list .pl-chip {
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    width: 100%;
+    padding: 1rem 1.35rem;
+  }
+  .pl-options--months .pl-chip { justify-content: center; min-width: 92px; }
+  .pl-options--months .pl-chip__dot { display: none; }
+  .pl-chip__dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1px solid rgba(247, 244, 238, 0.5);
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .pl-chip:hover { border-color: var(--color-accent-soft); }
+  .pl-chip[data-selected] {
+    border-color: var(--color-accent-soft);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .pl-chip[data-selected] .pl-chip__dot {
+    background-color: var(--color-on-accent);
+    border-color: var(--color-on-accent);
+    box-shadow: inset 0 0 0 3px var(--color-accent);
+  }
+
+  .pl-skip {
+    margin-top: 2rem;
+    background: none;
+    border: none;
+    color: rgba(247, 244, 238, 0.65);
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+  .pl-skip:hover { color: var(--color-on-accent); }
+
+  /* Nav */
+  .pl-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .pl-nav--form { margin-top: 2rem; justify-content: flex-end; }
+  .pl-back {
+    background: none;
+    border: none;
+    color: rgba(247, 244, 238, 0.7);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .pl-back:hover { color: var(--color-on-accent); }
+  .pl-next[disabled], .pl-submit[disabled] { opacity: 0.35; cursor: not-allowed; }
+
+  /* Contact form */
+  .pl-contact__inner {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 620px;
+    padding-block: 4rem;
+    text-align: left;
+  }
+  .pl-contact .pl-step__title { text-align: left; }
+  .pl-contact .pl-step__hint { text-align: left; }
+  .pl-form { display: flex; flex-direction: column; gap: 1.25rem; }
+  .pl-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .pl-field { display: flex; flex-direction: column; gap: 0.5rem; }
+  .pl-field > span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .pl-field > span em { text-transform: none; letter-spacing: 0; color: rgba(247, 244, 238, 0.45); font-style: normal; }
+  .pl-field input,
+  .pl-field textarea {
+    background-color: rgba(247, 244, 238, 0.06);
+    border: 1px solid rgba(247, 244, 238, 0.22);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-on-accent);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-ui, inherit);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .pl-field textarea { resize: vertical; }
+  .pl-field input:focus,
+  .pl-field textarea:focus {
+    outline: none;
+    border-color: var(--color-accent-soft);
+    background-color: rgba(247, 244, 238, 0.09);
+  }
+  .pl-form__error {
+    color: #e8b4a0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .pl-form__fineprint {
+    font-size: 0.8125rem;
+    color: rgba(247, 244, 238, 0.45);
+    text-align: right;
+  }
+
+  /* Thank you */
+  .pl-thanks__inner {
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.25rem;
+    padding-block: 5rem;
+  }
+  .pl-thanks .eyebrow { color: var(--color-accent-soft); }
+  .pl-thanks h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    line-height: 1.12;
+    max-width: 18ch;
+  }
+  .pl-thanks p {
+    max-width: 50ch;
+    color: rgba(247, 244, 238, 0.72);
+    line-height: 1.7;
+  }
+  .pl-thanks p a { color: var(--color-accent-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .pl-thanks__cta { display: flex; gap: 0.875rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+
+  @media (max-width: 640px) {
+    .pl-form__row { grid-template-columns: 1fr; }
+    .pl-nav--form { justify-content: space-between; }
+  }
+</style>

@@ -1,0 +1,247 @@
+---
+import { hero } from '../data/site';
+---
+
+<section class="hero">
+  <video
+    class="hero__img"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    poster={hero.poster}
+    aria-hidden="true"
+    data-hero-video
+  >
+    <source src={hero.video} type="video/mp4" />
+  </video>
+  <div class="hero__scrim"></div>
+
+  <div class="hero__headline">
+    <h1>{hero.title}</h1>
+    <p>{hero.subtitle}</p>
+  </div>
+
+  <div class="hero__split wrap">
+    <div class="hero__col">
+      <span class="hero__prompt">Take me to</span>
+      <form class="search" role="search" data-hero-search>
+        <input type="text" name="q" placeholder="Search destinations and journeys" aria-label="Search destinations and journeys" data-hero-search-input />
+        <button type="submit" class="search__btn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7" />
+            <path d="M13.6 13.6 18 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="hero__divider" aria-hidden="true"></div>
+
+    <div class="hero__col">
+      <span class="hero__prompt">Not sure where?</span>
+      <a href="/trip-planner" class="planner">Use Our Trip Planner</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(560px, 82vh, 760px);
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+
+  .hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* Centered radial darkening behind the headline (keeps white text
+       legible over any image), layered over the top-nav + bottom-panel
+       vertical gradient. */
+    background:
+      radial-gradient(
+        ellipse 70% 50% at 50% 40%,
+        rgba(20, 24, 21, 0.52) 0%,
+        rgba(20, 24, 21, 0) 68%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(20, 24, 21, 0.42) 0%,
+        rgba(20, 24, 21, 0.16) 30%,
+        rgba(20, 24, 21, 0.6) 70%,
+        rgba(20, 24, 21, 0.94) 100%
+      );
+  }
+
+  .hero__headline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.375rem;
+    text-align: center;
+    max-width: 1000px;
+    padding-inline: var(--gutter);
+    margin-bottom: clamp(6rem, 14vh, 9.375rem);
+  }
+  .hero__headline h1 {
+    font-size: clamp(3rem, 8vw, var(--text-hero));
+    color: var(--color-on-accent);
+    letter-spacing: -0.015em;
+  }
+  .hero__headline p {
+    max-width: 42ch;
+    font-size: clamp(1rem, 2vw, 1.1875rem);
+    line-height: 1.55;
+    color: rgba(247, 244, 238, 0.9);
+  }
+
+  .hero__split {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(2rem, 5vh, 3.625rem);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  .hero__col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 1 1 0;
+    max-width: 480px;
+  }
+  .hero__prompt {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.125rem);
+    letter-spacing: -0.01em;
+    color: var(--color-on-accent);
+  }
+  .hero__divider {
+    width: 1px;
+    align-self: stretch;
+    min-height: 126px;
+    background-color: rgba(247, 244, 238, 0.32);
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    padding: 0.5rem 0.5rem 0.5rem 1.75rem;
+    border: 1px solid rgba(247, 244, 238, 0.5);
+    border-radius: var(--radius-full);
+    background: rgba(20, 24, 21, 0.15);
+    backdrop-filter: blur(2px);
+  }
+  .search input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--color-on-accent);
+  }
+  .search input::placeholder {
+    color: rgba(247, 244, 238, 0.68);
+  }
+  .search__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    transition: filter 0.2s ease;
+  }
+  .search__btn:hover {
+    filter: brightness(0.95);
+  }
+
+  .planner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1.25rem 2.5rem;
+    border-radius: var(--radius-full);
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-weight: var(--fw-medium);
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    transition: filter 0.2s ease;
+  }
+  .planner:hover {
+    filter: brightness(0.95);
+  }
+
+  @media (max-width: 760px) {
+    .hero__split {
+      position: static;
+      flex-direction: column;
+      align-items: stretch;
+      padding-block: 2.5rem 3rem;
+      background-color: var(--color-ink);
+    }
+    .hero__col {
+      max-width: none;
+    }
+    .hero__divider {
+      display: none;
+    }
+    .hero {
+      justify-content: flex-start;
+      padding-top: clamp(4rem, 12vh, 7rem);
+    }
+    .hero__headline {
+      margin-bottom: 3rem;
+    }
+  }
+</style>
+
+<script>
+  // Respect reduced-motion: hold on the poster frame instead of playing.
+  const video = document.querySelector('[data-hero-video]') as HTMLVideoElement | null;
+  if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.removeAttribute('autoplay');
+    video.addEventListener('loadedmetadata', () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+    video.pause();
+  }
+
+  // Hero search -> filter the journeys grid below (handled in Journeys.astro).
+  const searchForm = document.querySelector<HTMLFormElement>('[data-hero-search]');
+  const searchInput = document.querySelector<HTMLInputElement>('[data-hero-search-input]');
+  searchForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const query = searchInput?.value ?? '';
+    window.dispatchEvent(new CustomEvent('mufasa:search', { detail: { query } }));
+  });
+</script>

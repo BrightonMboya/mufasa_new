@@ -1,0 +1,213 @@
+---
+import { experiences } from '../data/site';
+---
+
+<section id="experiences" class="exp section wrap">
+  <div class="exp__head">
+    <span class="exp__eyebrow">Why Tanzania</span>
+    <h2>The experiences people come for</h2>
+    <p>
+      The Great Migration, the cats, the coast, the roof of Africa — the
+      journeys below are built around these. Tell us which one you can’t leave
+      without, and we’ll draw the route to it.
+    </p>
+  </div>
+
+  <div class="exp__grid">
+    {experiences.map((x) => (
+      <a class="excard" href={x.href}>
+        <div class="excard__media">
+          <img src={x.image} alt={x.title} loading="lazy" />
+        </div>
+        <div class="excard__body">
+          <span class="excard__place">{x.place} · {x.season}</span>
+          <h3 class="excard__title">{x.title}</h3>
+          <p class="excard__line">{x.line}</p>
+          <span class="excard__cta">Explore this</span>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .exp {
+    background-color: var(--color-ground);
+  }
+  .exp__head {
+    max-width: 640px;
+    margin-bottom: clamp(2.5rem, 5vw, 3.75rem);
+  }
+  .exp__eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 1.25rem;
+  }
+  .exp__head h2 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+  .exp__head p {
+    color: var(--color-slate);
+    line-height: 1.65;
+    max-width: 500px;
+  }
+
+  /* Cinematic mosaic: a 6-column grid, cards spanning different widths so the
+     wall reads editorial rather than like a uniform product grid. Rows all
+     share one auto height so same-row cards align. */
+  .exp__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: clamp(320px, 32vw, 480px);
+    gap: 1.25rem;
+  }
+
+  .excard {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    grid-column: span 3; /* fallback */
+    border-radius: var(--radius-sm);
+    isolation: isolate;
+  }
+  /* Four-card pinwheel: wide / narrow on top, narrow / wide beneath. The two
+     landscape heroes (Migration, Kilimanjaro) take the wide slots. */
+  .excard:nth-child(1) { grid-column: span 4; }
+  .excard:nth-child(2) { grid-column: span 2; }
+  .excard:nth-child(3) { grid-column: span 2; }
+  .excard:nth-child(4) { grid-column: span 4; }
+
+  .excard__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .excard__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1);
+  }
+  /* Legibility scrim — darkens the lower half so white text always reads. */
+  .excard::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      to top,
+      rgba(12, 16, 13, 0.82) 0%,
+      rgba(12, 16, 13, 0.5) 32%,
+      rgba(12, 16, 13, 0.12) 60%,
+      rgba(12, 16, 13, 0) 100%
+    );
+    transition: opacity 0.4s ease;
+  }
+  .excard:hover .excard__media img {
+    transform: scale(1.05);
+  }
+
+  .excard__body {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: clamp(1.5rem, 2.5vw, 2.25rem);
+    color: var(--color-on-accent);
+  }
+  .excard__place {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.8);
+  }
+  .excard__title {
+    font-size: clamp(1.6rem, 2.6vw, 2.375rem);
+    font-weight: var(--fw-light);
+    line-height: 1.05;
+  }
+  .excard__line {
+    max-width: 34ch;
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: rgba(247, 244, 238, 0.9);
+  }
+  .excard__cta {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .excard__cta::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+  .excard:hover .excard__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .excard:hover .excard__cta::after {
+    transform: translateX(4px);
+  }
+
+  /* Tablet: an even 2×2 grid — four cards sit cleanly with no orphan. */
+  @media (max-width: 900px) {
+    .exp__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: clamp(300px, 44vw, 400px);
+    }
+    .excard,
+    .excard:nth-child(n) {
+      grid-column: span 1;
+    }
+  }
+
+  /* Phone: single column, always show the CTA since there's no hover, and
+     lift the scrim a touch so the smaller type stays legible. */
+  @media (max-width: 560px) {
+    .exp__grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: clamp(340px, 78vw, 440px);
+      gap: 1rem;
+    }
+    .excard,
+    .excard:nth-child(n) {
+      grid-column: span 1;
+    }
+    .excard::after {
+      background: linear-gradient(
+        to top,
+        rgba(12, 16, 13, 0.86) 0%,
+        rgba(12, 16, 13, 0.55) 38%,
+        rgba(12, 16, 13, 0.15) 66%,
+        rgba(12, 16, 13, 0) 100%
+      );
+    }
+    .excard__title {
+      font-size: 1.75rem;
+    }
+    .excard__cta {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

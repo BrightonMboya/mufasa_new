@@ -1,0 +1,213 @@
+---
+import { journeys } from '../data/site';
+
+// Build the filter list from the journeys that actually exist, so no tab
+// is ever empty. "All" first, then each distinct category in order.
+const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))];
+---
+
+<section id="journeys" class="journeys section wrap">
+  <div class="journeys__head">
+    <h2>Our Journeys</h2>
+    <a href="#enquiry" class="pill pill--outline">Make an Enquiry</a>
+  </div>
+
+  <div class="journeys__tabs" role="tablist" aria-label="Journey categories">
+    {filters.map((f, i) => (
+      <button
+        class:list={['tab', { 'tab--active': i === 0 }]}
+        role="tab"
+        aria-selected={i === 0}
+        data-filter={f}
+      >
+        {f}
+      </button>
+    ))}
+  </div>
+
+  <div class="journeys__grid" data-journeys-grid>
+    {journeys.map((j) => (
+      <a
+        class="jcard"
+        href={`/journeys/${j.slug}`}
+        data-category={j.category}
+        data-search={`${j.title} ${j.category} ${j.summary} ${j.days.map((d) => d.place).join(' ')}`.toLowerCase()}
+      >
+        <div class="jcard__frame">
+          <img src={j.image} alt={j.title} loading="lazy" />
+        </div>
+        <span class="jcard__meta">{j.meta}</span>
+        <h3 class="jcard__title">{j.title}</h3>
+        <span class="jcard__cta">Explore</span>
+      </a>
+    ))}
+  </div>
+
+  <p class="journeys__empty" data-journeys-empty hidden>
+    No journeys match that yet — <a href="#enquiry">tell us what you have in mind</a> and we’ll draw one.
+  </p>
+</section>
+
+<style>
+  .journeys {
+    background-color: var(--color-surface);
+  }
+  .journeys__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .journeys__head h2 {
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+  }
+
+  .journeys__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1rem, 2.5vw, 2.375rem);
+    padding-bottom: 3.375rem;
+  }
+  .tab {
+    font-size: var(--text-label);
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .tab:hover {
+    color: var(--color-ink);
+  }
+  .tab--active {
+    color: var(--color-ink);
+    font-weight: var(--fw-semibold);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .journeys__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .jcard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  .jcard__frame {
+    width: 100%;
+    aspect-ratio: 5 / 6;
+    overflow: hidden;
+    margin-bottom: 1.125rem;
+  }
+  .jcard__frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .jcard:hover .jcard__frame img {
+    transform: scale(1.04);
+  }
+  .jcard__meta {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .jcard__title {
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    color: var(--color-ink);
+  }
+  .jcard__cta {
+    margin-top: 0.375rem;
+    padding: 0.875rem 2.375rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .jcard:hover .jcard__cta {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .jcard[hidden] {
+    display: none;
+  }
+  .journeys__empty {
+    margin-top: 3rem;
+    text-align: center;
+    color: var(--color-slate);
+  }
+  .journeys__empty a {
+    color: var(--color-accent);
+    border-bottom: 1px solid currentColor;
+  }
+
+  @media (max-width: 860px) {
+    .journeys__grid {
+      grid-template-columns: 1fr;
+      max-width: 460px;
+      margin-inline: auto;
+      gap: 3rem;
+    }
+  }
+</style>
+
+<script>
+  const grid = document.querySelector('[data-journeys-grid]');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.jcard'));
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab'));
+  const empty = document.querySelector<HTMLElement>('[data-journeys-empty]');
+
+  // Apply a filter: either by category (from a tab) or a free-text query
+  // (from the hero search). `query` wins when present.
+  function apply({ category = 'All', query = '' } = {}) {
+    const q = query.trim().toLowerCase();
+    let shown = 0;
+    cards.forEach((card) => {
+      const matchCat = category === 'All' || card.dataset.category === category;
+      const matchQuery = !q || (card.dataset.search ?? '').includes(q);
+      const visible = matchCat && matchQuery;
+      card.hidden = !visible;
+      if (visible) shown++;
+    });
+    if (empty) empty.hidden = shown !== 0;
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        t.classList.toggle('tab--active', t === tab);
+        t.setAttribute('aria-selected', String(t === tab));
+      });
+      apply({ category: tab.dataset.filter ?? 'All' });
+    });
+  });
+
+  // The hero search dispatches this; reset tabs to "All" and filter by text.
+  window.addEventListener('mufasa:search', (e) => {
+    const query = (e as CustomEvent<{ query: string }>).detail?.query ?? '';
+    tabs.forEach((t, i) => {
+      t.classList.toggle('tab--active', i === 0);
+      t.setAttribute('aria-selected', String(i === 0));
+    });
+    apply({ query });
+    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+</script>

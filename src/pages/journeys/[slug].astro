@@ -1,0 +1,399 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import RouteMap from '../../components/RouteMap.astro';
+import { journeys, site } from '../../data/site';
+
+export function getStaticPaths() {
+  return journeys.map((j) => ({ params: { slug: j.slug }, props: { journey: j } }));
+}
+
+const { journey } = Astro.props;
+const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
+const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${site.shortName}`;
+---
+
+<Base title={title} description={journey.summary}>
+  <Header />
+  <main>
+    <!-- Detail hero -->
+    <section class="dhero">
+      <img class="dhero__img" src={journey.image} alt={journey.title} fetchpriority="high" />
+      <div class="dhero__scrim"></div>
+      <div class="dhero__content wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><a href="/#journeys">Safaris</a><span>/</span><span class="crumbs__here">{journey.title}</span>
+        </nav>
+        <span class="dhero__cat">{journey.category}</span>
+        <h1>{journey.title}</h1>
+      </div>
+    </section>
+
+    <!-- Overview + fact panel -->
+    <section class="overview section wrap">
+      <div class="overview__lead">
+        <p class="overview__summary">{journey.summary}</p>
+        <a href="#enquiry" class="pill pill--accent">Enquire about this journey</a>
+      </div>
+      <aside class="facts">
+        <div class="fact">
+          <span class="fact__label">Duration</span>
+          <span class="fact__value">{journey.nights} nights</span>
+        </div>
+        <div class="fact">
+          <span class="fact__label">Best season</span>
+          <span class="fact__value">{journey.season}</span>
+        </div>
+        <div class="fact">
+          <span class="fact__label">Route</span>
+          <span class="fact__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
+        </div>
+        <div class="fact">
+          <span class="fact__label">From / person</span>
+          <span class="fact__value fact__value--price">{journey.priceFrom}</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Route strip -->
+    <section class="rstrip section wrap">
+      <div class="rstrip__head">
+        <span class="eyebrow" style="color: var(--color-accent-soft)">The route</span>
+        <div class="itin__legend">
+          <span class="legend"><span class="legend__line legend__line--solid"></span>Core route</span>
+          {journey.days.some((d) => d.optional) && (
+            <span class="legend"><span class="legend__line legend__line--dashed"></span>Extension</span>
+          )}
+        </div>
+      </div>
+      <RouteMap stops={stops} compact />
+    </section>
+
+    <!-- Day by day -->
+    <section class="dbd section wrap">
+      <h2 class="dbd__title">Day by day</h2>
+      <ol class="dbd__list">
+        {journey.days.map((d, i) => (
+          <li class:list={['dayrow', { 'dayrow--optional': d.optional }]}>
+            <div class="dayrow__rail">
+              <span class="dayrow__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="dayrow__days">{d.days}</span>
+            </div>
+            <div class="dayrow__body">
+              <h3 class="dayrow__place">
+                {d.place}
+                {d.optional && <span class="dayrow__tag">Optional</span>}
+              </h3>
+              <span class="dayrow__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</span>
+              <p class="dayrow__note">{d.note}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- Included / excluded -->
+    <section class="incl section wrap">
+      <div class="incl__col">
+        <h2>What's included</h2>
+        <ul class="incl__list incl__list--yes">
+          {journey.included.map((x) => <li>{x}</li>)}
+        </ul>
+      </div>
+      <div class="incl__col">
+        <h2>Not included</h2>
+        <ul class="incl__list incl__list--no">
+          {journey.excluded.map((x) => <li>{x}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="gallery">
+      {journey.gallery.map((src) => (
+        <div class="gallery__cell"><img src={src} alt={`${journey.title} — Tanzania`} loading="lazy" /></div>
+      ))}
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* Detail hero */
+  .dhero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(420px, 60vh, 560px);
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+  .dhero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .dhero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.35) 0%, rgba(20, 24, 21, 0.2) 45%, rgba(20, 24, 21, 0.85) 100%);
+  }
+  .dhero__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: clamp(2.5rem, 5vw, 3.75rem);
+  }
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .crumbs a:hover { color: var(--color-on-accent); }
+  .crumbs__here { color: var(--color-accent-soft); }
+  .dhero__cat {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.85);
+  }
+  .dhero h1 {
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    color: var(--color-on-accent);
+    font-weight: var(--fw-light);
+  }
+
+  /* Overview */
+  .overview {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+    background-color: var(--color-ground);
+  }
+  .overview__lead {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+  .overview__summary {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.5rem, 3vw, 2.125rem);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+  }
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .fact__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .fact__value {
+    font-size: 1.125rem;
+    color: var(--color-ink);
+  }
+  .fact__value--price {
+    font-family: var(--font-mono);
+    font-size: 1.375rem;
+  }
+
+  /* Route strip */
+  .rstrip {
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
+  }
+  .rstrip__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.75rem;
+  }
+  .itin__legend { display: flex; gap: 1.875rem; }
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.75);
+    white-space: nowrap;
+  }
+  .legend__line { width: 26px; height: 2px; flex-shrink: 0; }
+  .legend__line--solid { background-color: var(--color-accent-soft); }
+  .legend__line--dashed { border-top: 2px dashed rgba(247, 244, 238, 0.45); }
+
+  /* Day by day */
+  .dbd {
+    background-color: var(--color-surface);
+  }
+  .dbd__title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-bottom: 3rem;
+  }
+  .dbd__list {
+    list-style: none;
+  }
+  .dayrow {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    padding-block: 2.25rem;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .dayrow:last-child { border-bottom: 1px solid var(--color-hairline); }
+  .dayrow__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .dayrow__num {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--color-accent);
+  }
+  .dayrow__days {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .dayrow__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 640px;
+  }
+  .dayrow__place {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: var(--fw-regular);
+    color: var(--color-ink);
+  }
+  .dayrow__tag {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+  .dayrow__nights {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--color-slate);
+  }
+  .dayrow__note {
+    margin-top: 0.5rem;
+    color: var(--color-slate);
+    line-height: 1.65;
+  }
+  .dayrow--optional .dayrow__num { color: var(--color-slate); }
+
+  /* Included / excluded */
+  .incl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    background-color: var(--color-ground);
+  }
+  .incl__col h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-bottom: 1.75rem;
+  }
+  .incl__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .incl__list li {
+    position: relative;
+    padding-left: 2rem;
+    color: var(--color-ink);
+    line-height: 1.5;
+  }
+  .incl__list li::before {
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+  .incl__list--yes li::before { content: '+'; color: var(--color-accent); }
+  .incl__list--no li { color: var(--color-slate); }
+  .incl__list--no li::before { content: '—'; color: var(--color-slate); }
+
+  /* Gallery */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .gallery__cell {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+  }
+  .gallery__cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+  .gallery__cell:hover img { transform: scale(1.04); }
+
+  @media (max-width: 860px) {
+    .overview { grid-template-columns: 1fr; }
+    .incl { grid-template-columns: 1fr; }
+    .dayrow { grid-template-columns: 1fr; gap: 0.75rem; }
+    .dayrow__rail { flex-direction: row; align-items: baseline; gap: 1rem; }
+    .dayrow__num { font-size: 1.75rem; }
+    .gallery { grid-template-columns: 1fr; }
+    .gallery__cell { aspect-ratio: 16 / 10; }
+  }
+</style>

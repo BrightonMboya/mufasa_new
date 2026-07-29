@@ -1,0 +1,61 @@
+/* Mufasa design tokens — ported 1:1 from the Paper file.
+   Mood: mineral (limestone dust, weathered slate, oxidized copper). */
+
+:root {
+  /* Color */
+  --color-ground: #ede9e1;      /* page ground — limestone dust */
+  --color-surface: #f7f4ee;     /* raised surface — bleached bone */
+  --color-ink: #141815;         /* primary text — wet slate */
+  --color-ink-panel: #1c211d;   /* nav bar — slate in shadow */
+  --color-slate: #6b726c;       /* secondary text — weathered stone */
+  --color-hairline: #d6d1c6;    /* rules and dividers */
+  --color-sand: #c9bfa9;        /* utility bar / planner — dry grass */
+  --color-accent: #2c6a5a;      /* primary accent — oxidized copper */
+  --color-accent-deep: #1e4e42; /* accent hover — copper in shadow */
+  --color-accent-soft: #7fb3a0; /* accent on dark grounds */
+  --color-on-accent: #f7f4ee;   /* text on accent surfaces */
+  --color-camp-highlands: #6e7a4b; /* per-camp token — highland olive */
+  --color-camp-ruaha: #a8763f;     /* per-camp token — riverbed ochre */
+
+  /* Type families */
+  --font-display: 'Petrona', Georgia, 'Times New Roman', serif;
+  --font-ui: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Type scale */
+  --text-micro: 0.75rem;   /* 12 */
+  --text-label: 0.875rem;  /* 14 */
+  --text-body: 1.0625rem;  /* 17 */
+  --text-lead: 1.3125rem;  /* 21 */
+  --text-h3: 2.125rem;     /* 34 */
+  --text-h2: 3.5rem;       /* 56 */
+  --text-h1: 5.75rem;      /* 92 */
+  --text-hero: 6.5rem;     /* 104 — hero display */
+
+  /* Weights */
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* Tracking */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.16em;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 7.5rem;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-full: 999px;
+
+  /* Layout */
+  --container-page: 1440px;
+  --container-text: 620px;
+  --gutter: clamp(1.5rem, 5vw, 4.5rem);
+}

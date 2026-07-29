@@ -1,0 +1,70 @@
+---
+import { enquiry, site } from '../data/site';
+---
+
+<section id="enquiry" class="enquiry">
+  <img class="enquiry__img" src={enquiry.image} alt="" loading="lazy" />
+  <div class="enquiry__scrim"></div>
+  <div class="enquiry__content wrap">
+    <h2>{enquiry.title}</h2>
+    <p>{enquiry.body}</p>
+    <div class="enquiry__cta">
+      <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="pill pill--accent">Start the conversation</a>
+      <a href={`mailto:${site.email}`} class="pill pill--ghost">Email us</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .enquiry {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 620px;
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+  .enquiry__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .enquiry__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      90deg,
+      rgba(20, 24, 21, 0.88) 0%,
+      rgba(20, 24, 21, 0.72) 46%,
+      rgba(20, 24, 21, 0.15) 100%
+    );
+  }
+  .enquiry__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.75rem;
+    max-width: 700px;
+  }
+  .enquiry__content h2 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-on-accent);
+    line-height: 1.1;
+  }
+  .enquiry__content p {
+    max-width: 540px;
+    color: rgba(247, 244, 238, 0.72);
+  }
+  .enquiry__cta {
+    display: flex;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+</style>

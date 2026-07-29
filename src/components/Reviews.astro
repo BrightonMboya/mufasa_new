@@ -1,0 +1,199 @@
+---
+import { reviews } from '../data/site';
+---
+
+<section id="reviews" class="reviews section wrap">
+  <div class="reviews__head">
+    <span class="eyebrow">{reviews.eyebrow}</span>
+    <h2>{reviews.title}</h2>
+    <p class="reviews__lead">{reviews.lead}</p>
+  </div>
+
+  <!-- Platform logos, each linking to the live reviews -->
+  <div class="reviews__ratings">
+    {reviews.ratings.map((r) => (
+      <a
+        class="rating"
+        href={r.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Read our reviews on ${r.platform}`}
+      >
+        <img
+          class:list={['rating__logo', { 'rating__logo--invert': r.invert }]}
+          src={r.logo}
+          alt={r.alt}
+          loading="lazy"
+        />
+        {r.pending ? (
+          <span class="rating__link">Read reviews →</span>
+        ) : (
+          <span class="rating__meta">
+            <span class="rating__stars" aria-hidden="true">
+              {Array.from({ length: 5 }).map(() => (
+                <svg viewBox="0 0 24 24" class="star"><path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.5L12 16.9 5.9 20.1l1.5-6.5-5-4.4 6.7-.6z"/></svg>
+              ))}
+            </span>
+            <span class="rating__figures">{r.score} · {r.count}</span>
+          </span>
+        )}
+      </a>
+    ))}
+  </div>
+
+  <!-- Accreditations / memberships -->
+  <div class="reviews__accred">
+    <span class="reviews__accred-label">Licensed &amp; accredited</span>
+    <ul class="badges">
+      {reviews.accreditations.map((a) => (
+        <li class="badge">
+          <span class="badge__short">{a.short}</span>
+          <span class="badge__full">{a.full}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    background-color: var(--color-surface);
+  }
+  .reviews__head {
+    max-width: 640px;
+    margin-bottom: clamp(2.75rem, 5vw, 4rem);
+  }
+  .reviews__head .eyebrow {
+    display: inline-block;
+    margin-bottom: 1.25rem;
+  }
+  .reviews__head h2 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+  .reviews__lead {
+    color: var(--color-slate);
+    line-height: 1.65;
+  }
+
+  /* Platform logo row — borderless, editorial. Thin rules separate each. */
+  .reviews__ratings {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .rating {
+    flex: 1 1 0;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.125rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 2rem);
+    text-align: center;
+    transition: transform 0.25s ease;
+  }
+  .rating + .rating {
+    border-left: 1px solid var(--color-hairline);
+  }
+  .rating:hover {
+    transform: translateY(-3px);
+  }
+  .rating__logo {
+    height: 26px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.92;
+    transition: opacity 0.25s ease;
+  }
+  /* White-on-transparent logo → ink, so it reads on the light surface. */
+  .rating__logo--invert {
+    filter: brightness(0);
+    opacity: 0.82;
+  }
+  .rating:hover .rating__logo {
+    opacity: 1;
+  }
+  .rating__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .rating__stars {
+    display: inline-flex;
+    gap: 2px;
+  }
+  .star {
+    width: 16px;
+    height: 16px;
+    fill: var(--color-camp-ruaha);
+  }
+  .rating__figures {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-slate);
+  }
+  .rating__link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  /* Accreditations */
+  .reviews__accred {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-hairline);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+  .reviews__accred-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .badges {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .badge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .badge__short {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: var(--fw-regular);
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+  }
+  .badge__full {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+
+  @media (max-width: 620px) {
+    .reviews__ratings {
+      flex-direction: column;
+    }
+    .rating + .rating {
+      border-left: none;
+      border-top: 1px solid var(--color-hairline);
+    }
+  }
+</style>

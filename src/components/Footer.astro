@@ -1,0 +1,84 @@
+---
+import { site, footerLinks } from '../data/site';
+---
+
+<footer class="footer section wrap">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <span class="footer__mark">{site.shortName}</span>
+      <p>{site.address[0]}<br />{site.address[1]}</p>
+    </div>
+
+    <div class="footer__cols">
+      {footerLinks.map((col) => (
+        <div class="footer__col">
+          <span class="footer__heading">{col.heading}</span>
+          {col.links.map((link) => <a href={link.href}>{link.label}</a>)}
+        </div>
+      ))}
+      <div class="footer__col">
+        <span class="footer__heading">Reach Us</span>
+        <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-ground);
+    padding-block: clamp(3.5rem, 6vw, 5.375rem) 3.375rem;
+  }
+  .footer__inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 5rem;
+    flex-wrap: wrap;
+  }
+  .footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 360px;
+  }
+  .footer__mark {
+    font-family: var(--font-display);
+    font-size: 1.6875rem;
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+  }
+  .footer__brand p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-slate);
+  }
+
+  .footer__cols {
+    display: flex;
+    gap: clamp(2.5rem, 6vw, 5.625rem);
+    flex-wrap: wrap;
+  }
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8125rem;
+  }
+  .footer__heading {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.25rem;
+  }
+  .footer__col a {
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+    transition: color 0.2s ease;
+  }
+  .footer__col a:hover {
+    color: var(--color-accent);
+  }
+</style>

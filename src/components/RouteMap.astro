@@ -1,0 +1,161 @@
+---
+/* Horizontal route line: solid core legs, dashed leg into any optional
+   (extension) stop, hollow marker on optional stops, filled start marker.
+   Rotates to vertical under 860px. */
+interface Stop {
+  days: string;
+  place: string;
+  note?: string;
+  optional?: boolean;
+}
+interface Props {
+  stops: Stop[];
+  compact?: boolean; // compact = no notes, tighter (used on detail pages)
+}
+const { stops, compact = false } = Astro.props;
+---
+
+<ol class:list={['route', { 'route--compact': compact }]} style={`--cols:${stops.length}`}>
+  {stops.map((stop, i) => (
+    <li class:list={['stop', { 'stop--optional': stop.optional, 'stop--last': i === stops.length - 1, 'stop--prelast': i === stops.length - 2 }]}>
+      <div class="stop__track" aria-hidden="true">
+        <span class="stop__node"></span>
+        {i < stops.length - 1 && <span class="stop__line"></span>}
+      </div>
+      <div class="stop__body">
+        <span class="stop__days">{stop.days}</span>
+        <h3 class="stop__place">{stop.place}</h3>
+        {!compact && stop.note && <p class="stop__note">{stop.note}</p>}
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .route {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    list-style: none;
+  }
+  .stop {
+    display: flex;
+    flex-direction: column;
+  }
+  .stop__track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 20px;
+  }
+  .stop__node {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent-soft);
+    z-index: 1;
+  }
+  .stop:first-child .stop__node {
+    background-color: var(--color-on-accent);
+  }
+  .stop__line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--color-accent-soft);
+  }
+
+  .stop__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.625rem 2.125rem 0 0;
+  }
+  .route--compact .stop__body {
+    padding-top: 1.125rem;
+  }
+  .stop__days {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-accent-soft);
+  }
+  .stop__place {
+    font-size: clamp(1.25rem, 2.5vw, 1.6875rem);
+    color: var(--color-on-accent);
+    font-weight: var(--fw-regular);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.1;
+  }
+  .stop__note {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: rgba(247, 244, 238, 0.62);
+  }
+
+  /* Optional (extension) stop */
+  .stop--optional .stop__node {
+    background-color: transparent;
+    border: 2px solid rgba(247, 244, 238, 0.55);
+  }
+  .stop--optional .stop__days {
+    color: rgba(247, 244, 238, 0.5);
+  }
+  .stop--optional .stop__place,
+  .stop--optional .stop__note {
+    opacity: 0.72;
+  }
+  /* dashed leg leading into an optional last stop */
+  .stop--prelast .stop__line {
+    /* only dash it if the following stop is optional; handled via extra class below */
+  }
+  .route[data-has-optional='true'] .stop--prelast .stop__line {
+    background-color: transparent;
+    height: 0;
+    border-top: 2px dashed rgba(247, 244, 238, 0.45);
+  }
+
+  @media (max-width: 860px) {
+    .route {
+      grid-template-columns: 1fr;
+    }
+    .stop {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+    .stop__track {
+      flex-direction: column;
+      align-items: center;
+      height: auto;
+      width: 13px;
+    }
+    .stop__line {
+      width: 2px;
+      height: auto;
+      flex: 1;
+      min-height: 40px;
+    }
+    .route[data-has-optional='true'] .stop--prelast .stop__line {
+      width: 0;
+      height: auto;
+      border-top: none;
+      border-left: 2px dashed rgba(247, 244, 238, 0.45);
+    }
+    .stop__body {
+      padding: 0 0 2.25rem 0;
+    }
+    .route--compact .stop__body {
+      padding-bottom: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  // mark routes that end in an optional stop so the pre-last leg dashes
+  document.querySelectorAll('.route').forEach((r) => {
+    const last = r.querySelector('.stop--last');
+    if (last?.classList.contains('stop--optional')) {
+      r.setAttribute('data-has-optional', 'true');
+    }
+  });
+</script>
