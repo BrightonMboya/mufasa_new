@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Enquiry from '../components/Enquiry.astro';
+import { dayTrips, site } from '../data/site';
+
+const title = `Day Trips — ${site.shortName}`;
+const description = dayTrips.intro.lead;
+---
+
+<Base title={title} description={description}>
+  <Header />
+  <main>
+    <section class="ddhero section wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>/</span><span class="crumbs__here">Day Trips</span>
+      </nav>
+      <span class="eyebrow">{dayTrips.intro.eyebrow}</span>
+      <h1>{dayTrips.intro.title}</h1>
+      <p class="ddhero__lead">{dayTrips.intro.lead}</p>
+    </section>
+
+    <section class="ddgrid section wrap">
+      {dayTrips.trips.map((t) => (
+        <article class="ddcard">
+          <div class="ddcard__frame">
+            <img src={t.image} alt={t.title} loading="lazy" />
+            {t.credit && (
+              <a class="ddcard__credit" href={t.credit.url} target="_blank" rel="noopener noreferrer nofollow">
+                Photo: {t.credit.name} / {t.credit.source}, {t.credit.license}
+              </a>
+            )}
+          </div>
+          <span class="ddcard__meta">{t.duration}</span>
+          <h3 class="ddcard__title">{t.title}</h3>
+          <p class="ddcard__summary">{t.summary}</p>
+          <ul class="ddcard__list">
+            {t.included.map((x) => <li>{x}</li>)}
+          </ul>
+          <a href="/#enquiry" class="pill pill--outline ddcard__cta">Enquire</a>
+        </article>
+      ))}
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .ddhero { background-color: var(--color-ground); max-width: 760px; }
+  .crumbs {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--color-slate); margin-bottom: 1rem;
+  }
+  .crumbs a:hover { color: var(--color-accent); }
+  .crumbs__here { color: var(--color-accent); }
+  .ddhero h1 { font-size: clamp(2.5rem, 5.5vw, 4rem); font-weight: var(--fw-light); color: var(--color-ink); margin-block: 0.75rem 1rem; }
+  .ddhero__lead { color: var(--color-slate); line-height: 1.7; font-size: 1.0625rem; }
+
+  .ddgrid {
+    background-color: var(--color-surface);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+  .ddcard { display: flex; flex-direction: column; gap: 0.75rem; }
+  .ddcard__frame { position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; margin-bottom: 0.5rem; }
+  .ddcard__frame img { width: 100%; height: 100%; object-fit: cover; }
+  .ddcard__credit {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(20, 24, 21, 0.55);
+    color: rgba(247, 244, 238, 0.85);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-sm);
+  }
+  .ddcard__credit:hover { color: var(--color-on-accent); background-color: rgba(20, 24, 21, 0.75); }
+  .ddcard__meta {
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .ddcard__title { font-size: clamp(1.375rem, 2.5vw, 1.75rem); color: var(--color-ink); }
+  .ddcard__summary { color: var(--color-slate); line-height: 1.6; font-size: 0.9375rem; }
+  .ddcard__list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; }
+  .ddcard__list li { position: relative; padding-left: 1.4rem; font-size: 0.875rem; color: var(--color-ink); }
+  .ddcard__list li::before {
+    content: ''; position: absolute; left: 0; top: 0.5em; width: 6px; height: 6px; border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+  .ddcard__cta { margin-top: 0.75rem; align-self: flex-start; padding: 0.7rem 1.5rem; }
+
+  @media (max-width: 860px) {
+    .ddgrid { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; }
+  }
+</style>

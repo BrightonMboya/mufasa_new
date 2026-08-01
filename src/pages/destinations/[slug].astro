@@ -1,0 +1,291 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import { destinations, journeys, site } from '../../data/site';
+
+export function getStaticPaths() {
+  return destinations.map((d) => ({ params: { slug: d.slug }, props: { destination: d } }));
+}
+
+const { destination } = Astro.props;
+const title = `${destination.name} — ${site.shortName}`;
+const related = journeys.filter((j) => j.category === destination.region).slice(0, 3);
+const idx = destinations.findIndex((d) => d.slug === destination.slug);
+const next = destinations[(idx + 1) % destinations.length];
+---
+
+<Base title={title} description={destination.summary}>
+  <Header />
+  <main>
+    <section class="dhero">
+      <img class="dhero__img" src={destination.image} alt={destination.name} fetchpriority="high" />
+      <div class="dhero__scrim"></div>
+      <div class="dhero__content wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><a href="/destinations">Destinations</a><span>/</span><span class="crumbs__here">{destination.name}</span>
+        </nav>
+        <span class="dhero__region">{destination.region} &middot; {String(idx + 1).padStart(2, '0')} / {String(destinations.length).padStart(2, '0')}</span>
+        <h1>{destination.name}</h1>
+      </div>
+    </section>
+
+    <section class="overview section wrap">
+      <div class="overview__lead">
+        <p class="overview__summary">{destination.lead}</p>
+        {destination.body.map((p: string) => <p class="overview__p">{p}</p>)}
+      </div>
+      <aside class="facts">
+        {destination.stats.map((s: { label: string; value: string }) => (
+          <div class="fact">
+            <span class="fact__label">{s.label}</span>
+            <span class="fact__value">{s.value}</span>
+          </div>
+        ))}
+      </aside>
+    </section>
+
+    {destination.quote && (
+      <section class="pullquote wrap">
+        <blockquote>
+          <span class="pullquote__mark" aria-hidden="true">&ldquo;</span>
+          {destination.quote}
+        </blockquote>
+      </section>
+    )}
+
+    {destination.gallery?.length ? (
+      <section class:list={['gallery wrap', { 'gallery--single': destination.gallery.length === 1 }]}>
+        <div class="gallery__frame gallery__frame--wide">
+          <img src={destination.gallery[0]} alt={`${destination.name} — landscape`} loading="lazy" />
+        </div>
+        {destination.gallery[1] && (
+          <div class="gallery__frame gallery__frame--tall">
+            <img src={destination.gallery[1]} alt={`${destination.name} — wildlife`} loading="lazy" />
+          </div>
+        )}
+      </section>
+    ) : null}
+
+    <section class="details section wrap">
+      <div class="details__col">
+        <span class="details__num">01</span>
+        <h2>Best time to visit</h2>
+        <p>{destination.bestTime}</p>
+      </div>
+      <div class="details__col">
+        <span class="details__num">02</span>
+        <h2>Activities</h2>
+        <ul class="details__list">
+          {destination.activities.map((a: string) => <li>{a}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    {related.length > 0 && (
+      <section class="related section wrap">
+        <div class="related__head">
+          <h2 class="related__title">Journeys through here</h2>
+          <a href="/journeys" class="related__all">See all journeys &rarr;</a>
+        </div>
+        <div class="related__grid">
+          {related.map((j) => (
+            <a class="rcard" href={`/journeys/${j.slug}`}>
+              <div class="rcard__frame"><img src={j.image} alt={j.title} loading="lazy" /></div>
+              <span class="rcard__meta">{j.meta}</span>
+              <h3 class="rcard__title">{j.title}</h3>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="nextpark wrap">
+      <a class="nextpark__link" href={`/destinations/${next.slug}`}>
+        <span class="nextpark__label">Next park</span>
+        <span class="nextpark__name">{next.name} <span aria-hidden="true">&rarr;</span></span>
+      </a>
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .dhero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(460px, 68vh, 640px);
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+  .dhero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .dhero__scrim {
+    position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.4) 0%, rgba(20, 24, 21, 0.22) 45%, rgba(20, 24, 21, 0.9) 100%);
+  }
+  .dhero__content { display: flex; flex-direction: column; gap: 1rem; padding-block: clamp(2.5rem, 5vw, 3.75rem); }
+  .crumbs {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .crumbs a:hover { color: var(--color-on-accent); }
+  .crumbs__here { color: var(--color-accent-soft); }
+  .dhero__region {
+    font-family: var(--font-mono); font-size: var(--text-micro); letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.85);
+  }
+  .dhero h1 { font-size: clamp(2.75rem, 8vw, 6rem); color: var(--color-on-accent); font-weight: var(--fw-light); }
+
+  .overview {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+    background-color: var(--color-ground);
+  }
+  .overview__lead { display: flex; flex-direction: column; gap: 1.25rem; }
+  .overview__summary {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.5rem, 3vw, 2.125rem);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+  .overview__p { color: var(--color-slate); line-height: 1.7; }
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+  }
+  .fact { display: flex; flex-direction: column; gap: 0.4rem; }
+  .fact__label {
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .fact__value { font-size: 1.125rem; color: var(--color-ink); }
+
+  /* Pull quote */
+  .pullquote {
+    background-color: var(--color-ground);
+    padding-block: 0 clamp(3rem, 7vw, 5rem);
+    display: flex;
+    justify-content: center;
+  }
+  .pullquote blockquote {
+    position: relative;
+    max-width: 780px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: var(--fw-light);
+    font-size: clamp(1.625rem, 3.6vw, 2.625rem);
+    line-height: 1.3;
+    color: var(--color-accent-deep);
+  }
+  .pullquote__mark {
+    display: block;
+    font-family: var(--font-display);
+    font-style: normal;
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    line-height: 0.5;
+    color: var(--color-accent-soft);
+    opacity: 0.55;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Gallery break */
+  .gallery {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+    padding-bottom: clamp(3.5rem, 8vw, 6rem);
+  }
+  .gallery__frame { overflow: hidden; background-color: var(--color-hairline); }
+  .gallery__frame--wide { aspect-ratio: 16 / 10; }
+  .gallery__frame--tall { aspect-ratio: 3 / 4; }
+  .gallery--single { grid-template-columns: 1fr; }
+  .gallery--single .gallery__frame--wide { aspect-ratio: 21 / 9; }
+  .gallery__frame img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .gallery__frame:hover img { transform: scale(1.04); }
+
+  .details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    background-color: var(--color-surface);
+  }
+  .details__num {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    font-weight: var(--fw-semibold);
+    margin-bottom: 0.75rem;
+  }
+  .details__col h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: var(--fw-light); color: var(--color-ink); margin-bottom: 1.25rem; }
+  .details__col p { color: var(--color-slate); line-height: 1.7; }
+  .details__list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .details__list li {
+    position: relative; padding-left: 1.4rem; color: var(--color-ink); line-height: 1.5;
+  }
+  .details__list li::before {
+    content: ''; position: absolute; left: 0; top: 0.5em; width: 6px; height: 6px; border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+
+  .related { background-color: var(--color-ground); }
+  .related__head {
+    display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .related__title { font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: var(--fw-light); color: var(--color-ink); }
+  .related__all {
+    font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent);
+  }
+  .related__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 3vw, 2.5rem); }
+  .rcard { display: flex; flex-direction: column; gap: 0.5rem; }
+  .rcard__frame { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; margin-bottom: 0.5rem; }
+  .rcard__frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+  .rcard:hover .rcard__frame img { transform: scale(1.04); }
+  .rcard__meta {
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-slate);
+  }
+  .rcard__title { font-size: 1.25rem; color: var(--color-ink); }
+
+  /* Next park */
+  .nextpark {
+    background-color: var(--color-ground);
+    padding-block: clamp(2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 5.5rem);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .nextpark__link { display: flex; flex-direction: column; gap: 0.35rem; }
+  .nextpark__label {
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-slate);
+  }
+  .nextpark__name {
+    font-family: var(--font-display); font-weight: var(--fw-light); font-size: clamp(1.75rem, 4vw, 2.75rem); color: var(--color-ink);
+    display: inline-flex; align-items: center; gap: 0.75rem;
+  }
+  .nextpark__name span { color: var(--color-accent); transition: transform 0.25s ease; }
+  .nextpark__link:hover .nextpark__name span { transform: translateX(6px); }
+
+  @media (max-width: 860px) {
+    .overview, .details, .gallery { grid-template-columns: 1fr; }
+    .gallery__frame--tall { aspect-ratio: 16 / 10; }
+    .related__grid { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; }
+  }
+</style>

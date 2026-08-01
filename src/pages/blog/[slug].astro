@@ -1,0 +1,143 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import { site } from '../../data/site';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const title = `${post.data.title} — ${site.shortName}`;
+---
+
+<Base title={title} description={post.data.description}>
+  <Header />
+  <main>
+    <!-- Detail hero -->
+    <section class="phero">
+      <img class="phero__img" src={post.data.image} alt={post.data.title} fetchpriority="high" />
+      <div class="phero__scrim"></div>
+      <div class="phero__content wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><a href="/blog">Journal</a><span>/</span><span class="crumbs__here">{post.data.title}</span>
+        </nav>
+        <span class="phero__cat">{post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+        <h1>{post.data.title}</h1>
+      </div>
+    </section>
+
+    <!-- Article body -->
+    <section class="article section wrap">
+      <div class="prose">
+        <Content />
+      </div>
+      <aside class="article__aside">
+        <div class="asidebox">
+          <h2>Plan this yourself</h2>
+          <p>Speak to the person who designs the route, not a call centre. A first conversation costs nothing.</p>
+          <a href="/#enquiry" class="pill pill--accent">Make an enquiry</a>
+        </div>
+      </aside>
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .phero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(380px, 52vh, 480px);
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+  .phero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .phero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.4) 0%, rgba(20, 24, 21, 0.25) 45%, rgba(20, 24, 21, 0.85) 100%);
+  }
+  .phero__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: clamp(2.5rem, 5vw, 3.75rem);
+    max-width: 900px;
+  }
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .crumbs a:hover { color: var(--color-on-accent); }
+  .crumbs__here { color: var(--color-accent-soft); }
+  .phero__cat {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.85);
+  }
+  .phero h1 {
+    font-size: clamp(2.25rem, 5.5vw, 4rem);
+    color: var(--color-on-accent);
+    font-weight: var(--fw-light);
+    line-height: 1.1;
+  }
+
+  /* Article */
+  .article {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+    background-color: var(--color-ground);
+  }
+  .article__aside { position: sticky; top: 2rem; }
+  .asidebox {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+  }
+  .asidebox h2 {
+    font-size: 1.375rem;
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+  }
+  .asidebox p {
+    color: var(--color-slate);
+    line-height: 1.6;
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 860px) {
+    .article { grid-template-columns: 1fr; }
+    .article__aside { position: static; }
+  }
+</style>

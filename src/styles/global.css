@@ -119,6 +119,80 @@ h3 {
   filter: brightness(0.95);
 }
 
+/* Shared long-form article styling — blog posts, legal/utility pages.
+   Applied to a wrapper div around rendered markdown (<Content />), so
+   these rules target raw HTML tags rather than component classes. */
+.prose {
+  max-width: var(--container-text);
+  color: var(--color-ink);
+}
+.prose h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: var(--fw-light);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.prose h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: var(--fw-regular);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose p {
+  color: var(--color-slate);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+}
+.prose ul,
+.prose ol {
+  color: var(--color-slate);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+.prose li {
+  margin-bottom: 0.5rem;
+}
+.prose strong {
+  color: var(--color-ink);
+  font-weight: var(--fw-semibold);
+}
+.prose em {
+  color: var(--color-slate);
+}
+.prose a {
+  color: var(--color-accent);
+  border-bottom: 1px solid currentColor;
+}
+.prose blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 1.5rem;
+  margin-block: 1.75rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1875rem;
+  color: var(--color-ink);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.75rem;
+}
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.6rem 1rem 0.6rem 0;
+  border-bottom: 1px solid var(--color-hairline);
+  color: var(--color-slate);
+}
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -1,0 +1,206 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import { destinations, site } from '../../data/site';
+
+const title = `Destinations — ${site.shortName}`;
+const description = 'The parks and reserves our journeys are built from — the Serengeti, Ngorongoro, Tarangire, Lake Manyara, Ruaha, and Arusha National Park.';
+---
+
+<Base title={title} description={description}>
+  <Header />
+  <main>
+    <section class="dhero">
+      <div class="dhero__content wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><span class="crumbs__here">Destinations</span>
+        </nav>
+        <span class="eyebrow" style="color: var(--color-accent-soft)">Destinations</span>
+        <h1>The ground our routes are drawn on</h1>
+        <p class="dhero__lead">Every journey we build is a route through a small number of parks our guides know by heart. Six grounds, one country, no two alike.</p>
+        <div class="dhero__stats">
+          <div class="dstat"><span class="dstat__value">06</span><span class="dstat__label">Parks &amp; reserves</span></div>
+          <div class="dstat"><span class="dstat__value">02</span><span class="dstat__label">Circuits, north &amp; south</span></div>
+          <div class="dstat"><span class="dstat__value">∞</span><span class="dstat__label">Routes drawn between them</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dindex section wrap">
+      {destinations.map((d, i) => (
+        <a class="drow" href={`/destinations/${d.slug}`} data-index={i}>
+          <div class="drow__media">
+            <div class="drow__frame">
+              <img src={d.image} alt={d.name} loading={i === 0 ? 'eager' : 'lazy'} />
+            </div>
+          </div>
+          <div class="drow__text">
+            <span class="drow__num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="drow__region">{d.region}</span>
+            <h2 class="drow__name">{d.name}</h2>
+            <p class="drow__summary">{d.summary}</p>
+            <div class="drow__stats">
+              {d.stats.slice(0, 3).map((s) => (
+                <div class="dchip">
+                  <span class="dchip__label">{s.label}</span>
+                  <span class="dchip__value">{s.value}</span>
+                </div>
+              ))}
+            </div>
+            <span class="drow__cta">Explore the park <span aria-hidden="true">&rarr;</span></span>
+          </div>
+        </a>
+      ))}
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .dhero { background-color: var(--color-ink); color: var(--color-on-accent); }
+  .dhero__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: clamp(3.5rem, 8vw, 6rem) clamp(2.5rem, 5vw, 4rem);
+    max-width: 780px;
+  }
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .crumbs a:hover { color: var(--color-on-accent); }
+  .crumbs__here { color: var(--color-accent-soft); }
+  .dhero h1 { font-size: clamp(2.75rem, 6vw, 4.5rem); font-weight: var(--fw-light); }
+  .dhero__lead { color: rgba(247, 244, 238, 0.8); line-height: 1.6; font-size: 1.0625rem; max-width: 640px; }
+
+  .dhero__stats {
+    display: flex;
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(247, 244, 238, 0.16);
+  }
+  .dstat { display: flex; flex-direction: column; gap: 0.3rem; }
+  .dstat__value {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    color: var(--color-accent-soft);
+    line-height: 1;
+  }
+  .dstat__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.65);
+    max-width: 9rem;
+  }
+
+  /* Editorial index — alternating image / text rows */
+  .dindex {
+    background-color: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3.5rem, 7vw, 6rem);
+  }
+  .drow {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+    padding-bottom: clamp(3.5rem, 7vw, 6rem);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .drow:last-child { border-bottom: none; padding-bottom: 0; }
+  .drow:nth-child(even) .drow__media { order: 2; }
+  .drow:nth-child(even) .drow__text { order: 1; }
+
+  .drow__frame {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background-color: var(--color-hairline);
+  }
+  .drow__frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .drow:hover .drow__frame img { transform: scale(1.05); }
+
+  .drow__text { display: flex; flex-direction: column; gap: 0.85rem; }
+  .drow__num {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    font-weight: var(--fw-semibold);
+  }
+  .drow__region {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .drow__name {
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    line-height: 1.1;
+  }
+  .drow__summary { color: var(--color-slate); line-height: 1.7; max-width: 46ch; }
+
+  .drow__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.75rem;
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .dchip { display: flex; flex-direction: column; gap: 0.3rem; }
+  .dchip__label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .dchip__value { font-size: 0.9375rem; color: var(--color-ink); }
+
+  .drow__cta {
+    margin-top: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .drow__cta span { transition: transform 0.25s ease; }
+  .drow:hover .drow__cta span { transform: translateX(4px); }
+
+  @media (max-width: 860px) {
+    .drow { grid-template-columns: 1fr; gap: 1.5rem; }
+    .drow:nth-child(even) .drow__media,
+    .drow:nth-child(even) .drow__text { order: initial; }
+    .dhero__stats { flex-wrap: wrap; row-gap: 1.25rem; }
+  }
+</style>

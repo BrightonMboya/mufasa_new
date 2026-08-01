@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('legal');
+  return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const { Content } = await render(page);
+const title = `${page.data.title} — ${site.shortName}`;
+---
+
+<Base title={title} description={page.data.description}>
+  <Header />
+  <main>
+    <section class="lhero section wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>/</span><span class="crumbs__here">{page.data.title}</span>
+      </nav>
+      <h1>{page.data.title}</h1>
+    </section>
+
+    <section class="lbody section wrap">
+      <div class="prose">
+        <Content />
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .lhero { background-color: var(--color-ground); max-width: 760px; padding-bottom: 0; }
+  .crumbs {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--color-slate); margin-bottom: 1rem;
+  }
+  .crumbs a:hover { color: var(--color-accent); }
+  .crumbs__here { color: var(--color-accent); }
+  .lhero h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: var(--fw-light); color: var(--color-ink); }
+
+  .lbody { background-color: var(--color-ground); padding-top: 0; }
+</style>

@@ -1,15 +1,19 @@
 ---
-import { journeys } from '../data/site';
+import { journeys as allJourneys } from '../data/site';
 
-// Build the filter list from the journeys that actually exist, so no tab
-// is ever empty. "All" first, then each distinct category in order.
+// The homepage shows only the hand-picked signature journeys — the full
+// library (including migrated itineraries) lives at /journeys.
+const journeys = allJourneys.filter((j) => j.featured);
 const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))];
 ---
 
 <section id="journeys" class="journeys section wrap">
   <div class="journeys__head">
     <h2>Our Journeys</h2>
-    <a href="#enquiry" class="pill pill--outline">Make an Enquiry</a>
+    <div class="journeys__head-actions">
+      <a href="/journeys" class="pill pill--outline">See All Journeys</a>
+      <a href="#enquiry" class="pill pill--accent">Make an Enquiry</a>
+    </div>
   </div>
 
   <div class="journeys__tabs" role="tablist" aria-label="Journey categories">
@@ -59,6 +63,12 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     gap: 1.5rem;
     flex-wrap: wrap;
     margin-bottom: 2.5rem;
+  }
+  .journeys__head-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
   .journeys__head h2 {
     font-style: italic;

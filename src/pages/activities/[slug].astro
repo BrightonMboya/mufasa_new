@@ -1,0 +1,172 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import { activities, site } from '../../data/site';
+
+export function getStaticPaths() {
+  return activities.map((a) => ({ params: { slug: a.slug }, props: { activity: a } }));
+}
+
+const { activity } = Astro.props;
+const title = `${activity.title} — ${site.shortName}`;
+const d = activity.details as {
+  location?: string[];
+  bestTime?: string;
+  price?: string;
+  duration?: string;
+  requirements?: string[];
+};
+const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.length);
+---
+
+<Base title={title} description={activity.tagline}>
+  <Header />
+  <main>
+    <section class="dhero">
+      <img class="dhero__img" src={activity.image} alt={activity.title} fetchpriority="high" />
+      <div class="dhero__scrim"></div>
+      <div class="dhero__content wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><a href="/activities">Activities</a><span>/</span><span class="crumbs__here">{activity.title}</span>
+        </nav>
+        <h1>{activity.title}</h1>
+      </div>
+    </section>
+
+    <section class="overview section wrap">
+      <div class="overview__lead">
+        <p class="overview__summary">{activity.lead}</p>
+        {activity.body.map((p: string) => <p class="overview__p">{p}</p>)}
+        <a href="/#enquiry" class="pill pill--accent">Add this to my safari</a>
+      </div>
+
+      {hasFacts && (
+        <aside class="facts">
+          {d.duration && (
+            <div class="fact"><span class="fact__label">Duration</span><span class="fact__value">{d.duration}</span></div>
+          )}
+          {d.bestTime && (
+            <div class="fact"><span class="fact__label">Best time</span><span class="fact__value">{d.bestTime}</span></div>
+          )}
+          {d.price && (
+            <div class="fact"><span class="fact__label">Price</span><span class="fact__value">{d.price}</span></div>
+          )}
+          {d.requirements?.length ? (
+            <div class="fact fact--wide">
+              <span class="fact__label">Good to know</span>
+              <ul class="fact__list">
+                {d.requirements.map((r) => <li>{r}</li>)}
+              </ul>
+            </div>
+          ) : null}
+        </aside>
+      )}
+    </section>
+
+    <section class="highlights section wrap">
+      <h2>Why add this</h2>
+      <ul class="highlights__list">
+        {activity.highlights.map((h: string) => <li>{h}</li>)}
+      </ul>
+    </section>
+
+    {d.location?.length ? (
+      <section class="locations section wrap">
+        <h2>Where to do it</h2>
+        <ul class="locations__list">
+          {d.location.map((loc) => <li>{loc}</li>)}
+        </ul>
+      </section>
+    ) : null}
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .dhero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(380px, 52vh, 480px);
+    overflow: hidden;
+    background-color: var(--color-ink);
+    isolation: isolate;
+  }
+  .dhero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .dhero__scrim {
+    position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.4) 0%, rgba(20, 24, 21, 0.25) 45%, rgba(20, 24, 21, 0.85) 100%);
+  }
+  .dhero__content { display: flex; flex-direction: column; gap: 1rem; padding-block: clamp(2.5rem, 5vw, 3.75rem); }
+  .crumbs {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .crumbs a:hover { color: var(--color-on-accent); }
+  .crumbs__here { color: var(--color-accent-soft); }
+  .dhero h1 { font-size: clamp(2.25rem, 5.5vw, 4rem); color: var(--color-on-accent); font-weight: var(--fw-light); }
+
+  .overview {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+    background-color: var(--color-ground);
+  }
+  .overview__lead { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+  .overview__summary {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.5rem, 3vw, 2.125rem);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+  .overview__p { color: var(--color-slate); line-height: 1.7; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    align-self: start;
+  }
+  .fact { display: flex; flex-direction: column; gap: 0.4rem; }
+  .fact--wide { grid-column: 1 / -1; }
+  .fact__label {
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .fact__value { font-size: 1.0625rem; color: var(--color-ink); }
+  .fact__list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; }
+  .fact__list li { position: relative; padding-left: 1.2rem; color: var(--color-ink); font-size: 0.9375rem; line-height: 1.5; }
+  .fact__list li::before {
+    content: ''; position: absolute; left: 0; top: 0.55em; width: 5px; height: 5px; border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+
+  .highlights { background-color: var(--color-surface); }
+  .highlights h2, .locations h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: var(--fw-light); color: var(--color-ink); margin-bottom: 2rem;
+  }
+  .highlights__list, .locations__list { list-style: none; display: flex; flex-direction: column; gap: 1rem; max-width: 760px; }
+  .highlights__list li, .locations__list li {
+    position: relative; padding-left: 2rem; color: var(--color-ink); line-height: 1.6;
+  }
+  .highlights__list li::before, .locations__list li::before {
+    content: '+'; position: absolute; left: 0; top: 0.05em; font-family: var(--font-mono); font-weight: 700; color: var(--color-accent);
+  }
+
+  .locations { background-color: var(--color-ground); }
+
+  @media (max-width: 860px) {
+    .overview { grid-template-columns: 1fr; }
+  }
+</style>
