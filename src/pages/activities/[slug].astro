@@ -54,7 +54,7 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
             <div class="fact"><span class="fact__label">Price</span><span class="fact__value">{d.price}</span></div>
           )}
           {d.requirements?.length ? (
-            <div class="fact fact--wide">
+            <div class="fact">
               <span class="fact__label">Good to know</span>
               <ul class="fact__list">
                 {d.requirements.map((r) => <li>{r}</li>)}
@@ -131,15 +131,14 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
 
   .facts {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     padding: 2rem;
     background-color: var(--color-surface);
     border: 1px solid var(--color-hairline);
     align-self: start;
   }
   .fact { display: flex; flex-direction: column; gap: 0.4rem; }
-  .fact--wide { grid-column: 1 / -1; }
   .fact__label {
     font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--color-slate);
