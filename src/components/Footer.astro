@@ -5,7 +5,7 @@ import { site, footerLinks } from '../data/site';
 <footer class="footer section wrap">
   <div class="footer__inner">
     <div class="footer__brand">
-      <span class="footer__mark">{site.shortName}</span>
+      <img class="footer__mark" src={site.logo} alt={site.name} width="1263" height="350" />
       <p>{site.address[0]}<br />{site.address[1]}</p>
     </div>
 
@@ -44,10 +44,8 @@ import { site, footerLinks } from '../data/site';
     max-width: 360px;
   }
   .footer__mark {
-    font-family: var(--font-display);
-    font-size: 1.6875rem;
-    letter-spacing: 0.02em;
-    color: var(--color-ink);
+    height: clamp(42px, 5vw, 52px);
+    width: auto;
   }
   .footer__brand p {
     font-size: 0.9375rem;

@@ -1127,7 +1127,10 @@ export const activities = [
   {
     slug: 'sundowner-experience',
     title: 'Sundowner',
-    image: 'https://images.unsplash.com/photo-1590523278191-995cbcda646b?w=1600&q=80&auto=format&fit=crop',
+    // Wikimedia Commons, Baobab at sunset - Tanzania (Tarangire) by Gopal
+    // Vijayaraghavan, CC BY 2.0 — requires visible credit, unlike the
+    // Unsplash images elsewhere on this page which don't.
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Baobab_at_sunset_-_Tanzania.jpg/1920px-Baobab_at_sunset_-_Tanzania.jpg',
     tagline: 'Drinks and canapés as the African sky turns gold — a safari tradition.',
     lead: "One of Africa's most cherished safari traditions — a drink and something to eat as the sun goes down, at a scenic spot your guide has chosen for the view.",
     body: [
@@ -1166,7 +1169,10 @@ export const activities = [
   {
     slug: 'zipline-adventure',
     title: 'Zipline Adventure',
-    image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1200&q=80&auto=format&fit=crop',
+    // Wikimedia Commons, Zip-line over rainforest canopy, Costa Rica, by
+    // Khaufle, CC BY-SA 3.0 / GFDL — requires visible credit, unlike the
+    // Unsplash images elsewhere on this page which don't.
+    image: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Zip-line_over_rainforest_canopy_4_January_2005%2C_Costa_Rica.jpg',
     tagline: 'Soar over the Great Rift Valley on four to five ziplines near Lake Manyara.',
     lead: "A run of ziplines through the trees at the base of the Great Rift Valley escarpment in Mto wa Mbu, between ancient baobabs with views across the valley and the Maasai Steppe — a natural stop between Arusha, Manyara, Ngorongoro and the Serengeti.",
     body: [
