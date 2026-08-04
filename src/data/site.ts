@@ -35,10 +35,14 @@ export const forms = {
 };
 
 export const hero = {
-  // Elephant family crossing a dusty plain (muted autoplay loop).
-  // Source: Pexels (license: free, no attribution). Compressed to ~2.2MB.
-  video: '/media/hero-elephants.mp4',
-  poster: '/media/hero-elephants.jpg',
+  // Auto-rotating background slideshow — crossfades between these on a timer.
+  // Source: Unsplash placeholders; replace with licensed, location-verified
+  // shots before launch (same rule as the rest of this file).
+  images: [
+    'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=2400&q=85&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1547970810-dc1eac37d174?w=2400&q=85&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?w=2400&q=85&auto=format&fit=crop',
+  ],
   title: 'The Plain Remembers',
   subtitle:
     'Set off on remarkable, deeply personal journeys through Tanzania, planned by the guides who walk them.',
