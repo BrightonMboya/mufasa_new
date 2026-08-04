@@ -39,7 +39,7 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
       <div class="overview__lead">
         <p class="overview__summary">{activity.lead}</p>
         {activity.body.map((p: string) => <p class="overview__p">{p}</p>)}
-        <a href="/#enquiry" class="pill pill--accent">Add this to my safari</a>
+        <a href="/trip-planner" class="pill pill--accent">Add this to my safari</a>
       </div>
 
       {hasFacts && (
