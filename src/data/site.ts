@@ -36,11 +36,14 @@ export const forms = {
 
 export const hero = {
   // Auto-rotating background slideshow — crossfades between these on a timer.
-  // Source: Unsplash placeholders; replace with licensed, location-verified
-  // shots before launch (same rule as the rest of this file).
   images: [
-    'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=2400&q=85&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1547970810-dc1eac37d174?w=2400&q=85&auto=format&fit=crop',
+    // Wikimedia Commons, Ngorongoro jeep safari, by Freesolo Adventures, CC BY 2.0.
+    'https://upload.wikimedia.org/wikipedia/commons/b/be/Ngorongoro_jeep_safari_%2827333740440%29.jpg',
+    // Wikimedia Commons, The White Rhinos in the Ngorongoro Conservation Area,
+    // Tanzania, by Rwebogora, CC BY-SA 4.0.
+    'https://upload.wikimedia.org/wikipedia/commons/3/36/The_White_Rhinos_in_the_Ngorongoro_Conservation_Area%2C_Tanzania.jpg',
+    // Unsplash placeholder; replace with a licensed, location-verified shot
+    // before launch (same rule as the rest of this file).
     'https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?w=2400&q=85&auto=format&fit=crop',
   ],
   title: 'The Plain Remembers',
