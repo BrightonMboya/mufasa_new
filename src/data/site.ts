@@ -1015,7 +1015,14 @@ export const activities = [
       'Lake Tanganyika — Africa\'s largest freshwater lake, crystal clear, with sport fishing and sunset cruising',
       'Rubondo Island / Lake Victoria — Africa\'s largest island national park, mostly untouched equatorial forest',
     ],
-    details: {},
+    details: {
+      duration: '2–3 hours (standard) or full day (combined hike & canoe)',
+      price: 'Standard Canoe Excursion (2–3 hours): $60–85pp · Combined Hike & Canoe (full day): $120–150pp',
+      requirements: [
+        'Includes professional guide, canoe rental, and safety gear',
+        'National park entry fees apply separately for Lake Manyara and Arusha National Park',
+      ],
+    },
   },
   {
     slug: 'cultural-tribes-visits',
@@ -1035,7 +1042,9 @@ export const activities = [
       'Watch a hunting demonstration with the Hadzabe',
     ],
     details: {
+      price: 'Standard Village Visit: $20–40pp (welcome dance, boma tour, and a brief cultural talk)',
       requirements: [
+        'Priced to ensure a high-end, ethical experience that properly compensates the community',
         'These communities are not isolated — expect a basic understanding of money, and craft sales or donation requests',
         'A small entrance fee applies to visit a village',
       ],
@@ -1078,7 +1087,10 @@ export const activities = [
       'Kilimanjaro National Park — the wilderness between Kilimanjaro and Meru, ridden from the "Little Serengeti" through Maasai land to the edge of the park',
       'Wildlife Management Areas — community-owned conservation land including Enduimet WMA, Singita Grumeti, and Loliondo',
     ],
-    details: {},
+    details: {
+      price: '$150pp',
+      requirements: ['Priced to ensure a high-end, ethical experience that properly compensates the community'],
+    },
   },
   {
     slug: 'night-game-drives',
@@ -1098,7 +1110,11 @@ export const activities = [
         'The southern circuit (Selous, Mikumi, Ruaha) — all permit night drives',
       ],
       duration: '2–4 hours, depending on the park',
-      requirements: ['Extra permits apply — a night-game fee and an armed-ranger fee'],
+      price: '$250pp',
+      requirements: [
+        'Priced to ensure a high-end, ethical experience that properly compensates the community',
+        'Extra permits apply — a night-game fee and an armed-ranger fee',
+      ],
     },
   },
   {
