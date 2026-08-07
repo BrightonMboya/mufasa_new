@@ -13,6 +13,16 @@ export function getStaticPaths() {
 const { journey } = Astro.props;
 const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
 const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${site.shortName}`;
+
+// Curated cross-sell set — shown on every journey page except its own.
+const FEATURED_SLUGS = [
+  '7-day-tanzania-drive-in-fly-out-luxury-safari',
+  '6-day-the-great-wildebeest-migration-safari',
+  '5-days-manyara-serengeti-ngorongoro-best-luxury-safari',
+  '5-days-tanzania-family-safari',
+  '7-days-tanzania-family-safari',
+];
+const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug !== journey.slug);
 ---
 
 <Base title={title} description={journey.summary}>
@@ -116,6 +126,26 @@ const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${sit
         <div class="gallery__cell"><img src={src} alt={`${journey.title} — Tanzania`} loading="lazy" /></div>
       ))}
     </section>
+
+    <!-- More journeys in this category -->
+    {related.length > 0 && (
+      <section class="related section wrap">
+        <h2 class="related__title">Popular Packages</h2>
+        <div class="related__grid">
+          {related.map((r) => (
+            <a class="rcard" href={`/journeys/${r.slug}`}>
+              <div class="rcard__frame">
+                <img src={r.image} alt={r.title} loading="lazy" />
+                <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+              </div>
+              <span class="rcard__meta">{r.meta}</span>
+              <h3 class="rcard__title">{r.title}</h3>
+              <span class="rcard__cta">View itinerary</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
 
     <Enquiry />
   </main>
@@ -387,6 +417,91 @@ const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${sit
   }
   .gallery__cell:hover img { transform: scale(1.04); }
 
+  /* More journeys in this category */
+  .related {
+    background-color: var(--color-surface);
+  }
+  .related__title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-bottom: 3rem;
+  }
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem 1.5rem;
+    row-gap: 3rem;
+  }
+  .rcard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .rcard__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 5 / 6;
+    overflow: hidden;
+    margin-bottom: 0.375rem;
+  }
+  .rcard__frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .rcard:hover .rcard__frame img { transform: scale(1.04); }
+  .rcard__price {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-full);
+  }
+  .rcard__price-unit {
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.7);
+  }
+  .rcard__meta {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .rcard__title {
+    font-size: 1.25rem;
+    color: var(--color-ink);
+  }
+  .rcard__cta {
+    margin-top: 0.125rem;
+    align-self: flex-start;
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+  .rcard:hover .rcard__cta { border-color: var(--color-accent); color: var(--color-accent); }
+
+  @media (max-width: 1080px) {
+    .related__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
   @media (max-width: 860px) {
     .overview { grid-template-columns: 1fr; }
     .incl { grid-template-columns: 1fr; }
@@ -395,5 +510,10 @@ const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${sit
     .dayrow__num { font-size: 1.75rem; }
     .gallery { grid-template-columns: 1fr; }
     .gallery__cell { aspect-ratio: 16 / 10; }
+    .related__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 560px) {
+    .related__grid { grid-template-columns: 1fr; max-width: 420px; margin-inline: auto; }
   }
 </style>
