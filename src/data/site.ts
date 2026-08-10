@@ -39,12 +39,8 @@ export const hero = {
   images: [
     // Wikimedia Commons, Elephant Family Eating (Tarangire), by Eric Kilby, CC BY-SA 2.0.
     'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Elephant_Family_Eating.jpg/1920px-Elephant_Family_Eating.jpg',
-    // Wikimedia Commons, The White Rhinos in the Ngorongoro Conservation Area,
-    // Tanzania, by Rwebogora, CC BY-SA 4.0.
-    'https://upload.wikimedia.org/wikipedia/commons/3/36/The_White_Rhinos_in_the_Ngorongoro_Conservation_Area%2C_Tanzania.jpg',
-    // Unsplash placeholder; replace with a licensed, location-verified shot
-    // before launch (same rule as the rest of this file).
-    'https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?w=2400&q=85&auto=format&fit=crop',
+    '/media/hero/hero-3.webp',
+    '/media/hero/hero-6.webp',
   ],
   title: 'The Plain Remembers',
   subtitle:
