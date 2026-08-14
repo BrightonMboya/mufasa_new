@@ -4,6 +4,8 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import RouteMap from '../../components/RouteMap.astro';
+import JourneyEnquiryModal from '../../components/JourneyEnquiryModal.astro';
+import LodgeLightbox from '../../components/LodgeLightbox.astro';
 import { journeys, site } from '../../data/site';
 
 export function getStaticPaths() {
@@ -14,7 +16,13 @@ const { journey } = Astro.props;
 const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
 const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${site.shortName}`;
 
-// Curated cross-sell set — shown on every journey page except its own.
+// north-to-sea is our packages hub: hero only, then every priced package
+// split by how you reach it — overland from Arusha, or flown in from Zanzibar.
+const isPackagesHub = journey.slug === 'north-to-sea';
+const northernCircuitPackages = journeys.filter((j) => j.packageGroup === 'northern-circuit');
+const flyInPackages = journeys.filter((j) => j.packageGroup === 'fly-in');
+
+// Curated cross-sell set — shown on every other journey page except its own.
 const FEATURED_SLUGS = [
   '7-day-tanzania-drive-in-fly-out-luxury-safari',
   '6-day-the-great-wildebeest-migration-safari',
@@ -41,115 +49,165 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
       </div>
     </section>
 
-    <!-- Overview + fact panel -->
-    <section class="overview section wrap">
-      <div class="overview__lead">
-        <p class="overview__summary">{journey.summary}</p>
-        <a href="/trip-planner" class="pill pill--accent">Enquire about this journey</a>
-      </div>
-      <aside class="facts">
-        <div class="fact">
-          <span class="fact__label">Duration</span>
-          <span class="fact__value">{journey.nights} nights</span>
-        </div>
-        <div class="fact">
-          <span class="fact__label">Best season</span>
-          <span class="fact__value">{journey.season}</span>
-        </div>
-        <div class="fact">
-          <span class="fact__label">Route</span>
-          <span class="fact__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
-        </div>
-        <div class="fact">
-          <span class="fact__label">From / person</span>
-          <span class="fact__value fact__value--price">{journey.priceFrom}</span>
-        </div>
-      </aside>
-    </section>
-
-    <!-- Route strip -->
-    <section class="rstrip section wrap">
-      <div class="rstrip__head">
-        <span class="eyebrow" style="color: var(--color-accent-soft)">The route</span>
-        <div class="itin__legend">
-          <span class="legend"><span class="legend__line legend__line--solid"></span>Core route</span>
-          {journey.days.some((d) => d.optional) && (
-            <span class="legend"><span class="legend__line legend__line--dashed"></span>Extension</span>
-          )}
-        </div>
-      </div>
-      <RouteMap stops={stops} compact />
-    </section>
-
-    <!-- Day by day -->
-    <section class="dbd section wrap">
-      <h2 class="dbd__title">Day by day</h2>
-      <ol class="dbd__list">
-        {journey.days.map((d, i) => (
-          <li class:list={['dayrow', { 'dayrow--optional': d.optional }]}>
-            <div class="dayrow__rail">
-              <span class="dayrow__num">{String(i + 1).padStart(2, '0')}</span>
-              <span class="dayrow__days">{d.days}</span>
+    {!isPackagesHub && (
+      <Fragment>
+        <!-- Overview + fact panel -->
+        <section class="overview section wrap">
+          <div class="overview__lead">
+            <p class="overview__summary">{journey.summary}</p>
+            <button type="button" class="pill pill--accent" data-emodal-open>Enquire about this journey</button>
+          </div>
+          <aside class="facts">
+            <div class="fact">
+              <span class="fact__label">Duration</span>
+              <span class="fact__value">{journey.nights} nights</span>
             </div>
-            <div class="dayrow__body">
-              <h3 class="dayrow__place">
-                {d.place}
-                {d.optional && <span class="dayrow__tag">Optional</span>}
-              </h3>
-              <span class="dayrow__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</span>
-              <p class="dayrow__note">{d.note}</p>
+            <div class="fact">
+              <span class="fact__label">Best season</span>
+              <span class="fact__value">{journey.season}</span>
             </div>
-          </li>
-        ))}
-      </ol>
-    </section>
+            <div class="fact">
+              <span class="fact__label">Route</span>
+              <span class="fact__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
+            </div>
+            <div class="fact">
+              <span class="fact__label">From / person</span>
+              <span class="fact__value fact__value--price">{journey.priceFrom}</span>
+            </div>
+          </aside>
+        </section>
 
-    <!-- Included / excluded -->
-    <section class="incl section wrap">
-      <div class="incl__col">
-        <h2>What's included</h2>
-        <ul class="incl__list incl__list--yes">
-          {journey.included.map((x) => <li>{x}</li>)}
-        </ul>
-      </div>
-      <div class="incl__col">
-        <h2>Not included</h2>
-        <ul class="incl__list incl__list--no">
-          {journey.excluded.map((x) => <li>{x}</li>)}
-        </ul>
-      </div>
-    </section>
+        <!-- Route strip -->
+        <section class="rstrip section wrap">
+          <div class="rstrip__head">
+            <span class="eyebrow" style="color: var(--color-accent-soft)">The route</span>
+            <div class="itin__legend">
+              <span class="legend"><span class="legend__line legend__line--solid"></span>Core route</span>
+              {journey.days.some((d) => d.optional) && (
+                <span class="legend"><span class="legend__line legend__line--dashed"></span>Extension</span>
+              )}
+            </div>
+          </div>
+          <RouteMap stops={stops} compact />
+        </section>
 
-    <!-- Gallery -->
-    <section class="gallery">
-      {journey.gallery.map((src) => (
-        <div class="gallery__cell"><img src={src} alt={`${journey.title} — Tanzania`} loading="lazy" /></div>
-      ))}
-    </section>
+        <!-- Day by day -->
+        <section class="dbd section wrap">
+          <h2 class="dbd__title">Day by day</h2>
+          <ol class="dbd__list">
+            {journey.days.map((d, i) => (
+              <li class:list={['dayrow', { 'dayrow--optional': d.optional, 'dayrow--has-image': d.images }]}>
+                <div class="dayrow__rail">
+                  <span class="dayrow__num">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="dayrow__days">{d.days}</span>
+                </div>
+                <div class="dayrow__body">
+                  <h3 class="dayrow__place">
+                    {d.place}
+                    {d.optional && <span class="dayrow__tag">Optional</span>}
+                  </h3>
+                  <span class="dayrow__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</span>
+                  <p class="dayrow__note">{d.note}</p>
+                </div>
+                {d.images && (
+                  <button
+                    type="button"
+                    class="dayrow__lodge"
+                    data-lodge-gallery={JSON.stringify(d.images)}
+                    aria-label={`View ${d.images.length} photos`}
+                  >
+                    <img src={d.images[0]} alt="" loading="lazy" />
+                    <span class="dayrow__lodge-count">{d.images.length} photos</span>
+                  </button>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
 
-    <!-- More journeys in this category -->
-    {related.length > 0 && (
-      <section class="related section wrap">
+        <!-- Included / excluded -->
+        <section class="incl section wrap">
+          <div class="incl__col">
+            <h2>What's included</h2>
+            <ul class="incl__list incl__list--yes">
+              {journey.included.map((x) => <li>{x}</li>)}
+            </ul>
+          </div>
+          <div class="incl__col">
+            <h2>Not included</h2>
+            <ul class="incl__list incl__list--no">
+              {journey.excluded.map((x) => <li>{x}</li>)}
+            </ul>
+          </div>
+        </section>
+      </Fragment>
+    )}
+
+    {/* Packages hub: every priced route, grouped by how you reach it */}
+    {isPackagesHub ? (
+      <section class="related related--hub section wrap">
         <h2 class="related__title">Popular Packages</h2>
-        <div class="related__grid">
-          {related.map((r) => (
-            <a class="rcard" href={`/journeys/${r.slug}`}>
-              <div class="rcard__frame">
-                <img src={r.image} alt={r.title} loading="lazy" />
-                <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
-              </div>
-              <span class="rcard__meta">{r.meta}</span>
-              <h3 class="rcard__title">{r.title}</h3>
-              <span class="rcard__cta">View itinerary</span>
-            </a>
-          ))}
+
+        <div class="pkg-group">
+          <h3 class="pkg-group__title">Northern Circuit</h3>
+          <div class="related__grid">
+            {northernCircuitPackages.map((r) => (
+              <a class="rcard" href={`/journeys/${r.slug}`}>
+                <div class="rcard__frame">
+                  <img src={r.image} alt={r.packageTitle ?? r.title} loading="lazy" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                </div>
+                <span class="rcard__meta">{r.meta}</span>
+                <h3 class="rcard__title">{r.packageTitle ?? r.title}</h3>
+                <span class="rcard__cta">View itinerary</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div class="pkg-group">
+          <h3 class="pkg-group__title">Fly-In, Fly-Out from Zanzibar</h3>
+          <div class="related__grid">
+            {flyInPackages.map((r) => (
+              <a class="rcard" href={`/journeys/${r.slug}`}>
+                <div class="rcard__frame">
+                  <img src={r.image} alt={r.packageTitle ?? r.title} loading="lazy" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                </div>
+                <span class="rcard__meta">{r.meta}</span>
+                <h3 class="rcard__title">{r.packageTitle ?? r.title}</h3>
+                <span class="rcard__cta">View itinerary</span>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
+    ) : (
+      related.length > 0 && (
+        <section class="related section wrap">
+          <h2 class="related__title">Popular Packages</h2>
+          <div class="related__grid">
+            {related.map((r) => (
+              <a class="rcard" href={`/journeys/${r.slug}`}>
+                <div class="rcard__frame">
+                  <img src={r.image} alt={r.title} loading="lazy" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                </div>
+                <span class="rcard__meta">{r.meta}</span>
+                <h3 class="rcard__title">{r.title}</h3>
+                <span class="rcard__cta">View itinerary</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
     )}
 
     <Enquiry />
   </main>
   <Footer />
+  {!isPackagesHub && <JourneyEnquiryModal journeyTitle={journey.title} />}
+  {!isPackagesHub && <LodgeLightbox />}
 </Base>
 
 <style>
@@ -308,7 +366,49 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
     padding-block: 2.25rem;
     border-top: 1px solid var(--color-hairline);
   }
+  .dayrow--has-image {
+    grid-template-columns: 200px 1fr 240px;
+  }
   .dayrow:last-child { border-bottom: 1px solid var(--color-hairline); }
+  .dayrow__lodge {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    align-self: start;
+    cursor: pointer;
+  }
+  .dayrow__lodge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(20, 24, 21, 0);
+    transition: background-color 0.2s ease;
+  }
+  .dayrow__lodge:hover::after { background-color: rgba(20, 24, 21, 0.15); }
+  .dayrow__lodge img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .dayrow__lodge:hover img { transform: scale(1.05); }
+  .dayrow__lodge-count {
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.6rem;
+    z-index: 1;
+    background-color: rgba(20, 24, 21, 0.65);
+    color: var(--color-on-accent);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-full);
+    pointer-events: none;
+  }
   .dayrow__rail {
     display: flex;
     flex-direction: column;
@@ -400,32 +500,29 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   .incl__list--no li { color: var(--color-slate); }
   .incl__list--no li::before { content: '—'; color: var(--color-slate); }
 
-  /* Gallery */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .gallery__cell {
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-  }
-  .gallery__cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.7s ease;
-  }
-  .gallery__cell:hover img { transform: scale(1.04); }
-
   /* More journeys in this category */
   .related {
     background-color: var(--color-surface);
+  }
+  .related--hub {
+    padding-top: clamp(2rem, 4vw, 3rem);
   }
   .related__title {
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: var(--fw-light);
     color: var(--color-ink);
     margin-bottom: 3rem;
+  }
+  .pkg-group + .pkg-group {
+    margin-top: 5rem;
+  }
+  .pkg-group__title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    padding-bottom: 1.25rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-hairline);
   }
   .related__grid {
     display: grid;

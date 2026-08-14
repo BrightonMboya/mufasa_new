@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Enquiry from '../components/Enquiry.astro';
+import JourneyEnquiryModal from '../components/JourneyEnquiryModal.astro';
 import { dayTrips, site } from '../data/site';
 
 const title = `Day Trips — ${site.shortName}`;
@@ -38,7 +39,7 @@ const description = dayTrips.intro.lead;
           <ul class="ddcard__list">
             {t.included.map((x) => <li>{x}</li>)}
           </ul>
-          <a href="/#enquiry" class="pill pill--outline ddcard__cta">Enquire</a>
+          <button type="button" class="pill pill--outline ddcard__cta" data-emodal-open data-journey={t.title}>Enquire</button>
         </article>
       ))}
     </section>
@@ -46,6 +47,7 @@ const description = dayTrips.intro.lead;
     <Enquiry />
   </main>
   <Footer />
+  <JourneyEnquiryModal journeyTitle={dayTrips.trips[0].title} />
 </Base>
 
 <style>

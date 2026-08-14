@@ -1,0 +1,313 @@
+---
+import { forms } from '../data/site';
+
+interface Props {
+  journeyTitle: string;
+}
+const { journeyTitle } = Astro.props;
+---
+
+<div class="jem" data-emodal hidden>
+  <div class="jem__backdrop" data-emodal-close></div>
+  <div class="jem__panel" role="dialog" aria-modal="true" aria-labelledby="jem-title">
+    <button type="button" class="jem__close" data-emodal-close aria-label="Close">&times;</button>
+
+    <span class="eyebrow">Enquire</span>
+    <h2 id="jem-title">Let's plan your trip</h2>
+    <p class="jem__journey">{journeyTitle}</p>
+
+    <form class="jem__form" data-emodal-form novalidate>
+      <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
+      <input type="hidden" name="journey" value={journeyTitle} />
+
+      <label class="jem__field">
+        <span>Full name</span>
+        <input type="text" name="name" autocomplete="name" required />
+      </label>
+      <label class="jem__field">
+        <span>Email</span>
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <div class="jem__row">
+        <label class="jem__field">
+          <span>Number of travellers</span>
+          <input type="number" name="travellers" min="1" value="2" required />
+        </label>
+        <label class="jem__field">
+          <span>Travel date</span>
+          <input type="date" name="date" required />
+        </label>
+      </div>
+      <label class="jem__field">
+        <span>Phone / WhatsApp <em>(optional)</em></span>
+        <input type="tel" name="phone" autocomplete="tel" />
+      </label>
+      <div class="jem__field">
+        <span>Preferred contact <em>(optional)</em></span>
+        <div class="jem__checks">
+          <label class="jem__check">
+            <input type="checkbox" name="prefer_whatsapp" value="WhatsApp" />
+            WhatsApp
+          </label>
+          <label class="jem__check">
+            <input type="checkbox" name="prefer_email" value="Email" />
+            Email
+          </label>
+        </div>
+      </div>
+      <label class="jem__field">
+        <span>Message <em>(optional)</em></span>
+        <textarea name="message" rows="3"></textarea>
+      </label>
+
+      <p class="jem__error" data-emodal-error hidden></p>
+
+      <button type="submit" class="pill pill--accent jem__submit" data-emodal-submit>Send enquiry</button>
+      <p class="jem__fineprint">We reply within a day, and never share your details.</p>
+    </form>
+
+    <div class="jem__thanks" data-emodal-thanks hidden>
+      <h3>Thank you — it's on its way to us.</h3>
+      <p>A guide will read what you've shared and reply personally, usually within a day.</p>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ formsKey: forms.web3formsKey, endpoint: forms.endpoint }}>
+  const modal = document.querySelector('[data-emodal]');
+  if (modal) {
+    const form = modal.querySelector('[data-emodal-form]');
+    const errorEl = modal.querySelector('[data-emodal-error]');
+    const thanksEl = modal.querySelector('[data-emodal-thanks]');
+    const submitBtn = modal.querySelector('[data-emodal-submit]');
+
+    function open(e) {
+      const journey = e?.currentTarget?.dataset?.journey;
+      if (journey) {
+        const label = modal.querySelector('.jem__journey');
+        const input = form.querySelector('input[name="journey"]');
+        if (label) label.textContent = journey;
+        if (input) input.value = journey;
+      }
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      form.hidden = false;
+      thanksEl.hidden = true;
+      errorEl.hidden = true;
+      form.querySelector('input[name="name"]')?.focus();
+    }
+    function close() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-emodal-open]').forEach((btn) => btn.addEventListener('click', open));
+    modal.querySelectorAll('[data-emodal-close]').forEach((el) => el.addEventListener('click', close));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) close();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const name = (data.get('name') || '').toString().trim();
+      const email = (data.get('email') || '').toString().trim();
+      const travellers = (data.get('travellers') || '').toString().trim();
+      const date = (data.get('date') || '').toString().trim();
+      const phone = (data.get('phone') || '').toString().trim();
+      const message = (data.get('message') || '').toString().trim();
+      const journey = (data.get('journey') || '').toString().trim();
+      const preferred = [data.get('prefer_whatsapp'), data.get('prefer_email')].filter(Boolean).join(' & ');
+
+      errorEl.hidden = true;
+      if (!name || !email || !travellers || !date) {
+        errorEl.textContent = 'Please fill in every field so we can put together a quote.';
+        errorEl.hidden = false;
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: formsKey,
+            subject: `New journey enquiry — ${journey}`,
+            from_name: 'King Mufasa · Journey Enquiry',
+            replyto: email,
+            botcheck: data.get('botcheck') ? true : false,
+            Journey: journey,
+            Name: name,
+            Email: email,
+            Phone: phone || '—',
+            'Number of travellers': travellers,
+            'Travel date': date,
+            'Preferred contact': preferred || '—',
+            Message: message || '—',
+          }),
+        });
+        const json = await res.json();
+        if (json && json.success) {
+          form.hidden = true;
+          thanksEl.hidden = false;
+        } else {
+          throw new Error((json && json.message) || 'Submission failed');
+        }
+      } catch (err) {
+        errorEl.textContent =
+          'Something went wrong sending that. Please try again, or email us directly at info@kingmufasaexpeditions.com.';
+        errorEl.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send enquiry';
+      }
+    });
+  }
+</script>
+
+<style>
+  .jem {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .jem[hidden] { display: none; }
+  .jem__backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(20, 24, 21, 0.55);
+    backdrop-filter: blur(2px);
+  }
+  .jem__panel {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    padding: clamp(2rem, 4vw, 2.75rem);
+    box-shadow: 0 30px 80px rgba(20, 24, 21, 0.35);
+  }
+  .jem__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-slate);
+  }
+  .jem__close:hover { color: var(--color-ink); }
+  .jem h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-top: 0.5rem;
+  }
+  .jem__journey {
+    color: var(--color-slate);
+    margin-top: 0.375rem;
+    margin-bottom: 1.75rem;
+  }
+  .jem__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .jem__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .jem__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .jem__field > span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .jem__field > span em {
+    text-transform: none;
+    letter-spacing: 0;
+    font-style: normal;
+    color: var(--color-slate);
+    opacity: 0.7;
+  }
+  .jem__field input,
+  .jem__field textarea {
+    background-color: var(--color-ground);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    color: var(--color-ink);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .jem__field textarea { resize: vertical; }
+  .jem__field input:focus,
+  .jem__field textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background-color: var(--color-surface);
+  }
+  .jem__checks {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .jem__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .jem__check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+  .jem__error {
+    color: #a8442e;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .jem__submit { align-self: flex-start; }
+  .jem__submit[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .jem__fineprint {
+    font-size: 0.8125rem;
+    color: var(--color-slate);
+  }
+  .jem__thanks h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .jem__thanks p { color: var(--color-slate); line-height: 1.6; }
+
+  @media (max-width: 480px) {
+    .jem__row { grid-template-columns: 1fr; }
+  }
+</style>

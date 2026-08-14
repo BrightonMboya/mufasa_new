@@ -5,22 +5,42 @@ import Hero from '../components/Hero.astro';
 import Statement from '../components/Statement.astro';
 import Journeys from '../components/Journeys.astro';
 import Experiences from '../components/Experiences.astro';
-import Itinerary from '../components/Itinerary.astro';
+import TravelerTypes from '../components/TravelerTypes.astro';
 import Reviews from '../components/Reviews.astro';
 import Enquiry from '../components/Enquiry.astro';
 import Footer from '../components/Footer.astro';
 ---
 
 <Base>
-  <Header />
-  <main>
+  <div class="hero-screen">
+    <Header />
     <Hero />
+  </div>
+  <main>
     <Statement />
     <Journeys />
     <Experiences />
-    <Itinerary />
+    <TravelerTypes />
     <Reviews />
     <Enquiry />
   </main>
   <Footer />
 </Base>
+
+<style>
+  @media (min-width: 761px) {
+    .hero-screen {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+    .hero-screen :global(.header) {
+      flex-shrink: 0;
+    }
+    .hero-screen :global(.hero) {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+</style>

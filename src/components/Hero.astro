@@ -81,21 +81,23 @@ import { hero } from '../data/site';
     inset: 0;
     z-index: -1;
     /* Centered radial darkening behind the headline (keeps white text
-       legible over any image), layered over the top-nav + bottom-panel
+       legible over any image), a flat low-opacity wash so text holds up
+       everywhere else too, layered over the top-nav + bottom-panel
        vertical gradient. */
     background:
       radial-gradient(
-        ellipse 70% 50% at 50% 40%,
-        rgba(20, 24, 21, 0.52) 0%,
-        rgba(20, 24, 21, 0) 68%
+        ellipse 75% 55% at 50% 42%,
+        rgba(20, 24, 21, 0.54) 0%,
+        rgba(20, 24, 21, 0) 70%
       ),
       linear-gradient(
         180deg,
         rgba(20, 24, 21, 0.42) 0%,
-        rgba(20, 24, 21, 0.16) 30%,
-        rgba(20, 24, 21, 0.6) 70%,
-        rgba(20, 24, 21, 0.94) 100%
-      );
+        rgba(20, 24, 21, 0.2) 30%,
+        rgba(20, 24, 21, 0.58) 70%,
+        rgba(20, 24, 21, 0.88) 100%
+      ),
+      rgba(20, 24, 21, 0.08);
   }
 
   .hero__headline {
