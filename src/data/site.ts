@@ -37,12 +37,11 @@ export const forms = {
 export const hero = {
   // Auto-rotating background slideshow — crossfades between these on a timer.
   images: [
-    '/media/hero/giraffes.jpg',
-      'https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoibWVsaWFcL2FjY291bnRzXC9mOFwvNDAwMDAxOFwvcHJvamVjdHNcLzEyN1wvYXNzZXRzXC8wMVwvNzA0NDlcL2E0MzgyZDg3MjEyYmQ4N2E2ZDAxOGJkNDhhNTBkM2ZkLTE2Mzg0NDk1NDkuanBnIn0:melia:XA4vJCvSuSf72XtcvVnnWFRZWUl-ag4iNHL0NSmIWbo?width=2400',
     'https://images.pexels.com/photos/2622266/pexels-photo-2622266.jpeg',
-      // 'https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoibWVsaWFcL2ZpbGVcL2RLWkJycWJkdjRLUFhpZnRKdlFlLmpwZyJ9:melia:SvOCb59OLR_CmPvvp5kwgIpm2JxDhITfFxgRjWedL5Y?width=2400'
+    '/media/hero/lodge-suite.jpg',
+    '/media/hero/migration-balloons.jpg',
   ],
-  title: 'The Plain Remembers',
+  title: 'Unforgettable Journeys',
   subtitle:
     'Set off on remarkable, deeply personal journeys through Tanzania, planned by the guides who walk them.',
 };
