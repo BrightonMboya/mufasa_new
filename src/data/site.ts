@@ -64,6 +64,84 @@ export const journeyFilters = [
   'Walking',
 ];
 
+/* Real lodge names + descriptions, sourced from the makisala/ratiba
+   accommodations table and keyed by the UUID already embedded in each
+   day's image URLs (assets.makisala.com/accommodations/<uuid>/...).
+   Journey day objects only carry photos — this is the single place that
+   maps a UUID to what a guest-facing "Where You'll Stay" panel should say. */
+export const accommodationDirectory: Record<string, { name: string; description: string }> = {
+  '940e029e-7a16-47e3-94da-820c533ae960': {
+    name: "Karibu Camp's Lions Paw",
+    description:
+      "An explicit view of the cradled Lake Magadi awaits you at the Lion's Paw east of Ngorongoro's caldera. Create unforgettable memories with views of large tusked elephants and the endangered black rhinos using your binoculars from the bar and lounge area. Lion's Paw is 10 minutes away from the crater entrance, where you can relax, unwind, and enjoy serene bush dinners to crown your crater experience.",
+  },
+  '06ac8d86-d1d7-45ad-9b71-aa802260d016': {
+    name: 'Marera Valley Lodge',
+    description:
+      'Marera Valley Lodge, located on the outskirts of Karatu town about midway between Lake Manyara and the Ngorongoro Crater, is close to the village of Rhotia. Convenient to the main road, this elegant lodge has stunning views over the valley to the hills beyond.',
+  },
+  '3dfcd843-1316-41e1-8a93-4a3e92b60118': {
+    name: 'Escarpment Luxury Lodge Manyara',
+    description:
+      "Escarpment Luxury Lodge is a globally recognized brand providing world-class luxury accommodation, safari, and other hospitality services in Africa. Established in 2011, the lodge was built to offer travelers an elevated safari experience with affordable yet global-standard luxury hospitality.",
+  },
+  '3bcefc6b-2bd8-4272-a7af-f3c419fba0aa': {
+    name: 'Moyo Camp Warangi',
+    description:
+      'A luxury tented camp nestled in the Serengeti National Reserve in the Seronera Valley, known as the big cat capital of Africa and one of the most popular areas in the entire reserve. Its location was thoughtfully chosen facing the Warangi River for the best year-round game viewing and breathtaking sunsets, just 20km from the Serengeti Seronera Airstrip.',
+  },
+  'a53c734d-50ca-4221-b4db-c4fa27eeaa52': {
+    name: 'Kubu Kubu Tented Lodge',
+    description:
+      "Kubu Kubu Tented Camp is an exciting addition to Tanganyika Wilderness Camps' collection of luxury safari accommodation, with a modern African appearance creating a fresh, sleek, yet comfortable ambiance. Situated in the stunning central Serengeti, the camp is strategically positioned in one of the main migration areas so guests can enjoy this awesome natural wonder from the comfort of their tents.",
+  },
+  '9e2966db-6cb2-4f58-9fab-25ce40fb4961': {
+    name: 'Rufiji River Camp',
+    description:
+      "An intimate tented camp on the banks of the Rufiji River in Nyerere National Park, offering front row seats to hippos, elephants and the world's largest population of endangered African wild dog.",
+  },
+  'bad0db9c-23ae-46b2-994b-4c1254c97fcd': {
+    name: 'Nyota Serengeti',
+    description:
+      "Nyota Serengeti is the brand's luxury tented camp, set on a special campsite at Banagi in northern Seronera, where the Orangi River draws wildlife to the camp's edge. Twenty-four canvas tents stand on hardwood platforms, and a rare Serengeti swimming pool and starlit mess tent anchor camp life.",
+  },
+  '60257fe5-f717-486e-bf87-549ff06254b9': {
+    name: 'Ruaha River Lodge',
+    description:
+      "A classic safari lodge of stone and thatch chalets strung along the Great Ruaha River in Ruaha National Park, Tanzania's largest protected wilderness, with game passing through camp day and night.",
+  },
+  '042b32ed-5c16-43ec-b97f-e3b081cb2e8e': {
+    name: 'Vuma Hills Tented Camp',
+    description:
+      "Sixteen tents perched in the forested Vuma Hills above Mikumi National Park's Mkata floodplain, a cool retreat with sweeping views over the game-rich plains below.",
+  },
+  'c9d7d124-cfb4-4089-8a62-00539aeb4a1e': {
+    name: 'Njiro Legacy',
+    description:
+      'A locally owned mid-range hotel in the Njiro suburb on the southern edge of Arusha, set in walled gardens around a swimming pool with Mount Meru on the skyline. Twenty-four rooms run from Standard to Executive, and the property works chiefly as a first and last night base for the northern circuit, with a safari desk, airport transfers and secure luggage storage while guests are in the parks.',
+  },
+  '90e9468a-7178-4222-95ee-3bf81bfe290a': {
+    name: 'Tulia Boutique Hotel and Spa',
+    description:
+      "Tulia Boutique Hotel and Spa is located on White Rose Road in the Sakina area of Arusha, about 15 minutes from Arusha Airport and 1.5 kilometers from the Uhuru Monument. The hotel offers an outdoor courtyard, a year-round swimming pool, a spa and the Kiota Gift Shop, alongside a restaurant serving local and international dishes and a cocktail bar.",
+  },
+  '1767dcf3-bfdc-4556-8e53-e7c90cd328c1': {
+    name: 'Maramboi Tented Lodge',
+    description:
+      'A large tented lodge on the migration corridor between Tarangire National Park and Lake Manyara, with a big pool, thatched lounge and views over golden grassland.',
+  },
+  '2138a428-ab46-4caf-8e92-6ee1fed16b64': {
+    name: 'Ngorongoro Serena Safari Lodge',
+    description:
+      'Nestled high on the jagged rim of the Ngorongoro Crater and shrouded in mist, this lodge is a stunning example of ecological and architectural harmony — its boulder-built buildings camouflaged by indigenous creepers and linked by timber walkways that skirt ancient trees.',
+  },
+  'aa75a5c7-3e97-4c31-80a2-75406fb6e4a8': {
+    name: 'Gran Melia Arusha',
+    description:
+      "This spectacular hotel is located between the Serengeti and Kilimanjaro National Parks, opening out onto all of Tanzania's majestic natural beauty. An oasis of five-star comfort and elegance, with extensive facilities, exclusive suites, international cuisine, a spa, infinity pool and gym.",
+  },
+};
+
 /* Each journey has a slug -> /journeys/{slug}, plus the data its
    detail page renders (day-by-day, inclusions, gallery). */
 export const journeys = [

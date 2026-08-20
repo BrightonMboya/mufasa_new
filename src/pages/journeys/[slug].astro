@@ -6,10 +6,18 @@ import Enquiry from '../../components/Enquiry.astro';
 import RouteMap from '../../components/RouteMap.astro';
 import JourneyEnquiryModal from '../../components/JourneyEnquiryModal.astro';
 import LodgeLightbox from '../../components/LodgeLightbox.astro';
-import { journeys, site } from '../../data/site';
+import { journeys, site, accommodationDirectory } from '../../data/site';
 
 export function getStaticPaths() {
   return journeys.map((j) => ({ params: { slug: j.slug }, props: { journey: j } }));
+}
+
+// Day objects only carry lodge photos; the UUID baked into the image URL
+// (assets.makisala.com/accommodations/<uuid>/...) is the join key back to
+// the real lodge name + description in accommodationDirectory.
+function lodgeFor(images?: string[]) {
+  const match = images?.[0]?.match(/accommodations\/([0-9a-f-]{36})\//);
+  return match ? accommodationDirectory[match[1]] : undefined;
 }
 
 const { journey } = Astro.props;
@@ -36,51 +44,94 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
 <Base title={title} description={journey.summary}>
   <Header />
   <main>
-    <!-- Detail hero -->
+    <!-- Cinematic hero -->
     <section class="dhero">
-      <img class="dhero__img" src={journey.image} alt={journey.title} fetchpriority="high" />
+      <img class="dhero__img" src={journey.image} alt={journey.title} fetchpriority="high" data-hero-img />
       <div class="dhero__scrim"></div>
-      <div class="dhero__content wrap">
+
+      <div class="dhero__top wrap">
         <nav class="crumbs" aria-label="Breadcrumb">
           <a href="/">Home</a><span>/</span><a href="/#journeys">Safaris</a><span>/</span><span class="crumbs__here">{journey.title}</span>
         </nav>
+      </div>
+
+      <div class="dhero__content wrap">
         <span class="dhero__cat">{journey.category}</span>
         <h1>{journey.title}</h1>
+        <div class="dhero__meta">
+          <span class="dhero__meta-item">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="3.2" width="12" height="10.3" rx="1" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M2 6.3h12M5.3 1.5v2.6M10.7 1.5v2.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            {journey.nights} nights
+          </span>
+          <span class="dhero__dot"></span>
+          <span class="dhero__meta-item">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M8 14.5s5-4.6 5-8.3A5 5 0 0 0 3 6.2c0 3.7 5 8.3 5 8.3Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              <circle cx="8" cy="6.1" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            {site.region}
+          </span>
+          {!isPackagesHub && (
+            <Fragment>
+              <span class="dhero__dot"></span>
+              <span class="dhero__meta-item">{journey.season}</span>
+            </Fragment>
+          )}
+        </div>
       </div>
+
+      {!isPackagesHub && (
+        <div class="dhero__scroll" aria-hidden="true">
+          <span>Scroll</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3.5 6 8 11l4.5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      )}
     </section>
 
     {!isPackagesHub && (
       <Fragment>
-        <!-- Overview + fact panel -->
-        <section class="overview section wrap">
-          <div class="overview__lead">
-            <p class="overview__summary">{journey.summary}</p>
-            <button type="button" class="pill pill--accent" data-emodal-open>Enquire about this journey</button>
+        <!-- Introduction + trip stats -->
+        <section class="intro section wrap">
+          <p class="eyebrow" data-reveal>The Journey</p>
+          <p class="intro__summary" data-reveal>{journey.summary}</p>
+          <div class="intro__stats" data-reveal>
+            <div class="stat">
+              <span class="stat__label">Duration</span>
+              <span class="stat__value">{journey.nights} nights</span>
+            </div>
+            <span class="stat__divider"></span>
+            <div class="stat">
+              <span class="stat__label">Best Season</span>
+              <span class="stat__value">{journey.season}</span>
+            </div>
+            <span class="stat__divider"></span>
+            <div class="stat">
+              <span class="stat__label">Route</span>
+              <span class="stat__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
+            </div>
+            <span class="stat__divider"></span>
+            <div class="stat">
+              <span class="stat__label">From / Person</span>
+              <span class="stat__value stat__value--price">{journey.priceFrom}</span>
+            </div>
           </div>
-          <aside class="facts">
-            <div class="fact">
-              <span class="fact__label">Duration</span>
-              <span class="fact__value">{journey.nights} nights</span>
-            </div>
-            <div class="fact">
-              <span class="fact__label">Best season</span>
-              <span class="fact__value">{journey.season}</span>
-            </div>
-            <div class="fact">
-              <span class="fact__label">Route</span>
-              <span class="fact__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
-            </div>
-            <div class="fact">
-              <span class="fact__label">From / person</span>
-              <span class="fact__value fact__value--price">{journey.priceFrom}</span>
-            </div>
-          </aside>
+          <button type="button" class="pill pill--accent intro__cta" data-emodal-open>
+            Enquire about this journey
+            <svg class="cta-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3.5 11 8l-5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </section>
 
-        <!-- Route strip -->
+        <!-- Route -->
         <section class="rstrip section wrap">
           <div class="rstrip__head">
-            <span class="eyebrow" style="color: var(--color-accent-soft)">The route</span>
+            <h2 class="rstrip__title" data-reveal>Your Route</h2>
             <div class="itin__legend">
               <span class="legend"><span class="legend__line legend__line--solid"></span>Core route</span>
               {journey.days.some((d) => d.optional) && (
@@ -92,52 +143,146 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
         </section>
 
         <!-- Day by day -->
-        <section class="dbd section wrap">
-          <h2 class="dbd__title">Day by day</h2>
-          <ol class="dbd__list">
-            {journey.days.map((d, i) => (
-              <li class:list={['dayrow', { 'dayrow--optional': d.optional, 'dayrow--has-image': d.images }]}>
-                <div class="dayrow__rail">
-                  <span class="dayrow__num">{String(i + 1).padStart(2, '0')}</span>
-                  <span class="dayrow__days">{d.days}</span>
-                </div>
-                <div class="dayrow__body">
-                  <h3 class="dayrow__place">
-                    {d.place}
-                    {d.optional && <span class="dayrow__tag">Optional</span>}
-                  </h3>
-                  <span class="dayrow__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</span>
-                  <p class="dayrow__note">{d.note}</p>
-                </div>
-                {d.images && (
-                  <button
-                    type="button"
-                    class="dayrow__lodge"
-                    data-lodge-gallery={JSON.stringify(d.images)}
-                    aria-label={`View ${d.images.length} photos`}
-                  >
-                    <img src={d.images[0]} alt="" loading="lazy" />
-                    <span class="dayrow__lodge-count">{d.images.length} photos</span>
-                  </button>
+        <section class="dbd">
+          <div class="dbd__head wrap">
+            <p class="eyebrow" data-reveal>Day by Day</p>
+            <h2 class="dbd__title" data-reveal>The Full Itinerary</h2>
+          </div>
+
+          {journey.days.map((d, i) => {
+            const bandImage = (d.images && d.images[0]) || journey.image;
+            const lodge = lodgeFor(d.images);
+            return (
+              <Fragment>
+                <article class="day">
+                  <div class="day__band">
+                    <img
+                      class="day__band-img"
+                      src={bandImage}
+                      alt={d.place}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                    />
+                    <div class="day__band-scrim"></div>
+                    <div class="day__band-content wrap">
+                      <div class="day__band-row" data-reveal>
+                        <span class="day__num">{String(i + 1).padStart(2, '0')}</span>
+                        <div class="day__band-meta">
+                          <p class="day__range">
+                            {d.days}
+                            {d.optional && <span class="day__tag">Optional</span>}
+                          </p>
+                          <p class="day__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</p>
+                        </div>
+                      </div>
+                      <h3 class="day__place" data-reveal>{d.place}</h3>
+                    </div>
+                  </div>
+
+                  <div class="day__narrative wrap">
+                    <p class="day__note" data-reveal>{d.note}</p>
+                  </div>
+
+                  {d.images && d.images.length > 0 && (
+                    <div class:list={['day__stay', { 'day__stay--reverse': i % 2 === 1 }]}>
+                      <div class="day__gallery" data-gallery>
+                        {d.images.map((src, gi) => (
+                          <img
+                            src={src}
+                            alt={lodge?.name ?? d.place}
+                            loading="lazy"
+                            class:list={['day__gallery-img', { 'is-active': gi === 0 }]}
+                            data-gallery-slide
+                          />
+                        ))}
+                        {d.images.length > 1 && (
+                          <Fragment>
+                            <button type="button" class="day__gallery-nav day__gallery-nav--prev" data-gallery-prev aria-label="Previous photo">&#8249;</button>
+                            <button type="button" class="day__gallery-nav day__gallery-nav--next" data-gallery-next aria-label="Next photo">&#8250;</button>
+                            <div class="day__gallery-dots" data-gallery-dots>
+                              {d.images.map((_, gi) => (
+                                <button
+                                  type="button"
+                                  class:list={['day__gallery-dot', { 'is-active': gi === 0 }]}
+                                  data-gallery-dot
+                                  aria-label={`Photo ${gi + 1}`}
+                                ></button>
+                              ))}
+                            </div>
+                          </Fragment>
+                        )}
+                        <button
+                          type="button"
+                          class="day__gallery-expand"
+                          data-lodge-gallery={JSON.stringify(d.images)}
+                          aria-label={`View all ${d.images.length} photos`}
+                        >
+                          {d.images.length} photos
+                        </button>
+                      </div>
+                      <div class="day__stay-content">
+                        <p class="eyebrow" data-reveal>Where You'll Stay</p>
+                        <h4 class="day__stay-title" data-reveal>{lodge?.name ?? d.place}</h4>
+                        {lodge?.description && (
+                          <p class="day__stay-desc" data-reveal>{lodge.description}</p>
+                        )}
+                        <p class="day__stay-meta" data-reveal>
+                          {lodge?.name && <Fragment>{d.place} · </Fragment>}
+                          {d.nights} {d.nights === 1 ? 'night' : 'nights'}{d.optional ? ' · Optional extension' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </article>
+
+                {i < journey.days.length - 1 && (
+                  <div class="day__divider" aria-hidden="true">
+                    <span class="day__divider-line"></span>
+                    <span class="day__divider-dot"></span>
+                    <span class="day__divider-line"></span>
+                  </div>
                 )}
-              </li>
-            ))}
-          </ol>
+              </Fragment>
+            );
+          })}
         </section>
 
-        <!-- Included / excluded -->
-        <section class="incl section wrap">
-          <div class="incl__col">
-            <h2>What's included</h2>
-            <ul class="incl__list incl__list--yes">
-              {journey.included.map((x) => <li>{x}</li>)}
-            </ul>
-          </div>
-          <div class="incl__col">
-            <h2>Not included</h2>
-            <ul class="incl__list incl__list--no">
-              {journey.excluded.map((x) => <li>{x}</li>)}
-            </ul>
+        <!-- Pricing + inclusions -->
+        <section class="pricing">
+          <div class="wrap pricing__grid">
+            <div class="pricing__price" data-reveal>
+              <p class="eyebrow pricing__eyebrow">Investment</p>
+              <p class="pricing__amount">{journey.priceFrom}</p>
+              <p class="pricing__caption">
+                Per person, sharing — full board, park fees, and a private guide for the whole route.
+              </p>
+              <button type="button" class="pill pill--accent pricing__cta" data-emodal-open>
+                Enquire about this journey
+                <svg class="cta-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 3.5 11 8l-5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="pricing__terms">
+              <div class="pricing__col" data-reveal>
+                <div class="pricing__col-head">
+                  <span class="pricing__badge pricing__badge--yes">&#10003;</span>
+                  <h3>Included</h3>
+                </div>
+                <ul>
+                  {journey.included.map((x) => <li>{x}</li>)}
+                </ul>
+              </div>
+              <div class="pricing__col" data-reveal>
+                <div class="pricing__col-head">
+                  <span class="pricing__badge pricing__badge--no">&#10005;</span>
+                  <h3>Not Included</h3>
+                </div>
+                <ul>
+                  {journey.excluded.map((x) => <li>{x}</li>)}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
       </Fragment>
@@ -210,36 +355,141 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   {!isPackagesHub && <LodgeLightbox />}
 </Base>
 
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll-reveal (fade + rise), mirroring the Discovery theme's whileInView motion
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    revealEls.forEach((el) => el.classList.add('reveal-init'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' },
+    );
+    revealEls.forEach((el) => observer.observe(el));
+  }
+
+  // Hero parallax
+  if (!prefersReducedMotion) {
+    const heroImg = document.querySelector('[data-hero-img]');
+    if (heroImg instanceof HTMLElement) {
+      let ticking = false;
+      const update = () => {
+        const y = Math.min(window.scrollY, window.innerHeight) * 0.25;
+        heroImg.style.transform = `translateY(${y}px)`;
+        ticking = false;
+      };
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+          }
+        },
+        { passive: true },
+      );
+    }
+  }
+
+  // Accommodation galleries — auto-advancing, pauses on hover
+  document.querySelectorAll('[data-gallery]').forEach((gallery) => {
+    const slides = Array.from(gallery.querySelectorAll('[data-gallery-slide]'));
+    const dots = Array.from(gallery.querySelectorAll('[data-gallery-dot]'));
+    if (slides.length <= 1) return;
+    let index = 0;
+    let timer = null;
+
+    const show = (next) => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+    };
+    const stopAutoplay = () => {
+      if (timer) window.clearInterval(timer);
+      timer = null;
+    };
+    const startAutoplay = () => {
+      if (prefersReducedMotion) return;
+      stopAutoplay();
+      timer = window.setInterval(() => show(index + 1), 5000);
+    };
+
+    gallery.querySelector('[data-gallery-prev]')?.addEventListener('click', () => {
+      show(index - 1);
+      startAutoplay();
+    });
+    gallery.querySelector('[data-gallery-next]')?.addEventListener('click', () => {
+      show(index + 1);
+      startAutoplay();
+    });
+    dots.forEach((dot, i) =>
+      dot.addEventListener('click', () => {
+        show(i);
+        startAutoplay();
+      }),
+    );
+    gallery.addEventListener('mouseenter', stopAutoplay);
+    gallery.addEventListener('mouseleave', startAutoplay);
+
+    startAutoplay();
+  });
+</script>
+
 <style>
-  /* Detail hero */
+  /* Scroll-reveal utility — default visible; JS opts elements in before observing,
+     so content never gets stuck hidden if scripting is unavailable. */
+  .reveal-init {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .reveal-init.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cinematic hero */
   .dhero {
     position: relative;
     display: flex;
-    align-items: flex-end;
-    min-height: clamp(420px, 60vh, 560px);
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 100vh;
     overflow: hidden;
     background-color: var(--color-ink);
     isolation: isolate;
   }
   .dhero__img {
     position: absolute;
-    inset: 0;
+    top: -5%;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 110%;
     object-fit: cover;
     z-index: -2;
+    will-change: transform;
   }
   .dhero__scrim {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(180deg, rgba(20, 24, 21, 0.35) 0%, rgba(20, 24, 21, 0.2) 45%, rgba(20, 24, 21, 0.85) 100%);
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.45) 0%, rgba(20, 24, 21, 0.15) 40%, rgba(20, 24, 21, 0.85) 100%);
   }
-  .dhero__content {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding-block: clamp(2.5rem, 5vw, 3.75rem);
+  .dhero__top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding-block: clamp(1.5rem, 3vw, 2rem);
   }
   .crumbs {
     display: flex;
@@ -253,71 +503,150 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   }
   .crumbs a:hover { color: var(--color-on-accent); }
   .crumbs__here { color: var(--color-accent-soft); }
+  .dhero__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: clamp(2.5rem, 5vw, 3.75rem);
+  }
   .dhero__cat {
     font-family: var(--font-mono);
     font-size: var(--text-micro);
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: rgba(247, 244, 238, 0.85);
+    animation: heroFade 0.7s ease 0.15s both;
   }
   .dhero h1 {
-    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    font-size: clamp(3rem, 7.5vw, 6.5rem);
     color: var(--color-on-accent);
     font-weight: var(--fw-light);
+    animation: heroRise 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) 0.25s both;
+  }
+  .dhero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 0.5rem;
+    color: rgba(247, 244, 238, 0.85);
+    animation: heroFade 0.7s ease 0.55s both;
+  }
+  .dhero__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+  }
+  .dhero__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background-color: rgba(247, 244, 238, 0.4);
+  }
+  .dhero__scroll {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: heroFade 0.7s ease 1s both;
+  }
+  .dhero__scroll span {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.55);
+  }
+  .dhero__scroll svg {
+    color: rgba(247, 244, 238, 0.55);
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes heroRise {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dhero__content, .dhero__cat, .dhero h1, .dhero__meta, .dhero__scroll, .dhero__scroll svg {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 
-  /* Overview */
-  .overview {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: clamp(2.5rem, 6vw, 6rem);
-    align-items: start;
+  /* CTA arrow flourish */
+  .cta-arrow { transition: transform 0.25s ease; }
+  .pill:hover .cta-arrow { transform: translateX(3px); }
+
+  /* Introduction + trip stats */
+  .intro {
     background-color: var(--color-ground);
+    text-align: center;
   }
-  .overview__lead {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2rem;
-  }
-  .overview__summary {
+  .intro__summary {
+    max-width: 44rem;
+    margin: 1.75rem auto 0;
     font-family: var(--font-display);
     font-weight: var(--fw-light);
-    font-size: clamp(1.5rem, 3vw, 2.125rem);
-    line-height: 1.35;
-    letter-spacing: -0.015em;
+    font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
     color: var(--color-ink);
   }
-  .facts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2rem;
-    padding: 2rem;
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-hairline);
+  .intro__stats {
+    margin-top: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 2rem;
+    row-gap: 1.5rem;
   }
-  .fact {
+  .stat {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 0.4rem;
+    padding-inline: 0.5rem;
   }
-  .fact__label {
+  .stat__label {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-slate);
   }
-  .fact__value {
-    font-size: 1.125rem;
+  .stat__value {
+    font-size: 1.0625rem;
     color: var(--color-ink);
   }
-  .fact__value--price {
+  .stat__value--price {
     font-family: var(--font-mono);
-    font-size: 1.375rem;
+    font-size: 1.1875rem;
   }
+  .stat__divider {
+    width: 1px;
+    height: 2rem;
+    background-color: var(--color-hairline);
+  }
+  .intro__cta { margin-top: 2.75rem; }
 
-  /* Route strip */
+  /* Route */
   .rstrip {
     background-color: var(--color-ink);
     color: var(--color-on-accent);
@@ -329,6 +658,11 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
     gap: 1.5rem;
     flex-wrap: wrap;
     margin-bottom: 2.75rem;
+  }
+  .rstrip__title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--fw-light);
+    color: var(--color-on-accent);
   }
   .itin__legend { display: flex; gap: 1.875rem; }
   .legend {
@@ -346,159 +680,282 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   .legend__line--solid { background-color: var(--color-accent-soft); }
   .legend__line--dashed { border-top: 2px dashed rgba(247, 244, 238, 0.45); }
 
-  /* Day by day */
-  .dbd {
-    background-color: var(--color-surface);
+  /* Day by day — cinematic */
+  .dbd { background-color: var(--color-surface); }
+  .dbd__head {
+    padding-block: clamp(4.5rem, 9vw, 8.125rem) 3rem;
   }
   .dbd__title {
+    margin-top: 0.75rem;
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: var(--fw-light);
     color: var(--color-ink);
-    margin-bottom: 3rem;
   }
-  .dbd__list {
-    list-style: none;
-  }
-  .dayrow {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: clamp(1.5rem, 4vw, 4rem);
-    padding-block: 2.25rem;
-    border-top: 1px solid var(--color-hairline);
-  }
-  .dayrow--has-image {
-    grid-template-columns: 200px 1fr 240px;
-  }
-  .dayrow:last-child { border-bottom: 1px solid var(--color-hairline); }
-  .dayrow__lodge {
+
+  .day__band {
     position: relative;
-    display: block;
-    width: 100%;
-    aspect-ratio: 4 / 3;
+    height: min(72vh, 680px);
     overflow: hidden;
-    align-self: start;
-    cursor: pointer;
+    background-color: var(--color-ink);
   }
-  .dayrow__lodge::after {
-    content: '';
+  .day__band-img {
     position: absolute;
     inset: 0;
-    background-color: rgba(20, 24, 21, 0);
-    transition: background-color 0.2s ease;
-  }
-  .dayrow__lodge:hover::after { background-color: rgba(20, 24, 21, 0.15); }
-  .dayrow__lodge img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
   }
-  .dayrow__lodge:hover img { transform: scale(1.05); }
-  .dayrow__lodge-count {
+  .day__band-scrim {
     position: absolute;
-    bottom: 0.6rem;
-    right: 0.6rem;
-    z-index: 1;
-    background-color: rgba(20, 24, 21, 0.65);
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 24, 21, 0.5) 0%, rgba(20, 24, 21, 0.05) 35%, rgba(20, 24, 21, 0.15) 60%, rgba(20, 24, 21, 0.85) 100%);
+  }
+  .day__band-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+  .day__band-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .day__num {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    line-height: 0.9;
+    color: rgba(247, 244, 238, 0.35);
+  }
+  .day__band-meta { padding-bottom: 0.35rem; }
+  .day__range {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.75);
+  }
+  .day__tag {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-on-accent);
+    padding: 0.2rem 0.55rem;
+    border: 1px solid rgba(247, 244, 238, 0.5);
+    border-radius: var(--radius-full);
+  }
+  .day__nights {
+    margin-top: 0.35rem;
+    font-size: 0.875rem;
+    color: rgba(247, 244, 238, 0.6);
+  }
+  .day__place {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--color-on-accent);
+    font-weight: var(--fw-light);
+  }
+
+  .day__narrative {
+    background-color: var(--color-surface);
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+  }
+  .day__note {
+    max-width: 46rem;
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+    line-height: 1.6;
+    color: var(--color-slate);
+  }
+
+  .day__stay {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .day__gallery {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+    background-color: var(--color-ink);
+  }
+  .day__gallery-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .day__gallery-img.is-active { opacity: 1; }
+  .day__gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background-color: rgba(20, 24, 21, 0.35);
+    color: var(--color-on-accent);
+    font-size: 1.5rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.25s ease, background-color 0.2s ease;
+  }
+  .day__gallery:hover .day__gallery-nav { opacity: 1; }
+  .day__gallery-nav:hover { background-color: rgba(20, 24, 21, 0.55); }
+  .day__gallery-nav--prev { left: 1rem; }
+  .day__gallery-nav--next { right: 1rem; }
+  .day__gallery-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.4rem;
+  }
+  .day__gallery-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: rgba(247, 244, 238, 0.5);
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  .day__gallery-dot.is-active {
+    width: 18px;
+    background-color: var(--color-on-accent);
+  }
+  .day__gallery-expand {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: rgba(20, 24, 21, 0.55);
     color: var(--color-on-accent);
     font-family: var(--font-mono);
     font-size: 0.625rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.3rem 0.6rem;
-    border-radius: var(--radius-full);
-    pointer-events: none;
-  }
-  .dayrow__rail {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .dayrow__num {
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    line-height: 1;
-    color: var(--color-accent);
-  }
-  .dayrow__days {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-slate);
-  }
-  .dayrow__body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-width: 640px;
-  }
-  .dayrow__place {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: var(--fw-regular);
-    color: var(--color-ink);
-  }
-  .dayrow__tag {
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    padding: 0.25rem 0.6rem;
-    border: 1px solid var(--color-accent);
+    padding: 0.4rem 0.8rem;
     border-radius: var(--radius-full);
   }
-  .dayrow__nights {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: var(--color-slate);
+  .day__stay-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--color-surface);
+    padding: clamp(2rem, 4vw, 4rem);
   }
-  .dayrow__note {
+  .day__stay-title {
     margin-top: 0.5rem;
-    color: var(--color-slate);
-    line-height: 1.65;
-  }
-  .dayrow--optional .dayrow__num { color: var(--color-slate); }
-
-  /* Included / excluded */
-  .incl {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(2.5rem, 6vw, 5rem);
-    background-color: var(--color-ground);
-  }
-  .incl__col h2 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
     font-weight: var(--fw-light);
     color: var(--color-ink);
-    margin-bottom: 1.75rem;
   }
-  .incl__list {
+  .day__stay-desc {
+    margin-top: 1.5rem;
+    max-width: 32rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-slate);
+  }
+  .day__stay-meta {
+    margin-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.05em;
+    color: var(--color-slate);
+  }
+
+  .day__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background-color: var(--color-surface);
+    padding-block: 2rem;
+  }
+  .day__divider-line { width: 64px; height: 1px; background-color: var(--color-hairline); }
+  .day__divider-dot { width: 6px; height: 6px; border-radius: var(--radius-full); background-color: var(--color-accent); }
+
+  /* Pricing + inclusions */
+  .pricing {
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
+    padding-block: clamp(4.5rem, 9vw, 7rem);
+  }
+  .pricing__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .pricing__eyebrow { color: rgba(247, 244, 238, 0.5); }
+  .pricing__amount {
+    margin-top: 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-on-accent);
+  }
+  .pricing__caption {
+    margin-top: 1.5rem;
+    max-width: 26rem;
+    color: rgba(247, 244, 238, 0.6);
+    line-height: 1.65;
+  }
+  .pricing__cta { margin-top: 2.5rem; }
+  .pricing__terms {
+    display: grid;
+    gap: 3rem;
+  }
+  .pricing__col-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .pricing__badge {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+  }
+  .pricing__badge--yes { background-color: rgba(127, 179, 160, 0.2); color: var(--color-accent-soft); }
+  .pricing__badge--no { background-color: rgba(247, 244, 238, 0.1); color: rgba(247, 244, 238, 0.5); }
+  .pricing__col h3 {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(247, 244, 238, 0.75);
+  }
+  .pricing__col ul {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.85rem;
+    padding-left: 2.85rem;
   }
-  .incl__list li {
-    position: relative;
-    padding-left: 2rem;
-    color: var(--color-ink);
-    line-height: 1.5;
+  .pricing__col li {
+    color: rgba(247, 244, 238, 0.6);
+    line-height: 1.6;
+    font-size: 0.9375rem;
   }
-  .incl__list li::before {
-    position: absolute;
-    left: 0;
-    top: 0.05em;
-    font-family: var(--font-mono);
-    font-weight: 700;
-  }
-  .incl__list--yes li::before { content: '+'; color: var(--color-accent); }
-  .incl__list--no li { color: var(--color-slate); }
-  .incl__list--no li::before { content: '—'; color: var(--color-slate); }
 
   /* More journeys in this category */
   .related {
@@ -595,22 +1052,24 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   }
   .rcard:hover .rcard__cta { border-color: var(--color-accent); color: var(--color-accent); }
 
+  @media (min-width: 1024px) {
+    .day__stay { grid-template-columns: 1fr 1fr; }
+    .day__stay--reverse .day__gallery { order: 2; }
+    .day__gallery { height: 600px; }
+    .pricing__grid { grid-template-columns: 1fr 1fr; }
+  }
+
   @media (max-width: 1080px) {
     .related__grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   @media (max-width: 860px) {
-    .overview { grid-template-columns: 1fr; }
-    .incl { grid-template-columns: 1fr; }
-    .dayrow { grid-template-columns: 1fr; gap: 0.75rem; }
-    .dayrow__rail { flex-direction: row; align-items: baseline; gap: 1rem; }
-    .dayrow__num { font-size: 1.75rem; }
-    .gallery { grid-template-columns: 1fr; }
-    .gallery__cell { aspect-ratio: 16 / 10; }
     .related__grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 560px) {
     .related__grid { grid-template-columns: 1fr; max-width: 420px; margin-inline: auto; }
+    .intro__stats { gap: 0 1.25rem; }
+    .stat__divider { display: none; }
   }
 </style>
