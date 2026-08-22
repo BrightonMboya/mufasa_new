@@ -528,11 +528,20 @@ const totalSteps = planner.steps.length;
     flex-direction: column;
     justify-content: center;
     max-width: 620px;
+    margin-inline: auto;
     padding-block: 4rem;
     text-align: left;
   }
-  .pl-contact .pl-step__title { text-align: left; }
-  .pl-contact .pl-step__hint { text-align: left; }
+  .pl-contact .pl-step__title {
+    text-align: left;
+    font-size: clamp(1.5rem, 5vw, 2.125rem);
+    white-space: nowrap;
+  }
+  .pl-contact .pl-step__hint {
+    text-align: left;
+    max-width: 56ch;
+    letter-spacing: 0.08em;
+  }
   .pl-form { display: flex; flex-direction: column; gap: 1.25rem; }
   .pl-form__row {
     display: grid;

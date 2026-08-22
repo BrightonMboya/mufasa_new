@@ -154,8 +154,7 @@ export const journeys = [
     nights: 14,
     season: 'Jun — Oct',
     priceFrom: '$8,900',
-    image:
-      'https://images.unsplash.com/photo-1673667618335-face21a8b1a8?w=1600&q=85&auto=format&fit=crop',
+    image: '/media/journeys/north-to-sea.jpeg',
     summary:
       'The whole arc of the north in one unhurried line — from the coffee farms below Meru, through baobab country and the crater, into the deep Serengeti, and out to the reef. Fourteen nights, five grounds, one guide the whole way.',
     days: [
@@ -193,8 +192,7 @@ export const journeys = [
     nights: 8,
     season: 'All Year',
     priceFrom: '$5,800',
-    image:
-      'https://images.unsplash.com/photo-1700222344634-a7621e8b1339?w=1600&q=85&auto=format&fit=crop',
+    image: '/media/journeys/the-quiet-south.jpeg',
     summary:
       'Nyerere by boat, Mikumi\'s floodplain giraffe, a waterfall trek into the Udzungwa rainforest, and Ruaha\'s wild dog and roan antelope country — four of the south\'s least-visited parks strung into one long circuit, closing with a bush flight back to the coast.',
     days: [
@@ -231,12 +229,11 @@ export const journeys = [
     featured: true,
     meta: 'Coast & Islands · 7 Nights',
     category: 'Coast & Islands',
-    title: 'Salt and Silence',
+    title: 'Zanzibar in Silence',
     nights: 7,
     season: 'Jun — Mar',
     priceFrom: '$4,200',
-    image:
-      'https://images.unsplash.com/photo-1665449417444-fe7fec4b7425?w=1600&q=85&auto=format&fit=crop',
+    image: '/media/journeys/zanzibar-in-silence.jpeg',
     summary:
       'For when the safari is over and the body wants salt water. Seven nights on the far side of Zanzibar and the Mafia channel — reef, dhow, spice, and a schedule with nothing on it.',
     days: [
@@ -833,8 +830,7 @@ export const planner = {
     title: 'Find your Tanzania in minutes',
     body: "Tell us what you'd love from your next journey and we'll draw the trips from our collection that fit. Think of it as a starting point for the conversation — not a checkout.",
     cta: "Let's begin",
-    heroImage:
-      'https://images.unsplash.com/photo-1745885979468-44a855f8a5fa?w=1800&q=80&auto=format&fit=crop',
+    heroImage: '/media/journeys/trip-planner-hero.jpeg',
   },
   steps: [
     {
