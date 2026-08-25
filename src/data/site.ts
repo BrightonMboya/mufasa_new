@@ -1458,10 +1458,10 @@ export const reviews = {
   title: 'Travellers on the record',
   lead: "Most of our guests come to us on a recommendation. The rest tend to read the reviews first — so here is where they live, unedited, on the platforms that host them.",
   // Platform logos link straight to the live review pages. Ratings/counts for
-  // SafariBookings and Tripadvisor are the real, verified figures. Google is
-  // pending its Business Profile URL and rating — `pending: true` shows a link
-  // only, no invented score. `invert` recolours a white-on-transparent logo to
-  // ink so it reads on the light surface.
+  // SafariBookings and Tripadvisor are the real, verified figures. Google and
+  // Design My Safari are pending their rating figures — `pending: true` shows
+  // a link only, no invented score. `invert` recolours a logo to ink so it
+  // reads on the light surface.
   ratings: [
     {
       platform: 'SafariBookings',
@@ -1486,6 +1486,14 @@ export const reviews = {
       alt: 'Google',
       pending: true,
       href: 'https://www.google.com/maps/search/King+Mufasa+Expeditions+Arusha',
+    },
+    {
+      platform: 'Design My Safari',
+      logo: '/brand/designmysafari.png',
+      alt: 'Design My Safari',
+      invert: true,
+      pending: true,
+      href: 'https://www.designmysafari.com/',
     },
   ],
   // Real, relevant credentials for a Tanzanian operator. Swap the text badges
