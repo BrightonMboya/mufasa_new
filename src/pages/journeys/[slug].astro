@@ -150,7 +150,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
           </div>
 
           {journey.days.map((d, i) => {
-            const bandImage = (d.images && d.images[0]) || journey.image;
+            const bandImage = d.bandImage || (d.images && d.images[0]) || journey.image;
             const lodge = lodgeFor(d.images);
             return (
               <Fragment>
@@ -782,7 +782,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   }
   .day__gallery {
     position: relative;
-    height: 420px;
+    height: 380px;
     overflow: hidden;
     background-color: var(--color-ink);
   }
@@ -1055,7 +1055,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   @media (min-width: 1024px) {
     .day__stay { grid-template-columns: 1fr 1fr; }
     .day__stay--reverse .day__gallery { order: 2; }
-    .day__gallery { height: 600px; }
+    .day__gallery { height: 520px; }
     .pricing__grid { grid-template-columns: 1fr 1fr; }
   }
 
