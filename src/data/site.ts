@@ -1464,7 +1464,9 @@ export const reviews = {
   // Platform logos link straight to the live review pages. Tripadvisor's score/count
   // is the real, verified figure. SafariBookings, Google, and Design My Safari show
   // a link only (no score/count) — `pending: true` on each. `invert` recolours a
-  // logo to ink so it reads on the light surface.
+  // logo to ink so it reads on the light surface. `badge` marks the Design My
+  // Safari partner graphic, which carries its own colours/border and is rendered
+  // larger, unfiltered, at its native aspect ratio.
   ratings: [
     {
       platform: 'SafariBookings',
@@ -1490,11 +1492,11 @@ export const reviews = {
     },
     {
       platform: 'Design My Safari',
-      logo: '/brand/designmysafari.png',
-      alt: 'Design My Safari',
-      invert: true,
+      logo: '/brand/designmysafari-partner.svg',
+      alt: 'Design My Safari Safari Partner',
+      badge: true,
       pending: true,
-      href: 'https://www.designmysafari.com/',
+      href: 'https://www.designmysafari.com/?utm_source=kingmufasaexpeditions&utm_medium=partner&utm_campaign=operator_partner',
     },
   ],
   // Real, relevant credentials for a Tanzanian operator. Swap the text badges

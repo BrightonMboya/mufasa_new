@@ -20,7 +20,10 @@ import { reviews } from '../data/site';
         aria-label={`Read our reviews on ${r.platform}`}
       >
         <img
-          class:list={['rating__logo', { 'rating__logo--invert': r.invert }]}
+          class:list={[
+            'rating__logo',
+            { 'rating__logo--invert': r.invert, 'rating__logo--badge': r.badge },
+          ]}
           src={r.logo}
           alt={r.alt}
           loading="lazy"
@@ -112,6 +115,15 @@ import { reviews } from '../data/site';
   .rating__logo--invert {
     filter: brightness(0);
     opacity: 0.82;
+  }
+  /* Design My Safari's badge carries its own colours/border — render it
+     larger and unfiltered rather than squeezing it into the wordmark row. */
+  .rating__logo--badge {
+    height: 52px;
+    opacity: 1;
+  }
+  .rating:hover .rating__logo--badge {
+    opacity: 1;
   }
   .rating:hover .rating__logo {
     opacity: 1;
