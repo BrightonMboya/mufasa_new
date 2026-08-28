@@ -22,7 +22,7 @@ function lodgeFor(images?: string[]) {
 
 const { journey } = Astro.props;
 const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
-const title = `${journey.title} — ${journey.nights} nights in Tanzania | ${site.shortName}`;
+const title = `${journey.title} — ${journey.nights + 1} Days / ${journey.nights} ${journey.nights === 1 ? 'Night' : 'Nights'} in Tanzania | ${site.shortName}`;
 
 // north-to-sea is our packages hub: hero only, then every priced package
 // split by how you reach it — overland from Arusha, or flown in from Zanzibar.
@@ -64,7 +64,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
               <rect x="2" y="3.2" width="12" height="10.3" rx="1" stroke="currentColor" stroke-width="1.2"/>
               <path d="M2 6.3h12M5.3 1.5v2.6M10.7 1.5v2.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
-            {journey.nights} nights
+            {journey.nights + 1} Days / {journey.nights} {journey.nights === 1 ? 'Night' : 'Nights'}
           </span>
           <span class="dhero__dot"></span>
           <span class="dhero__meta-item">
@@ -74,12 +74,6 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
             </svg>
             {site.region}
           </span>
-          {!isPackagesHub && (
-            <Fragment>
-              <span class="dhero__dot"></span>
-              <span class="dhero__meta-item">{journey.season}</span>
-            </Fragment>
-          )}
         </div>
       </div>
 
@@ -102,12 +96,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
           <div class="intro__stats" data-reveal>
             <div class="stat">
               <span class="stat__label">Duration</span>
-              <span class="stat__value">{journey.nights} nights</span>
-            </div>
-            <span class="stat__divider"></span>
-            <div class="stat">
-              <span class="stat__label">Best Season</span>
-              <span class="stat__value">{journey.season}</span>
+              <span class="stat__value">{journey.nights + 1} Days / {journey.nights} {journey.nights === 1 ? 'Night' : 'Nights'}</span>
             </div>
             <span class="stat__divider"></span>
             <div class="stat">
