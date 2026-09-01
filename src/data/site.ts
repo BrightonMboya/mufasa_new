@@ -37,13 +37,33 @@ export const forms = {
 export const hero = {
   // Auto-rotating background slideshow — crossfades between these on a timer.
   images: [
-    'https://images.pexels.com/photos/2622266/pexels-photo-2622266.jpeg',
-    '/media/hero/lodge-suite.jpg',
-    '/media/hero/migration-balloons.jpg',
+    // Ngorongoro plains under towering cloud, safari vehicles small on the horizon
+    'https://images.pexels.com/photos/34271302/pexels-photo-34271302.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Balloons over the Serengeti at dawn
+    'https://images.pexels.com/photos/28830598/pexels-photo-28830598.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Lone acacia above the wildebeest migration
+    'https://images.pexels.com/photos/31207738/pexels-photo-31207738.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Elephants in silhouette at sunset
+    'https://images.pexels.com/photos/5125391/pexels-photo-5125391.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Ngorongoro Crater panorama
+    'https://images.pexels.com/photos/30630770/pexels-photo-30630770.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Dhow off Zanzibar at sunset
+    'https://images.pexels.com/photos/30311543/pexels-photo-30311543.jpeg?auto=compress&cs=tinysrgb&w=1920',
   ],
-  title: 'Unforgettable Journeys',
-  subtitle:
-    'Set off on remarkable, deeply personal journeys through Tanzania, planned by the guides who walk them.',
+  // Background film: a 20s loop cut from Singita's "A wildlife showcase"
+  // (60-80s of the original — river crossing, cheetah cub, leopard, elephants,
+  // rhino). Self-hosted, no audio track. Shown only once it is actually
+  // playing; otherwise the images above stay up. Poster is its first frame.
+  // Two encodes of the same cut: 720p/4.4MB for wide screens, 480p/1.6MB for
+  // phones, chosen at runtime so neither is fetched speculatively.
+  video: {
+    src: '/media/hero/wildlife-loop.mp4',
+    srcSmall: '/media/hero/wildlife-loop-480.mp4',
+    poster: '/media/hero/wildlife-loop-poster.jpg',
+  },
+  title: 'Every detail designed around you',
+  subtitle: 'Thoughtful planning, handcrafted experiences & support every step of the way',
+  cta: { label: 'Start Planning', href: '/trip-planner' },
 };
 
 export const statement = {

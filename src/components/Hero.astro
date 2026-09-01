@@ -1,14 +1,19 @@
 ---
 import { hero } from '../data/site';
+
+
 ---
 
 <section class="hero">
   <div class="hero__slides" aria-hidden="true">
+    {/* The first frame is the video's poster and the fallback's first slide.
+        The rest only get fetched if the video never comes up. */}
     {hero.images.map((src, i) => (
       <img
         class="hero__slide"
         class:list={[{ 'is-active': i === 0 }]}
-        src={src}
+        src={i === 0 ? src : undefined}
+        data-src={i === 0 ? undefined : src}
         alt=""
         loading={i === 0 ? 'eager' : 'lazy'}
         fetchpriority={i === 0 ? 'high' : 'auto'}
@@ -16,44 +21,44 @@ import { hero } from '../data/site';
       />
     ))}
   </div>
-  <div class="hero__scrim"></div>
 
-  <div class="hero__headline">
-    <h1>{hero.title}</h1>
-    <p>{hero.subtitle}</p>
+  <div class="hero__video-frame" aria-hidden="true">
+    <video
+      class="hero__video"
+      data-src={hero.video.src}
+      data-src-small={hero.video.srcSmall}
+      poster={hero.video.poster}
+      muted
+      loop
+      playsinline
+      preload="none"
+      data-hero-video
+    ></video>
   </div>
 
-  <div class="hero__split wrap">
-    <div class="hero__col">
-      <span class="hero__prompt">Take me to</span>
-      <form class="search" role="search" data-hero-search>
-        <input type="text" name="q" placeholder="Search destinations and journeys" aria-label="Search destinations and journeys" data-hero-search-input />
-        <button type="submit" class="search__btn" aria-label="Search">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7" />
-            <path d="M13.6 13.6 18 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-          </svg>
-        </button>
-      </form>
-    </div>
+  <div class="hero__scrim"></div>
 
-    <div class="hero__divider" aria-hidden="true"></div>
-
-    <div class="hero__col">
-      <span class="hero__prompt">Not sure where?</span>
-      <a href="/trip-planner" class="planner">Use Our Trip Planner</a>
-    </div>
+  <div class="hero__headline wrap">
+    <h1>{hero.title}</h1>
+    <p>{hero.subtitle}</p>
+    <a href={hero.cta.href} class="hero__cta">
+      {hero.cta.label}
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+        <path d="M1 6h13m0 0-4.5-4.5M14 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </a>
   </div>
 </section>
 
 <style>
   .hero {
+    --hero-h: clamp(560px, 88vh, 860px);
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: clamp(560px, 82vh, 760px);
+    justify-content: flex-end;
+    min-height: var(--hero-h);
     overflow: hidden;
     background-color: var(--color-ink);
     isolation: isolate;
@@ -62,7 +67,30 @@ import { hero } from '../data/site';
   .hero__slides {
     position: absolute;
     inset: 0;
+    z-index: -3;
+  }
+
+  /* Video sits above the stills, but stays invisible until the player says it
+     is ready — a refused embed leaves the image hero untouched. */
+  .hero__video-frame {
+    position: absolute;
+    inset: 0;
     z-index: -2;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+  }
+  .hero__video-frame.is-ready {
+    opacity: 1;
+  }
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
   }
   .hero__slide {
     position: absolute;
@@ -80,166 +108,106 @@ import { hero } from '../data/site';
     position: absolute;
     inset: 0;
     z-index: -1;
-    /* Centered radial darkening behind the headline (keeps white text
-       legible over any image), a flat low-opacity wash so text holds up
-       everywhere else too, layered over the top-nav + bottom-panel
-       vertical gradient. */
+    /* Headline now sits low in the frame, so the darkening follows it:
+       a soft ellipse under the copy, over a vertical gradient that keeps
+       the top nav legible and weights the bottom third. */
     background:
       radial-gradient(
-        ellipse 75% 55% at 50% 42%,
-        rgba(20, 24, 21, 0.54) 0%,
-        rgba(20, 24, 21, 0) 70%
+        ellipse 80% 45% at 50% 88%,
+        rgba(20, 24, 21, 0.5) 0%,
+        rgba(20, 24, 21, 0) 75%
       ),
       linear-gradient(
         180deg,
         rgba(20, 24, 21, 0.42) 0%,
-        rgba(20, 24, 21, 0.2) 30%,
-        rgba(20, 24, 21, 0.58) 70%,
-        rgba(20, 24, 21, 0.88) 100%
+        rgba(20, 24, 21, 0.12) 32%,
+        rgba(20, 24, 21, 0.38) 72%,
+        rgba(20, 24, 21, 0.72) 100%
       ),
-      rgba(20, 24, 21, 0.08);
+      rgba(20, 24, 21, 0.06);
   }
 
   .hero__headline {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.375rem;
+    gap: 1.125rem;
     text-align: center;
-    max-width: 1000px;
-    padding-inline: var(--gutter);
-    margin-bottom: clamp(6rem, 14vh, 9.375rem);
+    padding-bottom: clamp(3rem, 8vh, 5.5rem);
   }
   .hero__headline h1 {
-    font-size: clamp(2.75rem, 6vw, 5rem);
+    max-width: 20ch;
+    font-size: clamp(1.5rem, 2.8vw, 2.75rem);
+    line-height: 1.15;
+    text-wrap: balance;
+    font-weight: var(--fw-regular);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
     color: var(--color-on-accent);
-    letter-spacing: -0.015em;
+    text-shadow: 0 2px 24px rgba(20, 24, 21, 0.35);
   }
   .hero__headline p {
-    max-width: 42ch;
-    font-size: clamp(1rem, 2vw, 1.1875rem);
+    max-width: 60ch;
+    font-size: clamp(0.9375rem, 1.3vw, 1.0625rem);
     line-height: 1.55;
-    color: rgba(247, 244, 238, 0.9);
+    color: rgba(247, 244, 238, 0.92);
+    text-shadow: 0 1px 16px rgba(20, 24, 21, 0.4);
   }
 
-  .hero__split {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: clamp(2rem, 5vh, 3.625rem);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-  }
-  .hero__col {
-    display: flex;
-    flex-direction: column;
+  .hero__cta {
+    display: inline-flex;
     align-items: center;
-    gap: 1.25rem;
-    flex: 1 1 0;
-    max-width: 480px;
-  }
-  .hero__prompt {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 3vw, 2.125rem);
-    letter-spacing: -0.01em;
-    color: var(--color-on-accent);
-  }
-  .hero__divider {
-    width: 1px;
-    align-self: stretch;
-    min-height: 126px;
-    background-color: rgba(247, 244, 238, 0.32);
-  }
-
-  .search {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    width: 100%;
-    padding: 0.5rem 0.5rem 0.5rem 1.75rem;
-    border: 1px solid rgba(247, 244, 238, 0.5);
+    gap: 0.75rem;
+    margin-top: 0.875rem;
+    padding: 1.0625rem 2.25rem;
     border-radius: var(--radius-full);
-    background: rgba(20, 24, 21, 0.15);
-    backdrop-filter: blur(2px);
-  }
-  .search input {
-    flex: 1;
-    min-width: 0;
-    background: none;
-    border: none;
-    outline: none;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
     font-family: var(--font-ui);
-    font-size: 1rem;
-    color: var(--color-on-accent);
+    font-size: 0.875rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background-color 0.25s ease, transform 0.25s ease;
   }
-  .search input::placeholder {
-    color: rgba(247, 244, 238, 0.68);
+  .hero__cta:hover {
+    background-color: var(--color-accent-deep);
   }
-  .search__btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    border-radius: var(--radius-full);
-    background-color: var(--color-sand);
-    color: var(--color-ink);
-    transition: filter 0.2s ease;
+  .hero__cta svg {
+    transition: transform 0.25s ease;
   }
-  .search__btn:hover {
-    filter: brightness(0.95);
-  }
-
-  .planner {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 1.25rem 2.5rem;
-    border-radius: var(--radius-full);
-    background-color: var(--color-sand);
-    color: var(--color-ink);
-    font-weight: var(--fw-medium);
-    font-size: 1rem;
-    letter-spacing: 0.01em;
-    transition: filter 0.2s ease;
-  }
-  .planner:hover {
-    filter: brightness(0.95);
+  .hero__cta:hover svg {
+    transform: translateX(3px);
   }
 
   @media (max-width: 760px) {
-    .hero__split {
-      position: static;
-      flex-direction: column;
-      align-items: stretch;
-      padding-block: 2.5rem 3rem;
-      background-color: var(--color-ink);
-    }
-    .hero__col {
-      max-width: none;
-    }
-    .hero__divider {
-      display: none;
-    }
     .hero {
-      justify-content: flex-start;
-      padding-top: clamp(4rem, 12vh, 7rem);
-    }
-    .hero__headline {
-      margin-bottom: 3rem;
+      /* Full-screen on phones. svh is the viewport with the browser chrome
+         showing, so the CTA never lands under the address bar; vh is the
+         fallback for browsers without it. */
+      --hero-h: 100vh;
+      --hero-h: 100svh;
     }
   }
 </style>
 
 <script>
-  // Auto-rotating hero background: crossfade to the next slide every 6s.
-  // Respects reduced-motion by holding on the first slide instead of cycling.
   const slides = document.querySelectorAll<HTMLImageElement>('[data-hero-slide]');
-  if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const frame = document.querySelector<HTMLElement>('.hero__video-frame');
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Fall back to the image slideshow: pull in the slides we deferred, then
+  // crossfade every 6s. Holds on the first frame under reduced-motion.
+  let started = false;
+  function useSlideshow() {
+    if (started) return;
+    started = true;
+    slides.forEach((s) => {
+      const src = s.dataset.src;
+      if (src && !s.src) s.src = src;
+    });
+    if (slides.length < 2 || reduced) return;
     let index = 0;
     setInterval(() => {
       slides[index].classList.remove('is-active');
@@ -248,12 +216,41 @@ import { hero } from '../data/site';
     }, 6000);
   }
 
-  // Hero search -> filter the journeys grid below (handled in Journeys.astro).
-  const searchForm = document.querySelector<HTMLFormElement>('[data-hero-search]');
-  const searchInput = document.querySelector<HTMLInputElement>('[data-hero-search-input]');
-  searchForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const query = searchInput?.value ?? '';
-    window.dispatchEvent(new CustomEvent('mufasa:search', { detail: { query } }));
-  });
+  // Who should never be sent the 4.4MB loop. Hosting cannot help a bad
+  // connection; not shipping the file to it can. Screen size is deliberately
+  // not a factor — phones on a good connection get the video like anyone
+  // else. These visitors get the poster plus the image slideshow instead.
+  const conn = (navigator as any).connection;
+  const saveData = conn?.saveData === true;
+  const slowLink = /^(slow-2g|2g|3g)$/.test(conn?.effectiveType ?? '');
+
+  if (!video || !frame || reduced || saveData || slowLink) {
+    video?.remove();
+    useSlideshow();
+  } else {
+    let done = false;
+    function fallback() {
+      if (done) return;
+      done = true;
+      video!.remove();
+      useSlideshow();
+    }
+
+    // Only reveal the video once it is genuinely painting frames — a failed
+    // fetch or a refused autoplay leaves the image hero in place instead of
+    // flashing an empty box.
+    video.addEventListener('playing', () => {
+      if (done) return;
+      done = true;
+      frame!.classList.add('is-ready');
+    }, { once: true });
+    video.addEventListener('error', fallback, { once: true });
+
+    // 480p is indistinguishable on a phone-sized box and costs a third as
+    // much data, so narrow viewports get it. Assigning src here — rather
+    // than in the markup — is what keeps the unused encode unfetched.
+    const small = window.matchMedia('(max-width: 900px)').matches;
+    video.src = (small && video.dataset.srcSmall) || video.dataset.src!;
+    video.play().catch(fallback);
+  }
 </script>

@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Enquiry from '../components/Enquiry.astro';
+import JourneyEnquiryModal from '../components/JourneyEnquiryModal.astro';
 import { trekking, site } from '../data/site';
 
 const title = `Trekking — Kilimanjaro & Mount Meru | ${site.shortName}`;
@@ -51,7 +52,7 @@ const description = trekking.intro.lead;
                 <span class="trek__price-label">From / person</span>
                 <span class="trek__price-value">{r.priceFrom}</span>
               </span>
-              <a href="/#enquiry" class="pill pill--outline trek__cta">Enquire</a>
+              <button type="button" class="pill pill--outline trek__cta" data-emodal-open data-journey={r.name}>Enquire</button>
             </div>
           </article>
         ))}
@@ -69,6 +70,8 @@ const description = trekking.intro.lead;
     <Enquiry />
   </main>
   <Footer />
+
+  <JourneyEnquiryModal journeyTitle={trekking.routes[0]?.name ?? 'Trekking'} />
 </Base>
 
 <style>
