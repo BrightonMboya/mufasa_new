@@ -107,7 +107,7 @@ const totalSteps = planner.steps.length;
             <button type="button" class="pl-back" data-go-back>Previous</button>
             <button type="submit" class="pill pill--accent pl-submit" data-submit>Send my enquiry</button>
           </div>
-          <p class="pl-form__fineprint">We reply within a day, and never share your details.</p>
+          <p class="pl-form__fineprint">We reply within a few hours, and never share your details.</p>
         </form>
       </div>
     </section>
@@ -116,8 +116,8 @@ const totalSteps = planner.steps.length;
     <section class="pl-screen pl-thanks" data-screen="thanks">
       <div class="wrap pl-thanks__inner">
         <span class="eyebrow">Enquiry received</span>
-        <h2 data-thanks-title>Thank you — it's on its way to us.</h2>
-        <p>A guide will read what you've shared and reply personally, usually within a day. If you'd rather talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
+        <h2 data-thanks-title>Thank you — we've got your enquiry.</h2>
+        <p>We will look at your request and get back to you within a few hours. If you'd rather talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
         <div class="pl-thanks__cta">
           <a href="/" class="pill pill--accent">Back to home</a>
           <button type="button" class="pill pill--ghost" data-restart>Plan another trip</button>
@@ -308,7 +308,7 @@ const totalSteps = planner.steps.length;
           const json = await res.json();
           if (json && json.success) {
             const first = name.split(' ')[0];
-            thanksTitle.textContent = `Thank you, ${first} — it's on its way to us.`;
+            thanksTitle.textContent = `Thank you, ${first} — we've got your enquiry.`;
             show(THANKS);
           } else {
             throw new Error((json && json.message) || 'Submission failed');

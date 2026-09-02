@@ -1014,7 +1014,7 @@ export const about = {
   },
   lead: 'King Mufasa Expeditions is a Tanzanian-owned house of travel specialists based in Arusha. We believe travel is transformative — so we craft every itinerary by hand, and stand behind it personally.',
   story: [
-    "The company is led by Davis Peter, Founder & CEO, and Anneth Benedict, Manager — a small, local team who reply to every enquiry within 24 hours rather than routing you through a call centre. Whether the trip is built around wildlife, culture, or a summit, our specialists tailor it to what you actually want, not a fixed package.",
+    "The company is led by Davis Peter, Founder & CEO, and Anneth Benedict, Manager — a small, local team who reply to every enquiry within a few hours rather than routing you through a call centre. Whether the trip is built around wildlife, culture, or a summit, our specialists tailor it to what you actually want, not a fixed package.",
     "We work exclusively with lodges, camps, and hotels chosen for the excellence of their personalised service, move between them in our own well-maintained, safari-prepared Land Cruisers, and put you with guides who are qualified, experienced, and deeply familiar with the ecosystems they drive.",
   ],
   stats: [
@@ -1031,7 +1031,7 @@ export const about = {
   },
   operations: {
     title: 'How we work',
-    body: "Every camp and hotel we use is chosen for the excellence of its personalised service, not just its view. We travel in our own safari-prepared Land Cruisers, and our local Tanzanian staff reply to every enquiry and reservation within 24 hours. We're listed and reviewed on TripAdvisor, GetYourGuide, SafariGo, and Google — the same platforms our guests use to check on us before they book.",
+    body: "Every camp and hotel we use is chosen for the excellence of its personalised service, not just its view. We travel in our own safari-prepared Land Cruisers, and our local Tanzanian staff reply to every enquiry and reservation within a few hours. We're listed and reviewed on TripAdvisor, GetYourGuide, SafariGo, and Google — the same platforms our guests use to check on us before they book.",
     image:
       'https://images.unsplash.com/photo-1557756006-90a218bcc7e1?w=1200&q=80&auto=format&fit=crop',
   },

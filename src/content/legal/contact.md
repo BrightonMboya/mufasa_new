@@ -14,4 +14,4 @@ We are always here to help.
 
 We're also reachable on WeChat, Facebook, Instagram, and LinkedIn.
 
-Prefer to just ask? [Send us an enquiry](/#enquiry) and we'll reply within 24 hours.
+Prefer to just ask? [Send us an enquiry](/#enquiry) and we'll reply within a few hours.

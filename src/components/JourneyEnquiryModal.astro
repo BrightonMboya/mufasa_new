@@ -1,5 +1,5 @@
 ---
-import { forms } from '../data/site';
+import { forms, site } from '../data/site';
 
 interface Props {
   journeyTitle: string;
@@ -63,12 +63,15 @@ const { journeyTitle } = Astro.props;
       <p class="jem__error" data-emodal-error hidden></p>
 
       <button type="submit" class="pill pill--accent jem__submit" data-emodal-submit>Send enquiry</button>
-      <p class="jem__fineprint">We reply within a day, and never share your details.</p>
+      <p class="jem__fineprint">We reply within a few hours, and never share your details.</p>
     </form>
 
     <div class="jem__thanks" data-emodal-thanks hidden>
-      <h3>Thank you — it's on its way to us.</h3>
-      <p>A guide will read what you've shared and reply personally, usually within a day.</p>
+      <span class="eyebrow">Enquiry received</span>
+      <h3 data-emodal-thanks-title>Thank you — we've got your enquiry.</h3>
+      <p>We will look at your request and get back to you within a few hours. If you'd rather
+        talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
+      <button type="button" class="pill pill--ghost jem__thanks-close" data-emodal-close>Close</button>
     </div>
   </div>
 </div>
@@ -164,6 +167,9 @@ const { journeyTitle } = Astro.props;
         const json = await res.json();
         if (json && json.success) {
           sent = true;
+          const first = name.split(' ')[0];
+          const thanksTitle = modal.querySelector('[data-emodal-thanks-title]');
+          if (thanksTitle && first) thanksTitle.textContent = `Thank you, ${first} — we've got your enquiry.`;
           form.hidden = true;
           thanksEl.hidden = false;
           // The panel scrolls; without this the confirmation can land above
@@ -332,6 +338,8 @@ const { journeyTitle } = Astro.props;
     margin-bottom: 0.75rem;
   }
   .jem__thanks p { color: var(--color-slate); line-height: 1.6; }
+  .jem__thanks p a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .jem__thanks-close { margin-top: 1.5rem; }
 
   @media (max-width: 480px) {
     .jem__row { grid-template-columns: 1fr; }
