@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { planner, site, forms } from '../data/site';
+import PhoneField from '../components/PhoneField.astro';
 
 const title = `Trip Planner — ${site.shortName}`;
 const description = planner.intro.body;
@@ -92,10 +93,7 @@ const totalSteps = planner.steps.length;
               <input type="email" name="email" autocomplete="email" required />
             </label>
           </div>
-          <label class="pl-field">
-            <span>Phone / WhatsApp <em>(optional)</em></span>
-            <input type="tel" name="phone" autocomplete="tel" />
-          </label>
+          <PhoneField fieldClass="pl-field" tone="dark" />
           <label class="pl-field">
             <span>Anything else we should know? <em>(optional)</em></span>
             <textarea name="note" rows="3"></textarea>

@@ -1,0 +1,621 @@
+---
+/* International phone field: a dial-code picker plus a national-number input,
+   writing a single E.164 value (+255712345678) into a hidden input. That
+   hidden input carries the `name`, so any form reading `FormData.get('phone')`
+   keeps working untouched.
+
+   All phone-number knowledge — dial codes, trunk-prefix stripping, per-country
+   validity, formatting — comes from libphonenumber-js. Nothing about numbering
+   plans is hand-written here; the country list itself is derived from the
+   library at runtime, and country names come from Intl.DisplayNames.
+
+   `tone` picks the palette: 'dark' for the trip-planner's dark panel,
+   'light' for the journey modal. */
+interface Props {
+  name?: string;
+  label?: string;
+  optional?: boolean;
+  defaultCountry?: string;
+  tone?: 'dark' | 'light';
+  fieldClass?: string;
+}
+
+const {
+  name = 'phone',
+  label = 'Phone / WhatsApp',
+  optional = true,
+  defaultCountry = 'TZ',
+  tone = 'dark',
+  fieldClass = '',
+} = Astro.props;
+
+const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
+---
+
+<div
+  class:list={[fieldClass, 'phf', `phf--${tone}`]}
+  data-phone-field
+  data-default-country={defaultCountry}
+  data-phf-uid={uid}
+>
+  <span class="phf__label" id={`${uid}-label`}>{label} {optional && <em>(optional)</em>}</span>
+
+  <div class="phf__control" data-phf-control>
+    <button
+      type="button"
+      class="phf__country"
+      data-phf-toggle
+      aria-haspopup="listbox"
+      aria-expanded="false"
+      aria-labelledby={`${uid}-label`}
+    >
+      <span class="phf__flag" data-phf-flag aria-hidden="true"></span>
+      <span class="phf__dial" data-phf-dial></span>
+      <svg class="phf__chev" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+
+    <input
+      type="tel"
+      class="phf__number"
+      data-phf-number
+      inputmode="tel"
+      autocomplete="tel-national"
+      aria-labelledby={`${uid}-label`}
+      aria-describedby={`${uid}-error`}
+    />
+  </div>
+
+  <div class="phf__pop" data-phf-pop hidden>
+    <input
+      type="text"
+      class="phf__search"
+      data-phf-search
+      placeholder="Search countries"
+      aria-label="Search countries"
+      autocomplete="off"
+      role="combobox"
+      aria-expanded="true"
+      aria-autocomplete="list"
+      aria-controls={`${uid}-list`}
+    />
+    <ul class="phf__list" id={`${uid}-list`} role="listbox" data-phf-list aria-labelledby={`${uid}-label`}></ul>
+    <p class="phf__empty" data-phf-empty hidden>No match</p>
+  </div>
+
+  <p class="phf__error" id={`${uid}-error`} data-phf-error hidden role="alert"></p>
+
+  <input type="hidden" name={name} data-phf-value />
+</div>
+
+<style is:global>
+  /* Deliberately `is:global`, for two reasons Astro's scoping forces:
+     1. The option rows are built in JS, so they never receive the component's
+        scope attribute and scoped rules would miss them entirely.
+     2. A host form's own `.pl-field input` rules cannot reach elements
+        rendered by this component, so the field has to carry its own look.
+     Every selector below is namespaced under `.phf`, so nothing leaks. */
+
+  .phf {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .phf--dark {
+    --phf-label: rgba(247, 244, 238, 0.7);
+    --phf-label-muted: rgba(247, 244, 238, 0.45);
+    --phf-bg: rgba(247, 244, 238, 0.06);
+    --phf-bg-hover: rgba(247, 244, 238, 0.11);
+    --phf-bg-focus: rgba(247, 244, 238, 0.09);
+    --phf-border: rgba(247, 244, 238, 0.22);
+    --phf-border-focus: var(--color-accent-soft);
+    --phf-text: var(--color-on-accent);
+    --phf-muted: rgba(247, 244, 238, 0.5);
+    --phf-pop-bg: #1f2622;
+    --phf-pop-border: rgba(247, 244, 238, 0.16);
+    --phf-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
+    --phf-error: #e8b4a0;
+  }
+  .phf--light {
+    --phf-label: var(--color-slate);
+    --phf-label-muted: #8b918c;
+    --phf-bg: var(--color-ground);
+    --phf-bg-hover: #e3ded4;
+    --phf-bg-focus: var(--color-surface);
+    --phf-border: var(--color-hairline);
+    --phf-border-focus: var(--color-accent);
+    --phf-text: var(--color-ink);
+    --phf-muted: var(--color-slate);
+    --phf-pop-bg: var(--color-surface);
+    --phf-pop-border: var(--color-hairline);
+    --phf-shadow: 0 20px 44px rgba(20, 24, 21, 0.16);
+    --phf-error: #a4442a;
+  }
+
+  /* Matches the sibling fields' label treatment in both host forms. */
+  .phf__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--phf-label);
+  }
+  .phf__label em {
+    text-transform: none;
+    letter-spacing: 0;
+    font-style: normal;
+    color: var(--phf-label-muted);
+  }
+
+  .phf__control {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  /* One shared shell so the button and the number input read as a single
+     control, and both match the name/email fields beside them. */
+  .phf__country,
+  .phf__number,
+  .phf__search {
+    background-color: var(--phf-bg);
+    border: 1px solid var(--phf-border);
+    border-radius: var(--radius-sm, 2px);
+    color: var(--phf-text);
+    font-family: var(--font-ui, inherit);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .phf__number,
+  .phf__search {
+    padding: 0.85rem 1rem;
+    width: 100%;
+    min-width: 0;
+  }
+  .phf__number:focus,
+  .phf__search:focus {
+    outline: none;
+    border-color: var(--phf-border-focus);
+    background-color: var(--phf-bg-focus);
+  }
+  .phf__number::placeholder,
+  .phf__search::placeholder {
+    color: var(--phf-muted);
+  }
+  .phf__number {
+    flex: 1 1 auto;
+  }
+
+  .phf__country {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex: 0 0 auto;
+    padding: 0.85rem 0.8rem;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .phf__country:hover {
+    background-color: var(--phf-bg-hover);
+  }
+  .phf__country:focus-visible {
+    outline: none;
+    border-color: var(--phf-border-focus);
+    background-color: var(--phf-bg-focus);
+  }
+  .phf__country[aria-expanded='true'] {
+    border-color: var(--phf-border-focus);
+  }
+
+  .phf__flag {
+    font-size: 1.05rem;
+    line-height: 1;
+    flex: 0 0 auto;
+    /* Windows ships no flag glyphs and falls back to the two
+       regional-indicator letters, which still reads next to the dial code. */
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  }
+  .phf__dial {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .phf__chev {
+    flex: 0 0 auto;
+    color: var(--phf-muted);
+    transition: transform 0.2s ease;
+  }
+  .phf__country[aria-expanded='true'] .phf__chev {
+    transform: rotate(180deg);
+  }
+
+  .phf__pop {
+    position: absolute;
+    z-index: 40;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    width: 100%;
+    max-width: 26rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    background-color: var(--phf-pop-bg);
+    border: 1px solid var(--phf-pop-border);
+    border-radius: var(--radius-sm, 2px);
+    box-shadow: var(--phf-shadow);
+  }
+  /* An author `display` beats the UA's [hidden] rule, so `pop.hidden = true`
+     is a no-op without this and the panel never closes. Same trap as
+     `.jem__form[hidden]` in JourneyEnquiryModal. */
+  .phf__pop[hidden] {
+    display: none;
+  }
+
+  .phf__list {
+    max-height: 15rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .phf__opt {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: var(--radius-sm, 2px);
+    color: var(--phf-text);
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+  .phf__opt.is-active {
+    background-color: var(--phf-bg-hover);
+  }
+  .phf__opt[aria-selected='true'] .phf__opt-name {
+    color: var(--phf-border-focus);
+  }
+  .phf__opt-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .phf__opt-dial {
+    flex: 0 0 auto;
+    color: var(--phf-muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.875rem;
+  }
+  .phf__empty {
+    padding: 0.65rem;
+    margin: 0;
+    color: var(--phf-muted);
+    font-size: 0.9375rem;
+  }
+
+  .phf__error {
+    margin: 0;
+    color: var(--phf-error);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 520px) {
+    .phf__pop {
+      max-width: none;
+    }
+  }
+</style>
+
+<script>
+  import {
+    AsYouType,
+    getCountries,
+    getCountryCallingCode,
+    isSupportedCountry,
+    getExampleNumber,
+    parsePhoneNumberFromString,
+    validatePhoneNumberLength,
+  } from 'libphonenumber-js/min';
+  // 4KB of example numbers, purely so the placeholder shows the shape the
+  // selected country actually expects.
+  import examples from 'libphonenumber-js/examples.mobile.json';
+
+  type Iso = ReturnType<typeof getCountries>[number];
+
+  // Country list derived from the library, named via the browser's own locale
+  // data — so there is no dial-code or country-name table to drift.
+  const regionNames = (() => {
+    try {
+      return new Intl.DisplayNames(['en'], { type: 'region' });
+    } catch {
+      return null;
+    }
+  })();
+
+  const collator = new Intl.Collator('en');
+  const COUNTRIES = getCountries()
+    .map((iso) => ({
+      iso,
+      dial: getCountryCallingCode(iso),
+      name: regionNames?.of(iso) ?? iso,
+    }))
+    .sort((a, b) => collator.compare(a.name, b.name));
+
+  function flagOf(iso: string) {
+    return String.fromCodePoint(
+      ...[...iso.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
+    );
+  }
+
+  // Best guess at the visitor's country: the region in their browser locale,
+  // then the field's own default (the operator's country).
+  function guessCountry(fallback: string): Iso {
+    for (const tag of navigator.languages ?? [navigator.language]) {
+      const region = new Intl.Locale(tag).region;
+      if (region && isSupportedCountry(region)) return region as Iso;
+    }
+    return (isSupportedCountry(fallback) ? fallback : 'TZ') as Iso;
+  }
+
+  function setup(root: HTMLElement) {
+    const toggle = root.querySelector<HTMLButtonElement>('[data-phf-toggle]')!;
+    const flagEl = root.querySelector<HTMLElement>('[data-phf-flag]')!;
+    const dialEl = root.querySelector<HTMLElement>('[data-phf-dial]')!;
+    const numberEl = root.querySelector<HTMLInputElement>('[data-phf-number]')!;
+    const pop = root.querySelector<HTMLElement>('[data-phf-pop]')!;
+    const search = root.querySelector<HTMLInputElement>('[data-phf-search]')!;
+    const list = root.querySelector<HTMLUListElement>('[data-phf-list]')!;
+    const emptyEl = root.querySelector<HTMLElement>('[data-phf-empty]')!;
+    const errorEl = root.querySelector<HTMLElement>('[data-phf-error]')!;
+    const hidden = root.querySelector<HTMLInputElement>('[data-phf-value]')!;
+    const uid = root.dataset.phfUid || 'phf';
+
+    let country = guessCountry(root.dataset.defaultCountry || 'TZ');
+    let activeIndex = -1;
+    let shown = COUNTRIES;
+
+    function paintCountry() {
+      flagEl.textContent = flagOf(country);
+      dialEl.textContent = '+' + getCountryCallingCode(country);
+      const c = COUNTRIES.find((x) => x.iso === country);
+      toggle.setAttribute('aria-label', `Country code: ${c?.name ?? country} +${c?.dial ?? ''}`);
+
+      // Show the country's own national format as the placeholder.
+      let hint = '';
+      try {
+        hint = getExampleNumber(country, examples)?.formatNational() ?? '';
+      } catch {
+        hint = '';
+      }
+      numberEl.placeholder = hint;
+    }
+
+    // Single source of truth for the submitted value: E.164 when the number
+    // parses as valid for the chosen country, empty otherwise.
+    function sync() {
+      const raw = numberEl.value.trim();
+      if (!raw) {
+        hidden.value = '';
+        return;
+      }
+      const parsed = parsePhoneNumberFromString(raw, country);
+      hidden.value = parsed?.isValid() ? parsed.number : '';
+    }
+
+    function clearError() {
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+    }
+
+    function renderList() {
+      list.textContent = '';
+      shown.forEach((c, i) => {
+        const li = document.createElement('li');
+        li.className = 'phf__opt';
+        li.id = `${uid}-opt-${c.iso}`;
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', String(c.iso === country));
+        li.dataset.iso = c.iso;
+        if (i === activeIndex) li.classList.add('is-active');
+        li.innerHTML =
+          `<span class="phf__flag" aria-hidden="true"></span>` +
+          `<span class="phf__opt-name"></span>` +
+          `<span class="phf__opt-dial"></span>`;
+        li.children[0].textContent = flagOf(c.iso);
+        li.children[1].textContent = c.name;
+        li.children[2].textContent = '+' + c.dial;
+        list.appendChild(li);
+      });
+      emptyEl.hidden = shown.length > 0;
+      paintActive();
+    }
+
+    // Screen readers follow the active row through the search box, which is
+    // where focus actually sits while the list is open.
+    function paintActive() {
+      [...list.children].forEach((el, i) => el.classList.toggle('is-active', i === activeIndex));
+      const active = list.children[activeIndex] as HTMLElement | undefined;
+      if (active) search.setAttribute('aria-activedescendant', active.id);
+      else search.removeAttribute('aria-activedescendant');
+    }
+
+    function filter(q: string) {
+      const term = q.trim().toLowerCase().replace(/^\+/, '');
+      shown = !term
+        ? COUNTRIES
+        : COUNTRIES.filter(
+            (c) =>
+              c.name.toLowerCase().includes(term) ||
+              c.iso.toLowerCase().startsWith(term) ||
+              c.dial.startsWith(term),
+          );
+      activeIndex = shown.findIndex((c) => c.iso === country);
+      if (activeIndex < 0 && shown.length) activeIndex = 0;
+      renderList();
+    }
+
+    function open() {
+      shown = COUNTRIES;
+      activeIndex = Math.max(0, COUNTRIES.findIndex((c) => c.iso === country));
+      search.value = '';
+      renderList();
+      pop.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      search.focus();
+      scrollActiveIntoView();
+    }
+
+    function close(refocus = true) {
+      pop.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      if (refocus) toggle.focus();
+    }
+
+    function scrollActiveIntoView() {
+      list.children[activeIndex]?.scrollIntoView({ block: 'nearest' });
+    }
+
+    function move(delta: number) {
+      if (!shown.length) return;
+      activeIndex = (activeIndex + delta + shown.length) % shown.length;
+      paintActive();
+      scrollActiveIntoView();
+    }
+
+    function pick(iso: string) {
+      country = iso as Iso;
+      paintCountry();
+      // Re-run the formatter under the new country, since grouping and any
+      // trunk prefix are country-specific.
+      numberEl.value = new AsYouType(country).input(numberEl.value);
+      sync();
+      clearError();
+      close(false);
+      numberEl.focus();
+    }
+
+    toggle.addEventListener('click', () => (pop.hidden ? open() : close()));
+
+    search.addEventListener('input', () => filter(search.value));
+    search.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (shown[activeIndex]) pick(shown[activeIndex].iso);
+      } else if (e.key === 'Escape') { e.preventDefault(); close(); }
+    });
+
+    list.addEventListener('click', (e) => {
+      const li = (e.target as HTMLElement).closest<HTMLElement>('[data-iso]');
+      if (li?.dataset.iso) pick(li.dataset.iso);
+    });
+
+    // "Away" means anything but the toggle and the panel itself — the number
+    // input sits inside the same field, so testing against the whole
+    // component would leave the panel hanging open while you type a number.
+    function isInPicker(target: EventTarget | null) {
+      return target instanceof Node && (pop.contains(target) || toggle.contains(target));
+    }
+    document.addEventListener('pointerdown', (e) => {
+      if (!pop.hidden && !isInPicker(e.target)) close(false);
+    });
+    // Covers keyboard exits too: tabbing into the number field dismisses it.
+    document.addEventListener('focusin', (e) => {
+      if (!pop.hidden && !isInPicker(e.target)) close(false);
+    });
+    // Escape works from anywhere in the field, not just the search box.
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !pop.hidden) {
+        e.stopPropagation();
+        close();
+      }
+    });
+
+    numberEl.addEventListener('input', () => {
+      clearError();
+      const raw = numberEl.value;
+
+      // A pasted or typed international number tells us its own country —
+      // follow it rather than forcing the current selection.
+      if (raw.trim().startsWith('+')) {
+        const parsed = parsePhoneNumberFromString(raw.trim());
+        if (parsed?.country && parsed.country !== country) {
+          country = parsed.country;
+          paintCountry();
+        }
+      }
+
+      // Reformat only while the caret sits at the end, so editing mid-number
+      // does not shunt the cursor around.
+      const atEnd = numberEl.selectionStart === raw.length;
+      if (atEnd) {
+        const formatted = new AsYouType(country).input(raw);
+        if (formatted !== raw) numberEl.value = formatted;
+      }
+      sync();
+    });
+
+    numberEl.addEventListener('blur', validate);
+
+    function validate() {
+      const raw = numberEl.value.trim();
+      // The field is optional: empty is always fine.
+      if (!raw) {
+        clearError();
+        return true;
+      }
+      sync();
+      if (hidden.value) {
+        clearError();
+        return true;
+      }
+      const reason = validatePhoneNumberLength(raw, country);
+      const name = COUNTRIES.find((c) => c.iso === country)?.name ?? country;
+      errorEl.textContent =
+        reason === 'TOO_SHORT'
+          ? `That looks a few digits short for ${name}. Please check the number.`
+          : reason === 'TOO_LONG'
+            ? `That looks a few digits too long for ${name}. Please check the number.`
+            : `That does not look like a valid ${name} number. Please check it, or leave the field blank.`;
+      errorEl.hidden = false;
+      return false;
+    }
+
+    // Both host forms are `novalidate` and submit over fetch, so the gate is a
+    // capture-phase listener: an invalid number never reaches their handler.
+    const form = root.closest('form');
+    form?.addEventListener(
+      'submit',
+      (e) => {
+        if (!validate()) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          numberEl.focus();
+          numberEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      },
+      true,
+    );
+
+    // A reset (the journey modal reuses its form) clears our two inputs too.
+    form?.addEventListener('reset', () => {
+      window.setTimeout(() => {
+        hidden.value = '';
+        clearError();
+      }, 0);
+    });
+
+    paintCountry();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-phone-field]').forEach(setup);
+</script>

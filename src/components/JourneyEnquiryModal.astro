@@ -1,5 +1,6 @@
 ---
 import { forms, site } from '../data/site';
+import PhoneField from './PhoneField.astro';
 
 interface Props {
   journeyTitle: string;
@@ -38,10 +39,7 @@ const { journeyTitle } = Astro.props;
           <input type="date" name="date" required />
         </label>
       </div>
-      <label class="jem__field">
-        <span>Phone / WhatsApp <em>(optional)</em></span>
-        <input type="tel" name="phone" autocomplete="tel" />
-      </label>
+      <PhoneField fieldClass="jem__field" tone="light" />
       <div class="jem__field">
         <span>Preferred contact <em>(optional)</em></span>
         <div class="jem__checks">
@@ -100,6 +98,12 @@ const { journeyTitle } = Astro.props;
       form.hidden = false;
       thanksEl.hidden = true;
       errorEl.hidden = true;
+      // The form keeps its values between opens, so clear the phone field's
+      // own validation message too — otherwise a stale one sits there.
+      form.querySelectorAll<HTMLElement>('[data-phf-error]').forEach((el) => {
+        el.hidden = true;
+        el.textContent = '';
+      });
       form.querySelector('input[name="name"]')?.focus();
     }
     function close() {
