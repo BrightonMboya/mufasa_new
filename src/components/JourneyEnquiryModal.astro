@@ -91,6 +91,9 @@ const { journeyTitle } = Astro.props;
       }
       modal.hidden = false;
       document.body.style.overflow = 'hidden';
+      sent = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send enquiry';
       form.hidden = false;
       thanksEl.hidden = true;
       errorEl.hidden = true;
@@ -107,8 +110,11 @@ const { journeyTitle } = Astro.props;
       if (e.key === 'Escape' && !modal.hidden) close();
     });
 
+    let sent = false;
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (sent) return;
       const data = new FormData(form);
       const name = (data.get('name') || '').toString().trim();
       const email = (data.get('email') || '').toString().trim();
@@ -157,8 +163,12 @@ const { journeyTitle } = Astro.props;
         });
         const json = await res.json();
         if (json && json.success) {
+          sent = true;
           form.hidden = true;
           thanksEl.hidden = false;
+          // The panel scrolls; without this the confirmation can land above
+          // the visitor's current scroll position and go unseen.
+          modal.querySelector('.jem__panel')?.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           throw new Error((json && json.message) || 'Submission failed');
         }
@@ -167,8 +177,13 @@ const { journeyTitle } = Astro.props;
           'Something went wrong sending that. Please try again, or email us directly at info@kingmufasaexpeditions.com.';
         errorEl.hidden = false;
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send enquiry';
+        // Only give the button back when there's something left to retry.
+        if (!sent) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send enquiry';
+        } else {
+          submitBtn.textContent = 'Sent';
+        }
       }
     });
   }
@@ -232,6 +247,11 @@ const { journeyTitle } = Astro.props;
     flex-direction: column;
     gap: 1.25rem;
   }
+  /* An author `display` beats the UA's [hidden] rule, so `form.hidden = true`
+     is a no-op without this — the form stayed on screen after a successful
+     send and people submitted two or three times. Same for the thanks panel. */
+  .jem__form[hidden] { display: none; }
+  .jem__thanks[hidden] { display: none; }
   .jem__row {
     display: grid;
     grid-template-columns: 1fr 1fr;
