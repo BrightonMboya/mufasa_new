@@ -118,6 +118,12 @@ const { journeyTitle } = Astro.props;
       const message = (data.get('message') || '').toString().trim();
       const journey = (data.get('journey') || '').toString().trim();
       const preferred = [data.get('prefer_whatsapp'), data.get('prefer_email')].filter(Boolean).join(' & ');
+      // The modal is shared across every journey page, so the URL is what tells
+      // us which page the enquiry actually came from — plus any utm_*/gclid the
+      // visitor arrived with. Web3Forms escapes HTML in values, so we can't send
+      // a real <a>; a bare URL next to the title gets auto-linked by every mail
+      // client, which puts the name and a clickable link on one line.
+      const journeyLine = journey ? `${journey} — ${window.location.href}` : window.location.href;
 
       errorEl.hidden = true;
       if (!name || !email || !travellers || !date) {
@@ -139,7 +145,7 @@ const { journeyTitle } = Astro.props;
             from_name: 'King Mufasa · Journey Enquiry',
             replyto: email,
             botcheck: data.get('botcheck') ? true : false,
-            Journey: journey,
+            Journey: journeyLine,
             Name: name,
             Email: email,
             Phone: phone || '—',

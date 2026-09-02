@@ -274,6 +274,12 @@ const totalSteps = planner.steps.length;
         const occasionL = answers.occasion.length ? labelFor('occasion', answers.occasion[0]) : '—';
         const monthsL = answers.months.length ? labels('months') : 'Not decided yet';
 
+        // The planner lives at one URL, so the href mainly carries the campaign
+        // params (utm_*/gclid); the referrer is what says which page sent them
+        // here. Both clickable from the lead email.
+        const pageUrl = window.location.href;
+        const referrer = document.referrer || '—';
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending…';
 
@@ -295,6 +301,8 @@ const totalSteps = planner.steps.length;
               'Travelling as': occasionL,
               'Preferred timing': monthsL,
               Notes: note || '—',
+              'Page URL': pageUrl,
+              'Came from': referrer,
             }),
           });
           const json = await res.json();
