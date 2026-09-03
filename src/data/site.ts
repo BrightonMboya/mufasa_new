@@ -991,8 +991,7 @@ export const planner = {
 /* About page. */
 export const about = {
   hero: {
-    image:
-      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80&auto=format&fit=crop',
+    image: '/media/about/about-hero.webp',
     eyebrow: 'About Us',
     title: 'The value of experience',
   },
