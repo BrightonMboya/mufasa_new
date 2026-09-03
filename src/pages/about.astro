@@ -15,7 +15,6 @@ const description = about.lead;
     <!-- Hero -->
     <section class="ahero">
       <img class="ahero__img" src={about.hero.image} alt="" fetchpriority="high" />
-      <div class="ahero__scrim"></div>
       <div class="ahero__content wrap">
         <nav class="crumbs" aria-label="Breadcrumb">
           <a href="/">Home</a><span>/</span><span class="crumbs__here">About Us</span>
@@ -89,12 +88,6 @@ const description = about.lead;
     height: 100%;
     object-fit: cover;
     z-index: -2;
-  }
-  .ahero__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(180deg, rgba(20, 24, 21, 0.4) 0%, rgba(20, 24, 21, 0.25) 45%, rgba(20, 24, 21, 0.85) 100%);
   }
   .ahero__content {
     display: flex;
