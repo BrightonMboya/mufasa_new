@@ -16,9 +16,10 @@ export const site = {
 };
 
 /* Top-level nav, trimmed: Home lives on the logo; Safaris/Destinations/
-   Zanzibar collapse into one "Safaris" entry (the journeys grid spans all). */
+   Zanzibar collapse into one "Safaris" entry pointing at the full journeys
+   library (the grid there spans all of them). */
 export const nav = [
-  { label: 'Safaris', href: '/#journeys' },
+  { label: 'Safaris', href: '/journeys' },
   { label: 'Trekking', href: '/trekking' },
   { label: 'Journal', href: '/blog' },
   { label: 'About Us', href: '/about' },
@@ -37,14 +38,12 @@ export const forms = {
 export const hero = {
   // Auto-rotating background slideshow — crossfades between these on a timer.
   images: [
-    // Scenic African safari landscape
-    'https://images.pexels.com/photos/33650626/pexels-photo-33650626.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    // Wildlife roaming the African savanna
-    'https://images.pexels.com/photos/28359728/pexels-photo-28359728.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    // Golden sunset over the African plains
-    'https://images.pexels.com/photos/28812642/pexels-photo-28812642.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    // Luxury safari lodge accommodation
-    'https://assets.makisala.com/accommodations/c74019d5-1402-4e78-918f-6b576dec69f0/1771279089075-1750156182047_0G5A9780.webp',
+    // Lioness asleep along an acacia branch over the Serengeti plains
+    'https://res.cloudinary.com/du50lw9fp/image/upload/f_auto,q_auto,w_2000/v1752415933/Serengeti-29_odnuye.jpg',
+    // Ngorongoro Lion's Paw — guest on a suite veranda in the forest
+    'https://images.pixieset.com/28988588/9087e1ac867d1ee993b993d73401a857-xxlarge.JPG',
+    // Balloon drifting over the Serengeti's acacia plains at dawn
+    'https://images.pexels.com/photos/15994203/pexels-photo-15994203.jpeg?auto=compress&cs=tinysrgb&w=1920',
   ],
   title: 'Every detail designed around you',
   subtitle: 'Thoughtful planning, handcrafted experiences & support every step of the way',
@@ -1011,8 +1010,7 @@ export const about = {
   guides: {
     title: 'Our guides',
     body: 'Guides are crucial to a safari — so we employ qualified, experienced people who know the wildlife and the regional ecosystems firsthand, not seasonal hires reading from a script. It is the same standard we hold our mountain crews to on Kilimanjaro and Meru.',
-    image:
-      'https://images.unsplash.com/photo-1616128417743-c3a6992a65e7?w=1200&q=80&auto=format&fit=crop',
+    image: '/media/about/guides-toast.webp',
   },
   operations: {
     title: 'How we work',
