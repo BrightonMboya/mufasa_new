@@ -8,6 +8,9 @@ import PhoneField from '../components/PhoneField.astro';
 const title = `Trip Planner — ${site.shortName}`;
 const description = planner.intro.body;
 const totalSteps = planner.steps.length;
+
+// Never offer a date in the past.
+const minDate = new Date().toISOString().slice(0, 10);
 ---
 
 <Base title={title} description={description}>
@@ -45,21 +48,42 @@ const totalSteps = planner.steps.length;
         <div class="wrap pl-step__inner">
           <h2 class="pl-step__title">{step.title}</h2>
           <p class="pl-step__hint">{step.hint}</p>
-          <div class={`pl-options ${step.id === 'occasion' ? 'pl-options--list' : ''} ${step.id === 'months' ? 'pl-options--months' : ''}`}>
-            {step.options.map((opt) => (
-              <button
-                type="button"
-                class="pl-chip"
-                data-option
-                data-step={step.id}
-                data-value={opt.value}
-                aria-pressed="false"
-              >
-                <span class="pl-chip__dot" aria-hidden="true"></span>
-                <span class="pl-chip__label">{opt.label}</span>
-              </button>
-            ))}
-          </div>
+          {step.kind === 'date' ? (
+            <div class="pl-date">
+              <label class="pl-date__field">
+                <span class="pl-sr">Approximate travel date</span>
+                <input
+                  type="date"
+                  min={minDate}
+                  class="pl-date__input"
+                  data-date-field
+                />
+                <span class="pl-date__icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M8 3v4M16 3v4M3 10h18" />
+                  </svg>
+                </span>
+              </label>
+              <p class="pl-date__pretty" data-date-pretty></p>
+            </div>
+          ) : (
+            <div class={`pl-options ${step.id === 'occasion' ? 'pl-options--list' : ''}`}>
+              {step.options.map((opt) => (
+                <button
+                  type="button"
+                  class="pl-chip"
+                  data-option
+                  data-step={step.id}
+                  data-value={opt.value}
+                  aria-pressed="false"
+                >
+                  <span class="pl-chip__dot" aria-hidden="true"></span>
+                  <span class="pl-chip__label">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
           {step.skip && (
             <button type="button" class="pl-skip" data-go-next data-skip>{step.skip}</button>
           )}
@@ -140,7 +164,7 @@ const totalSteps = planner.steps.length;
     const thanksTitle = root.querySelector('[data-thanks-title]');
     const total = stepScreens.length;
 
-    const answers = { see: [], interests: [], occasion: [], months: [] };
+    const answers = { see: [], interests: [], occasion: [], arrival: [] };
 
     // index: 0 = intro, 1..total = steps, total+1 = contact, total+2 = thanks
     const CONTACT = total + 1;
@@ -204,13 +228,43 @@ const totalSteps = planner.steps.length;
       });
     });
 
+    // Date step
+    const dateField = root.querySelector('[data-date-field]');
+    const datePretty = root.querySelector('[data-date-pretty]');
+
+    /** "Friday, 12 June 2026", or '' if the value isn't a real date. */
+    function longDate(iso) {
+      if (!iso) return '';
+      const when = new Date(iso + 'T00:00:00');
+      if (Number.isNaN(when.getTime())) return '';
+      return when.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    }
+
+    function syncArrival() {
+      const iso = answers.arrival[0] || '';
+      if (dateField) dateField.value = iso;
+      if (datePretty) datePretty.textContent = longDate(iso);
+    }
+
+    if (dateField) {
+      dateField.addEventListener('change', () => {
+        answers.arrival = dateField.value ? [dateField.value] : [];
+        syncArrival();
+      });
+    }
+
     function syncNext(screen) {
       const next = screen.querySelector('.pl-next');
       if (!next) return;
       const stepId = screen.dataset.stepId;
       const hasAny = answers[stepId] && answers[stepId].length > 0;
-      // the months step can always proceed (skip link covers the empty case)
-      next.disabled = stepId === 'months' ? false : !hasAny;
+      // the date step can always proceed (skip link covers the empty case)
+      next.disabled = stepId === 'arrival' ? false : !hasAny;
     }
 
     function go(dir) {
@@ -221,7 +275,10 @@ const totalSteps = planner.steps.length;
 
     root.querySelectorAll('[data-go-next]').forEach((b) =>
       b.addEventListener('click', () => {
-        if (b.dataset.skip !== undefined) answers.months = [];
+        if (b.dataset.skip !== undefined) {
+          answers.arrival = [];
+          syncArrival();
+        }
         go(1);
       })
     );
@@ -230,7 +287,8 @@ const totalSteps = planner.steps.length;
     );
     root.querySelectorAll('[data-restart]').forEach((b) =>
       b.addEventListener('click', () => {
-        answers.see = []; answers.interests = []; answers.occasion = []; answers.months = [];
+        answers.see = []; answers.interests = []; answers.occasion = []; answers.arrival = [];
+        syncArrival();
         root.querySelectorAll('[data-option]').forEach((c) => {
           delete c.dataset.selected;
           c.setAttribute('aria-pressed', 'false');
@@ -244,7 +302,7 @@ const totalSteps = planner.steps.length;
     // Map a stored value back to its human label for the email.
     function labelFor(stepId, value) {
       const step = steps.find((s) => s.id === stepId);
-      const opt = step && step.options.find((o) => o.value === value);
+      const opt = step && step.options && step.options.find((o) => o.value === value);
       return opt ? opt.label : value;
     }
     const labels = (stepId) =>
@@ -270,7 +328,9 @@ const totalSteps = planner.steps.length;
         const seeL = labels('see') || '—';
         const interestsL = labels('interests') || '—';
         const occasionL = answers.occasion.length ? labelFor('occasion', answers.occasion[0]) : '—';
-        const monthsL = answers.months.length ? labels('months') : 'Not decided yet';
+        const arrivalL = answers.arrival.length
+          ? longDate(answers.arrival[0]) || answers.arrival[0]
+          : 'Not decided yet';
 
         // The planner lives at one URL, so the href mainly carries the campaign
         // params (utm_*/gclid); the referrer is what says which page sent them
@@ -297,7 +357,7 @@ const totalSteps = planner.steps.length;
               'Would like to see': seeL,
               'Interested in': interestsL,
               'Travelling as': occasionL,
-              'Preferred timing': monthsL,
+              'Preferred timing': arrivalL,
               Notes: note || '—',
               'Page URL': pageUrl,
               'Came from': referrer,
@@ -323,6 +383,7 @@ const totalSteps = planner.steps.length;
       });
     }
 
+    syncArrival();
     show(0);
   }
 </script>
@@ -445,7 +506,6 @@ const totalSteps = planner.steps.length;
     gap: 0.75rem;
     max-width: 860px;
   }
-  .pl-options--months { max-width: 620px; }
   .pl-options--list {
     flex-direction: column;
     flex-wrap: nowrap;
@@ -472,8 +532,6 @@ const totalSteps = planner.steps.length;
     width: 100%;
     padding: 1rem 1.35rem;
   }
-  .pl-options--months .pl-chip { justify-content: center; min-width: 92px; }
-  .pl-options--months .pl-chip__dot { display: none; }
   .pl-chip__dot {
     width: 15px;
     height: 15px;
@@ -492,6 +550,83 @@ const totalSteps = planner.steps.length;
     background-color: var(--color-on-accent);
     border-color: var(--color-on-accent);
     box-shadow: inset 0 0 0 3px var(--color-accent);
+  }
+
+  /* Date picker */
+  .pl-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .pl-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 24rem;
+  }
+  .pl-date__field {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+  .pl-date__input {
+    /* Keep the native picker chrome dark to match the planner. */
+    color-scheme: dark;
+    width: 100%;
+    padding: 1rem 3.25rem 1rem 1.35rem;
+    background-color: transparent;
+    border: 1px solid rgba(247, 244, 238, 0.28);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-on-accent);
+    font-family: inherit;
+    font-size: 1.0625rem;
+    text-align: center;
+    transition: border-color 0.2s ease;
+  }
+  .pl-date__input:hover { border-color: var(--color-accent-soft); }
+  .pl-date__input:focus {
+    outline: none;
+    border-color: var(--color-accent-soft);
+  }
+  /* An empty field should read as a prompt, not as "dd/mm/yyyy" noise. */
+  .pl-date__input:not(:focus):invalid::-webkit-datetime-edit,
+  .pl-date__input[value='']:not(:focus)::-webkit-datetime-edit {
+    color: rgba(247, 244, 238, 0.5);
+  }
+  .pl-date__icon {
+    position: absolute;
+    inset-block: 0;
+    right: 1.1rem;
+    display: flex;
+    align-items: center;
+    color: var(--color-accent-soft);
+    pointer-events: none;
+  }
+  /* Stretch the invisible picker trigger across the whole field. */
+  .pl-date__input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .pl-date__pretty {
+    min-height: 1.75rem;
+    font-family: var(--font-display, inherit);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--color-accent-soft);
   }
 
   .pl-skip {
