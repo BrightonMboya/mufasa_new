@@ -14,9 +14,6 @@ const description = 'The parks and reserves our journeys are built from — the 
   <main>
     <section class="dhero">
       <div class="dhero__content wrap">
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a href="/">Home</a><span>/</span><span class="crumbs__here">Destinations</span>
-        </nav>
         <span class="eyebrow" style="color: var(--color-accent-soft)">Destinations</span>
         <h1>The ground our routes are drawn on</h1>
         <p class="dhero__lead">Every journey we build is a route through a small number of parks our guides know by heart. Six grounds, one country, no two alike.</p>
@@ -69,18 +66,6 @@ const description = 'The parks and reserves our journeys are built from — the 
     padding-block: clamp(3.5rem, 8vw, 6rem) clamp(2.5rem, 5vw, 4rem);
     max-width: 780px;
   }
-  .crumbs {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(247, 244, 238, 0.7);
-  }
-  .crumbs a:hover { color: var(--color-on-accent); }
-  .crumbs__here { color: var(--color-accent-soft); }
   .dhero h1 { font-size: clamp(2.75rem, 6vw, 4.5rem); font-weight: var(--fw-light); }
   .dhero__lead { color: rgba(247, 244, 238, 0.8); line-height: 1.6; font-size: 1.0625rem; max-width: 640px; }
 

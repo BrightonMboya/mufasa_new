@@ -58,4 +58,8 @@
   --container-page: 1440px;
   --container-text: 620px;
   --gutter: clamp(1.5rem, 5vw, 4.5rem);
+  /* Side padding for full-bleed bands: the gutter until the viewport passes
+     --container-page, then whatever it takes to keep content centred at that
+     width. Padding rather than max-width so section backgrounds stay edge to edge. */
+  --gutter-page: max(var(--gutter), calc((100% - var(--container-page)) / 2));
 }

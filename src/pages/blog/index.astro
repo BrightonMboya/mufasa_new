@@ -21,9 +21,6 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
     <!-- Hero -->
     <section class="jhero">
       <div class="jhero__content wrap">
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a href="/">Home</a><span>/</span><span class="crumbs__here">Journal</span>
-        </nav>
         <span class="eyebrow" style="color: var(--color-accent-soft)">Journal</span>
         <h1>Field notes from Tanzania</h1>
         <p class="jhero__lead">Safari planning, Kilimanjaro prep, and the small details that make a trip — written by the guides and planners behind them.</p>
@@ -81,28 +78,22 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
     flex-direction: column;
     gap: 1rem;
     padding-block: clamp(3.5rem, 8vw, 6rem) clamp(2.5rem, 5vw, 4rem);
-    max-width: 760px;
+    max-width: 1080px;
   }
-  .crumbs {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(247, 244, 238, 0.7);
-  }
-  .crumbs a:hover { color: var(--color-on-accent); }
-  .crumbs__here { color: var(--color-accent-soft); }
   .jhero h1 {
-    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
     font-weight: var(--fw-light);
+  }
+  /* Keep the headline on a single line wherever there is room for it;
+     below this it is allowed to wrap rather than overflow. */
+  @media (min-width: 861px) {
+    .jhero h1 { white-space: nowrap; }
   }
   .jhero__lead {
     color: rgba(247, 244, 238, 0.8);
     line-height: 1.6;
     font-size: 1.0625rem;
+    max-width: 62ch;
   }
 
   .jposts { background-color: var(--color-surface); }

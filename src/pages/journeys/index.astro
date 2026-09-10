@@ -15,9 +15,6 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
   <main>
     <section class="jhero">
       <div class="jhero__content wrap">
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a href="/">Home</a><span>/</span><span class="crumbs__here">Journeys</span>
-        </nav>
         <span class="eyebrow" style="color: var(--color-accent-soft)">All Journeys</span>
         <h1>Every route we run</h1>
         <p class="jhero__lead">From short crater fly-ins to the full nine-day route through the north — the complete library, not just the highlights.</p>
@@ -73,13 +70,6 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     padding-block: clamp(3.5rem, 8vw, 6rem) clamp(2.5rem, 5vw, 4rem);
     max-width: 760px;
   }
-  .crumbs {
-    display: flex; align-items: center; gap: 0.6rem;
-    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
-    color: rgba(247, 244, 238, 0.7);
-  }
-  .crumbs a:hover { color: var(--color-on-accent); }
-  .crumbs__here { color: var(--color-accent-soft); }
   .jhero h1 { font-size: clamp(2.75rem, 6vw, 4.5rem); font-weight: var(--fw-light); }
   .jhero__lead { color: rgba(247, 244, 238, 0.8); line-height: 1.6; font-size: 1.0625rem; }
 
