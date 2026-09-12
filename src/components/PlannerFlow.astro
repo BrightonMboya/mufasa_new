@@ -1,0 +1,880 @@
+---
+/* The full-screen planner wizard, shared by every planner route.
+   `steps` drives the questions, so a tailored planner (one experience, say)
+   is a different config rather than a second copy of this file.
+
+   Step kinds:
+     multi   - chips, any number selected
+     single  - chips, one selected, auto-advances
+     number  - a single count (travellers); always has a value
+     date    - a date input, with an optional skip link
+
+   `layout: 'list'` stacks the chips full-width, for options too wordy to sit
+   side by side. `emailLabel` names the step's row in the lead email and falls
+   back to the step title. */
+import { site, forms } from '../data/site';
+import PhoneField from './PhoneField.astro';
+
+interface Option { value: string; label: string }
+export interface PlannerStep {
+  id: string;
+  kind: 'multi' | 'single' | 'number' | 'date';
+  title: string;
+  hint: string;
+  options?: Option[];
+  layout?: 'grid' | 'list';
+  skip?: string;
+  emailLabel?: string;
+  min?: number;
+  max?: number;
+  initial?: number;
+}
+
+interface Props {
+  steps: PlannerStep[];
+  /* The page heading. Visually hidden: the step titles carry the design. */
+  srTitle: string;
+  contactTitle?: string;
+  contactHint?: string;
+  messageLabel?: string;
+  submitLabel?: string;
+  subject: string;
+  fromName: string;
+  restartLabel?: string;
+}
+
+const {
+  steps,
+  srTitle,
+  contactTitle = 'Where should we send your ideas?',
+  contactHint = 'Leave your details and a guide \u2014 not a call centre \u2014 will come back with routes that fit.',
+  messageLabel = 'Anything else we should know?',
+  submitLabel = 'Send my enquiry',
+  subject,
+  fromName,
+  restartLabel = 'Plan another trip',
+} = Astro.props;
+
+const totalSteps = steps.length;
+
+// Never offer a date in the past.
+const minDate = new Date().toISOString().slice(0, 10);
+---
+
+<main class="planner" data-planner>
+  <h1 class="pl-sr">{srTitle}</h1>
+
+  <!-- Progress rail -->
+  <div class="pl-progress" data-progress>
+    <div class="pl-progress__inner wrap">
+      <span class="pl-progress__count"><span data-progress-current>1</span> / {totalSteps}</span>
+      <div class="pl-progress__track"><span class="pl-progress__bar" data-progress-bar></span></div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  {steps.map((step, i) => (
+    <section
+      class="pl-screen pl-step"
+      data-screen="step"
+      data-step-id={step.id}
+      data-step-kind={step.kind}
+      data-step-index={i}
+      data-active={i === 0 ? '' : undefined}
+    >
+      <div class="wrap pl-step__inner">
+        <h2 class="pl-step__title">{step.title}</h2>
+        <p class="pl-step__hint">{step.hint}</p>
+
+        {step.kind === 'date' && (
+          <div class="pl-date">
+            <label class="pl-date__field">
+              <span class="pl-sr">Approximate travel date</span>
+              <input type="date" min={minDate} class="pl-date__input" data-date-field />
+              <span class="pl-date__icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="5" width="18" height="16" rx="2" />
+                  <path d="M8 3v4M16 3v4M3 10h18" />
+                </svg>
+              </span>
+            </label>
+            <p class="pl-date__pretty" data-date-pretty></p>
+          </div>
+        )}
+
+        {step.kind === 'number' && (
+          <div class="pl-count">
+            <button type="button" class="pl-count__btn" data-count-step="-1" aria-label="One fewer">&#8722;</button>
+            <label class="pl-count__field">
+              <span class="pl-sr">{step.title}</span>
+              <input
+                type="number"
+                class="pl-count__input"
+                data-count-field
+                inputmode="numeric"
+                min={step.min ?? 1}
+                max={step.max ?? 20}
+                value={step.initial ?? 2}
+              />
+            </label>
+            <button type="button" class="pl-count__btn" data-count-step="1" aria-label="One more">+</button>
+          </div>
+        )}
+
+        {(step.kind === 'multi' || step.kind === 'single') && (
+          <div class:list={['pl-options', { 'pl-options--list': step.layout === 'list' }]}>
+            {(step.options ?? []).map((opt) => (
+              <button
+                type="button"
+                class="pl-chip"
+                data-option
+                data-step={step.id}
+                data-value={opt.value}
+                aria-pressed="false"
+              >
+                <span class="pl-chip__dot" aria-hidden="true"></span>
+                <span class="pl-chip__label">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {step.skip && (
+          <button type="button" class="pl-skip" data-go-next data-skip>{step.skip}</button>
+        )}
+        <div class="pl-nav">
+          {i > 0 && <button type="button" class="pl-back" data-go-back>Previous</button>}
+          <button type="button" class="pill pill--accent pl-next" data-go-next disabled>
+            {i === totalSteps - 1 ? 'Continue' : 'Next step'}
+          </button>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <!-- Contact -->
+  <section class="pl-screen pl-contact" data-screen="contact">
+    <div class="wrap pl-contact__inner">
+      <h2 class="pl-step__title">{contactTitle}</h2>
+      <p class="pl-step__hint">{contactHint}</p>
+
+      <form class="pl-form" data-form novalidate>
+        <!-- Honeypot: hidden from people, tempting to bots. -->
+        <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
+
+        <div class="pl-form__row">
+          <label class="pl-field">
+            <span>Your name</span>
+            <input type="text" name="name" autocomplete="name" required />
+          </label>
+          <label class="pl-field">
+            <span>Email</span>
+            <input type="email" name="email" autocomplete="email" required />
+          </label>
+        </div>
+        <PhoneField fieldClass="pl-field" tone="light" />
+        <label class="pl-field">
+          <span>{messageLabel} <em>(optional)</em></span>
+          <textarea name="note" rows="3"></textarea>
+        </label>
+
+        <p class="pl-form__error" data-form-error hidden></p>
+
+        <div class="pl-nav pl-nav--form">
+          <button type="button" class="pl-back" data-go-back>Previous</button>
+          <button type="submit" class="pill pill--accent pl-submit" data-submit>{submitLabel}</button>
+        </div>
+        <p class="pl-form__fineprint">We reply within a few hours, and never share your details.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Thank you -->
+  <section class="pl-screen pl-thanks" data-screen="thanks">
+    <div class="wrap pl-thanks__inner">
+      <span class="eyebrow">Enquiry received</span>
+      <h2 data-thanks-title>Thank you — we've got your enquiry.</h2>
+      <p>We will look at your request and get back to you within a few hours. If you'd rather talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
+      <div class="pl-thanks__cta">
+        <a href="/" class="pill pill--accent">Back to home</a>
+        <button type="button" class="pill pill--ghost" data-restart>{restartLabel}</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script define:vars={{ steps, formsKey: forms.web3formsKey, endpoint: forms.endpoint, subject, fromName, submitLabel }}>
+  const root = document.querySelector('[data-planner]');
+  if (root) {
+    const screens = Array.from(root.querySelectorAll('[data-screen]'));
+    const stepScreens = screens.filter((s) => s.dataset.screen === 'step');
+    const progress = root.querySelector('[data-progress]');
+    const progressBar = root.querySelector('[data-progress-bar]');
+    const progressCurrent = root.querySelector('[data-progress-current]');
+    const form = root.querySelector('[data-form]');
+    const formError = root.querySelector('[data-form-error]');
+    const submitBtn = root.querySelector('[data-submit]');
+    const thanksTitle = root.querySelector('[data-thanks-title]');
+    const total = stepScreens.length;
+
+    // One slot per configured step, so the shape follows the config.
+    const blank = () => Object.fromEntries(steps.map((s) => [s.id, []]));
+    const answers = blank();
+    // A count step starts at its default rather than empty.
+    steps.forEach((s) => {
+      if (s.kind === 'number') answers[s.id] = [String(s.initial ?? 2)];
+    });
+
+    // index: 0..total-1 = steps, total = contact, total+1 = thanks
+    const CONTACT = total;
+    const THANKS = total + 1;
+    let index = 0;
+
+    function show(i) {
+      index = i;
+      const isContact = i === CONTACT;
+      const isThanks = i === THANKS;
+      const isStep = i >= 0 && i < total;
+      const stepPos = i;
+
+      screens.forEach((s) => delete s.dataset.active);
+      if (isContact) root.querySelector('[data-screen="contact"]').dataset.active = '';
+      else if (isThanks) root.querySelector('[data-screen="thanks"]').dataset.active = '';
+      else {
+        stepScreens[stepPos].dataset.active = '';
+        syncNext(stepScreens[stepPos]);
+      }
+
+      progress.hidden = !isStep;
+      if (isStep) {
+        progressCurrent.textContent = String(stepPos + 1);
+        progressBar.style.width = ((stepPos + 1) / total) * 100 + '%';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Option chips
+    root.querySelectorAll('[data-option]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const stepId = chip.dataset.step;
+        const value = chip.dataset.value;
+        const screen = chip.closest('[data-screen="step"]');
+        const kind = screen.dataset.stepKind;
+
+        if (kind === 'single') {
+          answers[stepId] = [value];
+          screen.querySelectorAll('[data-option]').forEach((c) => {
+            const on = c === chip;
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+            if (on) c.dataset.selected = '';
+            else delete c.dataset.selected;
+          });
+          setTimeout(() => go(1), 180);
+          return;
+        }
+
+        const set = new Set(answers[stepId]);
+        if (set.has(value)) set.delete(value);
+        else set.add(value);
+        answers[stepId] = Array.from(set);
+        const on = set.has(value);
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (on) chip.dataset.selected = '';
+        else delete chip.dataset.selected;
+        syncNext(screen);
+      });
+    });
+
+    // Count steps (travellers)
+    root.querySelectorAll('[data-screen="step"][data-step-kind="number"]').forEach((screen) => {
+      const stepId = screen.dataset.stepId;
+      const field = screen.querySelector('[data-count-field]');
+      const min = Number(field.min || 1);
+      const max = Number(field.max || 20);
+
+      function commit(n) {
+        const clamped = Math.min(max, Math.max(min, Number.isFinite(n) ? n : min));
+        field.value = String(clamped);
+        answers[stepId] = [String(clamped)];
+        screen.querySelectorAll('[data-count-step]').forEach((b) => {
+          const dir = Number(b.dataset.countStep);
+          b.disabled = dir < 0 ? clamped <= min : clamped >= max;
+        });
+      }
+
+      screen.querySelectorAll('[data-count-step]').forEach((b) =>
+        b.addEventListener('click', () => commit(Number(field.value) + Number(b.dataset.countStep)))
+      );
+      // Typing is allowed, but the value is only clamped once the field settles,
+      // so a half-typed "1" on the way to "12" is not snapped back.
+      field.addEventListener('input', () => {
+        const n = Number(field.value);
+        if (Number.isFinite(n) && n >= min && n <= max) answers[stepId] = [String(n)];
+      });
+      field.addEventListener('blur', () => commit(Number(field.value)));
+      commit(Number(field.value));
+    });
+
+    // Date step
+    const dateField = root.querySelector('[data-date-field]');
+    const datePretty = root.querySelector('[data-date-pretty]');
+    const dateStep = steps.find((s) => s.kind === 'date');
+
+    /** "Friday, 12 June 2026", or '' if the value isn't a real date. */
+    function longDate(iso) {
+      if (!iso) return '';
+      const when = new Date(iso + 'T00:00:00');
+      if (Number.isNaN(when.getTime())) return '';
+      return when.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    }
+
+    function syncArrival() {
+      if (!dateStep) return;
+      const iso = answers[dateStep.id][0] || '';
+      if (dateField) dateField.value = iso;
+      if (datePretty) datePretty.textContent = longDate(iso);
+    }
+
+    if (dateField && dateStep) {
+      dateField.addEventListener('change', () => {
+        answers[dateStep.id] = dateField.value ? [dateField.value] : [];
+        syncArrival();
+      });
+    }
+
+    function syncNext(screen) {
+      const next = screen.querySelector('.pl-next');
+      if (!next) return;
+      const kind = screen.dataset.stepKind;
+      // A date can be skipped and a count always holds a value; only the
+      // chip steps need something chosen before moving on.
+      if (kind === 'date' || kind === 'number') {
+        next.disabled = false;
+        return;
+      }
+      const stepId = screen.dataset.stepId;
+      next.disabled = !(answers[stepId] && answers[stepId].length > 0);
+    }
+
+    function go(dir) {
+      const target = index + dir;
+      if (target < 0 || target > THANKS) return;
+      show(target);
+    }
+
+    root.querySelectorAll('[data-go-next]').forEach((b) =>
+      b.addEventListener('click', () => {
+        if (b.dataset.skip !== undefined && dateStep) {
+          answers[dateStep.id] = [];
+          syncArrival();
+        }
+        go(1);
+      })
+    );
+    root.querySelectorAll('[data-go-back]').forEach((b) =>
+      b.addEventListener('click', () => go(-1))
+    );
+    root.querySelectorAll('[data-restart]').forEach((b) =>
+      b.addEventListener('click', () => {
+        Object.assign(answers, blank());
+        steps.forEach((s) => {
+          if (s.kind === 'number') answers[s.id] = [String(s.initial ?? 2)];
+        });
+        root.querySelectorAll('[data-count-field]').forEach((f) => {
+          const s = steps.find((x) => x.id === f.closest('[data-screen]').dataset.stepId);
+          f.value = String((s && s.initial) ?? 2);
+        });
+        syncArrival();
+        root.querySelectorAll('[data-option]').forEach((c) => {
+          delete c.dataset.selected;
+          c.setAttribute('aria-pressed', 'false');
+        });
+        if (form) form.reset();
+        stepScreens.forEach((s) => syncNext(s));
+        show(0);
+      })
+    );
+
+    // Map a stored value back to its human label for the email.
+    function labelFor(stepId, value) {
+      const step = steps.find((s) => s.id === stepId);
+      const opt = step && step.options && step.options.find((o) => o.value === value);
+      return opt ? opt.label : value;
+    }
+
+    /** One email row per step, in the order the questions were asked. */
+    function answerRows() {
+      const rows = {};
+      steps.forEach((s) => {
+        const picked = answers[s.id] || [];
+        let value;
+        if (s.kind === 'date') {
+          value = picked.length ? longDate(picked[0]) || picked[0] : 'Not decided yet';
+        } else if (s.kind === 'number') {
+          value = picked[0] || '—';
+        } else {
+          value = picked.map((v) => labelFor(s.id, v)).join(', ') || '—';
+        }
+        rows[s.emailLabel || s.title] = value;
+      });
+      return rows;
+    }
+
+    // Submit → Web3Forms → info@kingmufasaexpeditions.com
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const name = (data.get('name') || '').toString().trim();
+        const email = (data.get('email') || '').toString().trim();
+        const phone = (data.get('phone') || '').toString().trim();
+        const note = (data.get('note') || '').toString().trim();
+
+        formError.hidden = true;
+        if (!name || !email) {
+          formError.textContent = 'Please add your name and email so we can reply.';
+          formError.hidden = false;
+          return;
+        }
+
+        // Each planner lives at one URL, so the href mainly carries the campaign
+        // params (utm_*/gclid); the referrer is what says which page sent them
+        // here. Both clickable from the lead email.
+        const pageUrl = window.location.href;
+        const referrer = document.referrer || '—';
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              access_key: formsKey,
+              subject: `${subject} — ${name}`,
+              from_name: fromName,
+              replyto: email,
+              botcheck: data.get('botcheck') ? true : false,
+              Name: name,
+              Email: email,
+              Phone: phone || '—',
+              ...answerRows(),
+              Notes: note || '—',
+              'Page URL': pageUrl,
+              'Came from': referrer,
+            }),
+          });
+          const json = await res.json();
+          if (json && json.success) {
+            const first = name.split(' ')[0];
+            thanksTitle.textContent = `Thank you, ${first} — we've got your enquiry.`;
+            show(THANKS);
+          } else {
+            throw new Error((json && json.message) || 'Submission failed');
+          }
+        } catch (err) {
+          formError.textContent =
+            'Something went wrong sending that. Please try again, or email us directly at ' +
+            'info@kingmufasaexpeditions.com.';
+          formError.hidden = false;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitLabel;
+        }
+      });
+    }
+
+    syncArrival();
+    show(0);
+  }
+</script>
+<style is:global>
+  .pl-form .phf--light {
+    --phf-bg: #fff;
+    --phf-bg-hover: #f4f2ee;
+    --phf-bg-focus: #fff;
+  }
+</style>
+
+<style>
+  /* Light ground, matching the off-white atlas uses for its journey pages. */
+  .planner {
+    background-color: #fdfcfb;
+    color: var(--color-ink);
+    min-height: 100vh;
+  }
+
+  .pl-screen { display: none; }
+  .pl-screen[data-active] { display: block; }
+
+  /* Progress rail */
+  .pl-progress {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background-color: rgba(253, 252, 251, 0.9);
+    backdrop-filter: blur(6px);
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .pl-progress__inner { display: flex; align-items: center; gap: 1.25rem; }
+  .pl-progress__count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .pl-progress__track {
+    flex: 1;
+    height: 2px;
+    background-color: var(--color-hairline);
+    overflow: hidden;
+  }
+  .pl-progress__bar {
+    display: block;
+    height: 100%;
+    width: 25%;
+    background-color: var(--color-accent);
+    transition: width 0.4s ease;
+  }
+
+  /* Steps */
+  .pl-step__inner {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding-block: 4rem;
+  }
+  .pl-step__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    line-height: 1.1;
+  }
+  .pl-step__hint {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+    margin-bottom: 2.5rem;
+    max-width: 44ch;
+  }
+
+  /* Option chips */
+  .pl-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    max-width: 860px;
+  }
+  .pl-options--list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 480px;
+    gap: 0.6rem;
+  }
+  .pl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.35rem;
+    background-color: #fff;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+  .pl-options--list .pl-chip {
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    width: 100%;
+    padding: 1rem 1.35rem;
+  }
+  .pl-chip__dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1px solid #b9b3a5;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .pl-chip:hover { border-color: var(--color-accent); }
+  .pl-chip[data-selected] {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .pl-chip[data-selected] .pl-chip__dot {
+    background-color: var(--color-on-accent);
+    border-color: var(--color-on-accent);
+    box-shadow: inset 0 0 0 3px var(--color-accent);
+  }
+
+  /* Date picker */
+  .pl-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .pl-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 24rem;
+  }
+  .pl-date__field {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+  .pl-date__input {
+    /* Keep the native picker chrome light to match the planner. */
+    color-scheme: light;
+    width: 100%;
+    padding: 1rem 3.25rem 1rem 1.35rem;
+    background-color: #fff;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 1.0625rem;
+    text-align: center;
+    transition: border-color 0.2s ease;
+  }
+  .pl-date__input:hover { border-color: var(--color-accent); }
+  .pl-date__input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+  /* An empty field should read as a prompt, not as "dd/mm/yyyy" noise. */
+  .pl-date__input:not(:focus):invalid::-webkit-datetime-edit,
+  .pl-date__input[value='']:not(:focus)::-webkit-datetime-edit {
+    color: var(--color-slate);
+  }
+  .pl-date__icon {
+    position: absolute;
+    inset-block: 0;
+    right: 1.1rem;
+    display: flex;
+    align-items: center;
+    color: var(--color-accent);
+    pointer-events: none;
+  }
+  /* Stretch the invisible picker trigger across the whole field. */
+  .pl-date__input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .pl-date__pretty {
+    min-height: 1.75rem;
+    font-family: var(--font-display, inherit);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  /* Count step (travellers) */
+  .pl-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .pl-count__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3.4rem;
+    background-color: #fff;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-ink);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .pl-count__btn:hover:not([disabled]) { border-color: var(--color-accent); color: var(--color-accent); }
+  .pl-count__btn[disabled] { opacity: 0.35; cursor: not-allowed; }
+  .pl-count__field { display: block; }
+  .pl-count__input {
+    width: 7rem;
+    height: 3.4rem;
+    padding: 0 0.5rem;
+    background-color: #fff;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-ink);
+    font-family: var(--font-display, inherit);
+    font-size: 1.5rem;
+    text-align: center;
+    transition: border-color 0.2s ease;
+    /* The chrome is redundant next to the -/+ buttons. */
+    -moz-appearance: textfield;
+  }
+  .pl-count__input::-webkit-outer-spin-button,
+  .pl-count__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .pl-count__input:focus { outline: none; border-color: var(--color-accent); }
+
+  .pl-skip {
+    margin-top: 2rem;
+    background: none;
+    border: none;
+    color: var(--color-slate);
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+  .pl-skip:hover { color: var(--color-ink); }
+
+  /* Nav */
+  .pl-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .pl-nav--form { margin-top: 2rem; justify-content: flex-end; }
+  .pl-back {
+    background: none;
+    border: none;
+    color: var(--color-slate);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .pl-back:hover { color: var(--color-ink); }
+  .pl-next[disabled], .pl-submit[disabled] { opacity: 0.35; cursor: not-allowed; }
+
+  /* Contact form */
+  .pl-contact__inner {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 620px;
+    margin-inline: auto;
+    padding-block: 4rem;
+    text-align: left;
+  }
+  .pl-contact .pl-step__title {
+    text-align: left;
+    font-size: clamp(1.5rem, 5vw, 2.125rem);
+    text-wrap: balance;
+  }
+  .pl-contact .pl-step__hint {
+    text-align: left;
+    max-width: 56ch;
+    letter-spacing: 0.08em;
+  }
+  .pl-form { display: flex; flex-direction: column; gap: 1.25rem; }
+  .pl-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .pl-field { display: flex; flex-direction: column; gap: 0.5rem; }
+  .pl-field > span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .pl-field > span em { text-transform: none; letter-spacing: 0; color: #8b918c; font-style: normal; }
+  .pl-field input,
+  .pl-field textarea {
+    background-color: #fff;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-ink);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-ui, inherit);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .pl-field textarea { resize: vertical; }
+  .pl-field input:focus,
+  .pl-field textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background-color: #fff;
+  }
+  .pl-form__error {
+    color: #a4442a;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .pl-form__fineprint {
+    font-size: 0.8125rem;
+    color: var(--color-slate);
+    text-align: right;
+  }
+
+  /* Thank you */
+  .pl-thanks__inner {
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.25rem;
+    padding-block: 5rem;
+  }
+  .pl-thanks .eyebrow { color: var(--color-accent); }
+  .pl-thanks h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    line-height: 1.12;
+    max-width: 18ch;
+  }
+  .pl-thanks p {
+    max-width: 50ch;
+    color: var(--color-slate);
+    line-height: 1.7;
+  }
+  .pl-thanks p a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .pl-thanks__cta { display: flex; gap: 0.875rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+
+  @media (max-width: 640px) {
+    .pl-form__row { grid-template-columns: 1fr; }
+    .pl-nav--form { justify-content: space-between; }
+  }
+</style>

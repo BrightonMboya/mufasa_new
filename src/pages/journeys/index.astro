@@ -1,12 +1,19 @@
 ---
+import JourneyCard from '../../components/JourneyCard.astro';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
-import { journeys, site } from '../../data/site';
+import { journeys as allJourneys, site } from '../../data/site';
 
 const title = `All Journeys — ${site.shortName}`;
 const description = 'Every safari and itinerary we run, from short crater fly-ins to the full nine-day route through the north.';
+
+/* "North to Sea" is the collection the northern packages sit inside, not a
+   route of its own, so the catalogue lists its contents instead of the
+   collection. Its hub page stays reachable at /journeys/north-to-sea. */
+const HUB_SLUGS = ['north-to-sea'];
+const journeys = allJourneys.filter((j) => !HUB_SLUGS.includes(j.slug));
 const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))];
 ---
 
@@ -36,23 +43,7 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
       </div>
 
       <div class="journeys__grid" data-journeys-grid>
-        {journeys.map((j) => (
-          <a class="jcard" href={`/journeys/${j.slug}`} data-category={j.category}>
-            <div class="jcard__frame">
-              <img src={j.image} alt={j.title} loading="lazy" />
-              <span class="jcard__price">
-                {j.priceFrom.startsWith('$') ? (
-                  <>From {j.priceFrom} <span class="jcard__price-unit">/ person</span></>
-                ) : (
-                  j.priceFrom
-                )}
-              </span>
-            </div>
-            <span class="jcard__meta">{j.meta}</span>
-            <h3 class="jcard__title">{j.title}</h3>
-            <span class="jcard__cta">Explore</span>
-          </a>
-        ))}
+        {journeys.map((j) => <JourneyCard journey={j} showPrice />)}
       </div>
     </section>
 
@@ -78,7 +69,7 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     display: flex;
     flex-wrap: wrap;
     gap: clamp(1rem, 2.5vw, 2.375rem);
-    padding-bottom: 3.375rem;
+    padding-bottom: 2rem;
   }
   .tab {
     font-size: var(--text-label);
@@ -101,60 +92,16 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem 1.5rem;
-    row-gap: 3rem;
+    row-gap: 1.75rem;
   }
-  .jcard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    text-align: center;
+  .tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
+  @media (min-width: 641px) and (max-width: 1050px) {
+    .journeys__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  .jcard__frame { position: relative; width: 100%; aspect-ratio: 5 / 6; overflow: hidden; margin-bottom: 1.125rem; }
-  .jcard__frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-  .jcard:hover .jcard__frame img { transform: scale(1.04); }
-  .jcard__price {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    display: flex;
-    align-items: baseline;
-    gap: 0.3rem;
-    padding: 0.4rem 0.75rem;
-    background-color: var(--color-ink);
-    color: var(--color-on-accent);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    letter-spacing: 0.04em;
+  @media (max-width: 640px) {
+    .journeys__grid { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; gap: 1.75rem; }
   }
-  .jcard__price-unit {
-    font-size: 0.625rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(247, 244, 238, 0.7);
-  }
-  .jcard__meta {
-    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--color-slate);
-  }
-  .jcard__title { font-size: clamp(1.375rem, 2.6vw, 1.75rem); color: var(--color-ink); }
-  .jcard__cta {
-    margin-top: 0.375rem;
-    padding: 0.875rem 2.375rem;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-full);
-    font-size: 0.8125rem;
-    font-weight: var(--fw-semibold);
-    letter-spacing: 0.11em;
-    text-transform: uppercase;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-  }
-  .jcard:hover .jcard__cta { border-color: var(--color-accent); color: var(--color-accent); }
-  .jcard[hidden] { display: none; }
 
-  @media (max-width: 860px) {
-    .journeys__grid { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; gap: 3rem; }
-  }
 </style>
 
 <script>

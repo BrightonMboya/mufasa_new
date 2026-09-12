@@ -23,7 +23,7 @@ interface Props {
 const {
   name = 'phone',
   label = 'Phone / WhatsApp',
-  optional = true,
+  optional = false,
   defaultCountry = 'TZ',
   tone = 'dark',
   fieldClass = '',
@@ -36,6 +36,7 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
   class:list={[fieldClass, 'phf', `phf--${tone}`]}
   data-phone-field
   data-default-country={defaultCountry}
+  data-optional={optional ? 'true' : 'false'}
   data-phf-uid={uid}
 >
   <span class="phf__label" id={`${uid}-label`}>{label} {optional && <em>(optional)</em>}</span>
@@ -62,6 +63,8 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
       data-phf-number
       inputmode="tel"
       autocomplete="tel-national"
+      required={!optional}
+      aria-required={optional ? undefined : 'true'}
       aria-labelledby={`${uid}-label`}
       aria-describedby={`${uid}-error`}
     />
@@ -378,6 +381,7 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
     const hidden = root.querySelector<HTMLInputElement>('[data-phf-value]')!;
     const uid = root.dataset.phfUid || 'phf';
 
+    const isOptional = root.dataset.optional === 'true';
     let country = guessCountry(root.dataset.defaultCountry || 'TZ');
     let activeIndex = -1;
     let shown = COUNTRIES;
@@ -568,10 +572,14 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
 
     function validate() {
       const raw = numberEl.value.trim();
-      // The field is optional: empty is always fine.
       if (!raw) {
-        clearError();
-        return true;
+        if (isOptional) {
+          clearError();
+          return true;
+        }
+        errorEl.textContent = 'Please add a phone number so we can reach you.';
+        errorEl.hidden = false;
+        return false;
       }
       sync();
       if (hidden.value) {
@@ -585,7 +593,9 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
           ? `That looks a few digits short for ${name}. Please check the number.`
           : reason === 'TOO_LONG'
             ? `That looks a few digits too long for ${name}. Please check the number.`
-            : `That does not look like a valid ${name} number. Please check it, or leave the field blank.`;
+            : isOptional
+              ? `That does not look like a valid ${name} number. Please check it, or leave the field blank.`
+              : `That does not look like a valid ${name} number. Please check it.`;
       errorEl.hidden = false;
       return false;
     }

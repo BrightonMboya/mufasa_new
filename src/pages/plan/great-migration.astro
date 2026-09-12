@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PlannerFlow from '../../components/PlannerFlow.astro';
+import { migrationPlanner, site } from '../../data/site';
+
+const title = `${migrationPlanner.title} — ${site.shortName}`;
+---
+
+<Base title={title} description={migrationPlanner.body}>
+  <Header />
+  <PlannerFlow
+    steps={migrationPlanner.steps}
+    srTitle={migrationPlanner.title}
+    contactTitle="Where should we send your migration routes?"
+    contactHint="Leave your details and a guide — not a call centre — will come back with camps that sit where the herds will be."
+    messageLabel="Anything else we should know?"
+    submitLabel="Send my enquiry"
+    subject="New Great Migration enquiry"
+    fromName="King Mufasa · Great Migration"
+    restartLabel="Start again"
+  />
+  <Footer />
+</Base>

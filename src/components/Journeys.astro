@@ -1,17 +1,49 @@
 ---
+import JourneyCard from './JourneyCard.astro';
 import { journeys as allJourneys } from '../data/site';
 
-// The homepage shows only the hand-picked signature journeys — the full
-// library (including migrated itineraries) lives at /journeys.
-const journeys = allJourneys.filter((j) => j.featured);
-const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))];
+/* The homepage showcases real, bookable itineraries — three driven from
+   Arusha, three flown in from Zanzibar. "North to Sea" is deliberately not
+   here: it is the collection these northern routes belong to, not a route you
+   can book, and it reads as a duplicate beside its own contents. The full
+   library, that hub included, is behind "See all Itineraries".
+
+   Curated rather than sliced off the array so the durations ladder (5/6/7 days
+   overland, 2/3/4 days fly-in) instead of landing wherever the data order does. */
+const NORTHERN_CIRCUIT = [
+  '5-days-manyara-serengeti-ngorongoro-best-luxury-safari',
+  '6-day-the-great-wildebeest-migration-safari',
+  '7-day-private-luxury-safari-to-tanzania-premier-parks',
+];
+const FROM_ZANZIBAR = [
+  '2-day-tarangire-and-ngorongoro-crater-from-zanzibar',
+  '3-day-luxury-fly-in-fly-out-safari-from-zanzibar',
+  '4-day-endless-plains-from-zanzibar-to-serengeti',
+];
+
+const NORTHERN = 'Northern Circuit';
+const ZANZIBAR = 'Fly-In from Zanzibar';
+
+const bySlug = (slug: string) => allJourneys.find((j) => j.slug === slug);
+// Every slug above must resolve, or a card silently vanishes from the homepage.
+const pick = (slugs: string[], group: string) =>
+  slugs.map((slug) => {
+    const journey = bySlug(slug);
+    if (!journey) throw new Error(`Journeys: unknown slug "${slug}"`);
+    return { journey, group };
+  });
+
+const cards = [...pick(NORTHERN_CIRCUIT, NORTHERN), ...pick(FROM_ZANZIBAR, ZANZIBAR)];
+
+// Both rows are category "Northern Circuit", so tabbing on category would give
+// one dead filter. Tab on how you get there, which is the real difference.
+const filters = ['All', NORTHERN, ZANZIBAR];
 ---
 
 <section id="journeys" class="journeys section wrap">
   <div class="journeys__head">
     <h2>Our Journeys</h2>
     <div class="journeys__head-actions">
-      <a href="/journeys" class="pill pill--outline">See All Journeys</a>
       <a href="#enquiry" class="pill pill--accent">Make an Enquiry</a>
     </div>
   </div>
@@ -30,31 +62,26 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
   </div>
 
   <div class="journeys__grid" data-journeys-grid>
-    {journeys.map((j) => (
-      <a
-        class="jcard"
-        href={`/journeys/${j.slug}`}
-        data-category={j.category}
-        data-search={`${j.title} ${j.category} ${j.summary} ${j.days.map((d) => d.place).join(' ')}`.toLowerCase()}
-      >
-        <div class="jcard__frame">
-          <img src={j.image} alt={j.title} loading="lazy" />
-        </div>
-        <span class="jcard__meta">{j.meta}</span>
-        <h3 class="jcard__title">{j.title}</h3>
-        <span class="jcard__cta">Explore</span>
-      </a>
-    ))}
+    {cards.map(({ journey, group }) => <JourneyCard journey={journey} filterGroup={group} />)}
   </div>
 
   <p class="journeys__empty" data-journeys-empty hidden>
     No journeys match that yet — <a href="#enquiry">tell us what you have in mind</a> and we’ll draw one.
   </p>
+
+  <div class="journeys__all">
+    <a href="/journeys" class="pill pill--accent">See all Itineraries</a>
+  </div>
 </section>
 
 <style>
   .journeys {
     background-color: var(--color-surface);
+  }
+  .journeys__all {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
   .journeys__head {
     display: flex;
@@ -81,7 +108,7 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     display: flex;
     flex-wrap: wrap;
     gap: clamp(1rem, 2.5vw, 2.375rem);
-    padding-bottom: 3.375rem;
+    padding-bottom: 2rem;
   }
   .tab {
     font-size: var(--text-label);
@@ -107,58 +134,11 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
-  .jcard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    text-align: center;
-  }
-  .jcard__frame {
-    width: 100%;
-    aspect-ratio: 5 / 6;
-    overflow: hidden;
-    margin-bottom: 1.125rem;
-  }
-  .jcard__frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-  }
-  .jcard:hover .jcard__frame img {
-    transform: scale(1.04);
-  }
-  .jcard__meta {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-slate);
-  }
-  .jcard__title {
-    font-size: clamp(1.5rem, 3vw, 1.875rem);
-    color: var(--color-ink);
-  }
-  .jcard__cta {
-    margin-top: 0.375rem;
-    padding: 0.875rem 2.375rem;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-full);
-    font-size: 0.8125rem;
-    font-weight: var(--fw-semibold);
-    letter-spacing: 0.11em;
-    text-transform: uppercase;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-  }
-  .jcard:hover .jcard__cta {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+  .tab:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 5px;
   }
 
-  .jcard[hidden] {
-    display: none;
-  }
   .journeys__empty {
     margin-top: 3rem;
     text-align: center;
@@ -169,12 +149,16 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
     border-bottom: 1px solid currentColor;
   }
 
-  @media (max-width: 860px) {
+  @media (min-width: 641px) and (max-width: 1050px) {
+    .journeys__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 640px) {
     .journeys__grid {
       grid-template-columns: 1fr;
       max-width: 460px;
       margin-inline: auto;
-      gap: 3rem;
+      gap: 1.75rem;
     }
   }
 </style>

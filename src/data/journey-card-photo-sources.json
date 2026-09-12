@@ -1,0 +1,74 @@
+[
+  {
+    "itinerary": "north-to-sea",
+    "file": "guests-with-maasai-elders.webp",
+    "sourceKey": "Downloads/chem.jpg (Chem Chem \u2014 guests in conversation with Maasai elders)",
+    "note": "Replaces safari-guests-lion-sighting.webp. Checked against polecat: not used there."
+  },
+  {
+    "itinerary": "the-quiet-south",
+    "file": "guide-and-young-explorers.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/ref2-222-nomad-tanzania.jpg"
+  },
+  {
+    "itinerary": "salt-and-silence",
+    "file": "beachside-reading.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/ref2-198-nomad-tanzania.jpg"
+  },
+  {
+    "itinerary": "2-day-tarangire-and-ngorongoro-crater-from-zanzibar",
+    "file": "guided-walk-briefing.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/ref2-149-cottars.jpg",
+    "note": "Replaces crater-view-with-guide.webp. Checked against polecat: not used there."
+  },
+  {
+    "itinerary": "3-day-luxury-fly-in-fly-out-safari-from-zanzibar",
+    "file": "guest-watching-elephant.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/73-tza-itin-honeymoon-3.jpg"
+  },
+  {
+    "itinerary": "4-day-endless-plains-from-zanzibar-to-serengeti",
+    "file": "photographing-lions-on-safari.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/29-TZA_Experiences_042826_Game-Drives_Asset-1.jpg"
+  },
+  {
+    "itinerary": "4-day-serengeti-fly-in-fly-out-safari-luxury-safari",
+    "file": "elephant-watching-from-vehicle.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/28-TZA_Experiences_042826_Big-Tuskers_Hero.jpg"
+  },
+  {
+    "itinerary": "5-day-fly-in-serengeti-ngorongoro-crater-lake-manyara",
+    "file": "giraffe-walk-with-guides.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/67-tza-chemchemlodge-grid-secluded-Chem-Chem-Lodge-nature-walk.jpg"
+  },
+  {
+    "itinerary": "5-days-manyara-serengeti-ngorongoro-best-luxury-safari",
+    "file": "sunset-walk-with-maasai-guide.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/74-tza-itin-honeymoon-4.jpg"
+  },
+  {
+    "itinerary": "5-days-tanzania-family-safari",
+    "file": "guests-photographing-from-vehicle.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/ref2-102-cottars.jpg"
+  },
+  {
+    "itinerary": "6-day-the-great-wildebeest-migration-safari",
+    "file": "travellers-watching-migration.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/47-saf-exp-walkingsafari-hero-Legendary-Expeditions-Feb-19-Copyright-Scott-Ramsay-102.jpg"
+  },
+  {
+    "itinerary": "7-day-private-luxury-safari-to-tanzania-premier-parks",
+    "file": "maasai-welcome.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/79-tza-itin-honeymoon-9.jpg"
+  },
+  {
+    "itinerary": "7-day-tanzania-drive-in-fly-out-luxury-safari",
+    "file": "sunset-game-drive.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/80-tza-itin-honeymoon-bottomhero.jpg"
+  },
+  {
+    "itinerary": "7-days-tanzania-family-safari",
+    "file": "discovering-wildlife-field-guide.webp",
+    "sourceKey": "accommodations/0ad5e268-a0d8-4ed0-9d6c-453928c5b7cc/org/411c36e8-0808-46f4-a3b2-130a3eecc349/ref2-158-naturalselection.jpg"
+  }
+]

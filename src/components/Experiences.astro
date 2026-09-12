@@ -4,12 +4,10 @@ import { experiences } from '../data/site';
 
 <section id="experiences" class="exp section wrap">
   <div class="exp__head">
-    <span class="exp__eyebrow">Why Tanzania</span>
     <h2>The experiences people come for</h2>
     <p>
       The Great Migration, the cats, the coast, the roof of Africa — the
-      journeys below are built around these. Tell us which one you can’t leave
-      without, and we’ll draw the route to it.
+      journeys below are built around these.
     </p>
   </div>
 
@@ -22,7 +20,6 @@ import { experiences } from '../data/site';
         <div class="excard__body">
           <span class="excard__place">{x.place} · {x.season}</span>
           <h3 class="excard__title">{x.title}</h3>
-          <p class="excard__line">{x.line}</p>
           <span class="excard__cta">Explore this</span>
         </div>
       </a>
@@ -37,15 +34,6 @@ import { experiences } from '../data/site';
   .exp__head {
     max-width: 640px;
     margin-bottom: clamp(2.5rem, 5vw, 3.75rem);
-  }
-  .exp__eyebrow {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: var(--text-micro);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    margin-bottom: 1.25rem;
   }
   .exp__head h2 {
     font-size: clamp(2.25rem, 5vw, 3.5rem);
@@ -136,12 +124,6 @@ import { experiences } from '../data/site';
     font-size: clamp(1.6rem, 2.6vw, 2.375rem);
     font-weight: var(--fw-light);
     line-height: 1.05;
-  }
-  .excard__line {
-    max-width: 34ch;
-    font-size: var(--text-body);
-    line-height: 1.5;
-    color: rgba(247, 244, 238, 0.9);
   }
   .excard__cta {
     margin-top: 0.6rem;

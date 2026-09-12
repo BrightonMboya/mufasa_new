@@ -603,10 +603,9 @@ export const experiences = [
     line: 'Two million wildebeest on the move, and river crossings that stop your breath.',
     place: 'Serengeti',
     season: 'Jun — Oct',
-    href: '/journeys/north-to-sea',
-    // Wildebeest streaming down the bank into the river — the crossing itself.
-    image:
-      'https://images.unsplash.com/photo-1772175007897-0a4927cf4531?w=1600&q=80&auto=format&fit=crop',
+    href: '/plan/great-migration',
+    // Guests and an armed ranger on foot, herds spread across the plain behind.
+    image: '/media/experiences/walking-safari-with-herds.webp',
   },
   {
     title: 'Big Cats & the Wild South',
@@ -614,8 +613,9 @@ export const experiences = [
     place: 'Ruaha & the Selous',
     season: 'Jun — Nov',
     href: '/journeys/the-quiet-south',
-    image:
-      'https://images.unsplash.com/photo-1585468274952-66591eb14165?w=1200&q=80&auto=format&fit=crop',
+    // Chem Chem tree-climbing lion, from the ratiba gallery; served locally as
+    // a 1400px webp rather than the 2000px source JPEG.
+    image: '/media/journeys/safari-guests-lion-sighting.webp',
   },
   {
     title: 'Zanzibar & the Reef',
@@ -623,8 +623,7 @@ export const experiences = [
     place: 'Zanzibar & Mafia',
     season: 'Jun — Mar',
     href: '/journeys/salt-and-silence',
-    image:
-      'https://images.unsplash.com/photo-1516815231560-8f41ec531527?w=1200&q=80&auto=format&fit=crop',
+    image: '/media/experiences/zanzibar-beach-dinner.webp',
   },
   {
     title: 'Kilimanjaro',
@@ -632,8 +631,8 @@ export const experiences = [
     place: 'Kilimanjaro',
     season: 'Jan — Mar, Jun — Oct',
     href: '/trekking',
-    image:
-      'https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=1600&q=80&auto=format&fit=crop',
+    // Our own frame: a trekker at high camp, sunrise over the crater rim.
+    image: '/media/experiences/kilimanjaro-sunrise-camp.webp',
   },
 ];
 
@@ -764,6 +763,7 @@ export const planner = {
     {
       id: 'see',
       kind: 'multi',
+      emailLabel: 'Would like to see',
       title: 'What would you like to see?',
       hint: 'Select one or more',
       options: [
@@ -778,6 +778,7 @@ export const planner = {
     {
       id: 'interests',
       kind: 'multi',
+      emailLabel: 'Interested in',
       title: 'What draws you?',
       hint: 'Select one or more',
       options: [
@@ -794,6 +795,8 @@ export const planner = {
     {
       id: 'occasion',
       kind: 'single',
+      emailLabel: 'Travelling as',
+      layout: 'list',
       title: 'Who is travelling?',
       hint: 'Select one',
       options: [
@@ -807,6 +810,7 @@ export const planner = {
     {
       id: 'arrival',
       kind: 'date',
+      emailLabel: 'Preferred timing',
       title: 'When would you like to travel?',
       hint: 'An approximate date is fine \u2014 we can move it later',
       skip: "I haven't decided yet",
@@ -897,6 +901,51 @@ export const planner = {
         occasion: ['solo', 'friends', 'couple'],
         months: [1, 2, 3, 6, 7, 8, 9, 10],
       },
+    },
+  ],
+};
+
+/* Great Migration planner. Same wizard as the trip planner, asked around the
+   one thing these enquiries turn on: which leg of the migration they want.
+   The herds move all year, so the "when" is really a "where" — Ndutu in the
+   calving months, Kogatende for the Mara crossings. */
+export const migrationPlanner = {
+  title: 'Plan your Great Migration safari',
+  body: "Two million wildebeest move through the Serengeti all year — the question is which chapter you want to stand in. Tell us that and we'll build the route around it.",
+  steps: [
+    {
+      id: 'leg',
+      kind: 'single',
+      emailLabel: 'Migration leg',
+      layout: 'list',
+      title: 'Which months are you planning for?',
+      hint: 'Select one',
+      options: [
+        { value: 'ndutu', label: 'Ndutu & the calving season · Dec — Mar' },
+        { value: 'grumeti', label: 'The western corridor & Grumeti · May — Jul' },
+        { value: 'kogatende', label: 'Kogatende & the Mara River crossings · Jul — Oct' },
+        { value: 'unsure', label: "I'm not sure yet — help me choose" },
+      ],
+    },
+    {
+      id: 'travellers',
+      kind: 'number',
+      emailLabel: 'Number of travellers',
+      title: 'How many of you are travelling?',
+      hint: 'Including children',
+      min: 1,
+      max: 20,
+      initial: 2,
+      options: [],
+    },
+    {
+      id: 'arrival',
+      kind: 'date',
+      emailLabel: 'Preferred date',
+      title: 'When would you like to travel?',
+      hint: 'An approximate date is fine \u2014 we can move it later',
+      skip: "I haven't decided yet",
+      options: [],
     },
   ],
 };
@@ -1413,15 +1462,6 @@ export const reviews = {
       pending: true,
       href: 'https://www.designmysafari.com/?utm_source=kingmufasaexpeditions&utm_medium=partner&utm_campaign=operator_partner',
     },
-  ],
-  // Real, relevant credentials for a Tanzanian operator. Swap the text badges
-  // for official logos when you have them.
-  accreditations: [
-    { short: 'TATO', full: 'Tanzania Association of Tour Operators' },
-    { short: 'TALA', full: 'Licensed Tourist Agent' },
-    { short: 'ATTA', full: 'African Travel & Tourism Association' },
-    { short: 'KPAP', full: 'Partner for Responsible Travel' },
-    { short: 'SafariBookings', full: 'Verified Operator' },
   ],
 };
 
