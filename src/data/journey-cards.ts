@@ -27,3 +27,10 @@ export const introductions: Record<string, string> = {
   '4-day-endless-plains-from-zanzibar-to-serengeti': 'Four days through the Serengeti, Ngorongoro, and Tarangire, with a flight from Zanzibar to start the adventure.',
   'salt-and-silence': 'Slow island days between Zanzibar and Mafia. Coral reefs, sunset dhows, and time to simply be.',
 };
+
+/* The listing card and the detail-page hero must show the same frame, so both
+   resolve their photo through here rather than reaching for `journey.image`. */
+export function journeyPhoto(slug: string, fallback: string) {
+  const photo = cardPhotos[slug];
+  return { src: photo?.src ?? fallback, position: photo?.position ?? 'center' };
+}

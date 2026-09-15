@@ -26,7 +26,10 @@ import { reviews } from '../data/site';
           ]}
           src={r.logo}
           alt={r.alt}
+          width={r.logoWidth}
+          height={r.logoHeight}
           loading="lazy"
+          decoding="async"
         />
         {r.pending ? (
           <span class="rating__link">Read reviews →</span>

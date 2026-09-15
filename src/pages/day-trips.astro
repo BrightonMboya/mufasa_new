@@ -23,7 +23,7 @@ const description = dayTrips.intro.lead;
       {dayTrips.trips.map((t) => (
         <article class="ddcard">
           <div class="ddcard__frame">
-            <img src={t.image} alt={t.title} loading="lazy" />
+            <img src={t.image} alt={t.title} loading="lazy" decoding="async" />
             {t.credit && (
               <a class="ddcard__credit" href={t.credit.url} target="_blank" rel="noopener noreferrer nofollow">
                 Photo: {t.credit.name} / {t.credit.source}, {t.credit.license}

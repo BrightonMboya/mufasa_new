@@ -25,7 +25,7 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
   <Header />
   <main>
     <section class="dhero">
-      <img class="dhero__img" src={activity.image} alt={activity.title} fetchpriority="high" />
+      <img class="dhero__img" src={activity.image} alt={activity.title} fetchpriority="high" decoding="async" />
       <div class="dhero__scrim"></div>
       <div class="dhero__content wrap">
         <h1>{activity.title}</h1>

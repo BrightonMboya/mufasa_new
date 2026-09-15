@@ -3,7 +3,7 @@ import { enquiry, site } from '../data/site';
 ---
 
 <section id="enquiry" class="enquiry">
-  <img class="enquiry__img" src={enquiry.image} alt="" loading="lazy" />
+  <img class="enquiry__img" src={enquiry.image} alt="" loading="lazy" decoding="async" />
   <div class="enquiry__scrim"></div>
   <div class="enquiry__content wrap">
     <h2>{enquiry.title}</h2>

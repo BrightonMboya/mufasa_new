@@ -18,7 +18,7 @@ import { hero } from '../data/site';
         loading={i === 0 ? 'eager' : 'lazy'}
         fetchpriority={i === 0 ? 'high' : 'auto'}
         data-hero-slide
-      />
+      decoding="async" />
     ))}
   </div>
 

@@ -36,7 +36,7 @@ const types = [
     {types.map((t) => (
       <a class="travcard" href="/trip-planner">
         <div class="travcard__frame">
-          <img src={t.image} alt={t.alt} loading="lazy" />
+          <img src={t.image} alt={t.alt} loading="lazy" decoding="async" />
         </div>
         <h3 class="travcard__title">{t.title}</h3>
       </a>

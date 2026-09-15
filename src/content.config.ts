@@ -19,6 +19,9 @@ const legal = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    /* Optional editorial accent shown beside the copy on desktop only. */
+    sideImage: z.string().optional(),
+    sideImageAlt: z.string().optional(),
   }),
 });
 

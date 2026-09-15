@@ -21,7 +21,7 @@ const title = `${post.data.title} — ${site.shortName}`;
   <main>
     <!-- Detail hero -->
     <section class="phero">
-      <img class="phero__img" src={post.data.image} alt={post.data.title} fetchpriority="high" />
+      <img class="phero__img" src={post.data.image} alt={post.data.title} fetchpriority="high" decoding="async" />
       <div class="phero__scrim"></div>
       <div class="phero__content wrap">
         <span class="phero__cat">{post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>

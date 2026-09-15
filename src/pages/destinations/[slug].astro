@@ -20,7 +20,7 @@ const next = destinations[(idx + 1) % destinations.length];
   <Header />
   <main>
     <section class="dhero">
-      <img class="dhero__img" src={destination.image} alt={destination.name} fetchpriority="high" />
+      <img class="dhero__img" src={destination.image} alt={destination.name} fetchpriority="high" decoding="async" />
       <div class="dhero__scrim"></div>
       <div class="dhero__content wrap">
         <span class="dhero__region">{destination.region} &middot; {String(idx + 1).padStart(2, '0')} / {String(destinations.length).padStart(2, '0')}</span>
@@ -55,11 +55,11 @@ const next = destinations[(idx + 1) % destinations.length];
     {destination.gallery?.length ? (
       <section class:list={['gallery wrap', { 'gallery--single': destination.gallery.length === 1 }]}>
         <div class="gallery__frame gallery__frame--wide">
-          <img src={destination.gallery[0]} alt={`${destination.name} — landscape`} loading="lazy" />
+          <img src={destination.gallery[0]} alt={`${destination.name} — landscape`} loading="lazy" decoding="async" />
         </div>
         {destination.gallery[1] && (
           <div class="gallery__frame gallery__frame--tall">
-            <img src={destination.gallery[1]} alt={`${destination.name} — wildlife`} loading="lazy" />
+            <img src={destination.gallery[1]} alt={`${destination.name} — wildlife`} loading="lazy" decoding="async" />
           </div>
         )}
       </section>
@@ -89,7 +89,7 @@ const next = destinations[(idx + 1) % destinations.length];
         <div class="related__grid">
           {related.map((j) => (
             <a class="rcard" href={`/journeys/${j.slug}`}>
-              <div class="rcard__frame"><img src={j.image} alt={j.title} loading="lazy" /></div>
+              <div class="rcard__frame"><img src={j.image} alt={j.title} loading="lazy" decoding="async" /></div>
               <span class="rcard__meta">{j.meta}</span>
               <h3 class="rcard__title">{j.title}</h3>
             </a>

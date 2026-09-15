@@ -21,7 +21,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     {posts.map((post, i) => (
       <a class="pcard" href={`/blog/${post.id}`}>
         <div class="pcard__frame">
-          <img src={post.data.image} alt={post.data.title} loading="lazy" />
+          <img src={post.data.image} alt={post.data.title} loading="lazy" decoding="async" />
         </div>
         <span class="pcard__meta">
           {post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}

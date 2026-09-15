@@ -1,6 +1,6 @@
 ---
 import type { journeys } from '../data/site';
-import { cardPhotos, introductions } from '../data/journey-cards';
+import { cardPhotos, introductions, journeyPhoto } from '../data/journey-cards';
 
 interface Props {
   journey: (typeof journeys)[number];
@@ -10,6 +10,7 @@ interface Props {
   filterGroup?: string;
 }
 const { journey: j, showPrice = false, filterGroup } = Astro.props;
+const photo = journeyPhoto(j.slug, j.image);
 ---
 
 <a
@@ -19,7 +20,7 @@ const { journey: j, showPrice = false, filterGroup } = Astro.props;
         data-search={`${j.title} ${j.category} ${j.summary} ${j.days.map((d) => d.place).join(' ')}`.toLowerCase()}
       >
         <div class="jcard__frame">
-          <img src={cardPhotos[j.slug]?.src ?? j.image} style={{ objectPosition: cardPhotos[j.slug]?.position ?? 'center' }} alt="" loading="lazy" />
+          <img src={photo.src} style={{ objectPosition: photo.position }} alt="" loading="lazy" decoding="async" />
           <span class:list={['jcard__duration', { 'jcard__duration--left': !!cardPhotos[j.slug] }]}>{j.nights} {j.nights === 1 ? 'night' : 'nights'}</span>
           <h3 class="jcard__title">{j.title}</h3>
         </div>

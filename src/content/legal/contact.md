@@ -1,6 +1,8 @@
 ---
 title: "Contact"
 description: "How to reach King Mufasa Expeditions — office, emergency line, and address."
+sideImage: "/media/journeys/guests-photographing-from-vehicle.webp"
+sideImageAlt: "Guests photographing wildlife from an open safari vehicle in the Serengeti"
 ---
 
 We are always here to help.

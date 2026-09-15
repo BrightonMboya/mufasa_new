@@ -24,7 +24,7 @@ const description = 'Balloon safaris, canoeing, cultural visits and more — boo
       {activities.map((a, i) => (
         <a class:list={['acard', { 'acard--featured': i === 0 }]} href={`/activities/${a.slug}`}>
           <div class="acard__frame">
-            <img src={a.image} alt={a.title} loading={i === 0 ? 'eager' : 'lazy'} />
+            <img src={a.image} alt={a.title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
           </div>
           <div class="acard__body">
             <h3 class="acard__title">{a.title}</h3>

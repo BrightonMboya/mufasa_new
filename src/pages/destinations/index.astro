@@ -30,7 +30,7 @@ const description = 'The parks and reserves our journeys are built from — the 
         <a class="drow" href={`/destinations/${d.slug}`} data-index={i}>
           <div class="drow__media">
             <div class="drow__frame">
-              <img src={d.image} alt={d.name} loading={i === 0 ? 'eager' : 'lazy'} />
+              <img src={d.image} alt={d.name} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
             </div>
           </div>
           <div class="drow__text">

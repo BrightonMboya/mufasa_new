@@ -14,7 +14,7 @@ const description = about.lead;
   <main>
     <!-- Hero -->
     <section class="ahero">
-      <img class="ahero__img" src={about.hero.image} alt="" fetchpriority="high" />
+      <img class="ahero__img" src={about.hero.image} alt="" fetchpriority="high" decoding="async" />
       <div class="ahero__content wrap">
         <span class="eyebrow" style="color: var(--color-accent-soft)">{about.hero.eyebrow}</span>
         <h1>{about.hero.title}</h1>
@@ -44,7 +44,7 @@ const description = about.lead;
     <!-- Guides -->
     <section id="guides" class="slab section wrap">
       <div class="slab__media">
-        <img src={about.guides.image} alt={about.guides.title} loading="lazy" />
+        <img src={about.guides.image} alt={about.guides.title} loading="lazy" decoding="async" />
       </div>
       <div class="slab__text">
         <h2>{about.guides.title}</h2>
@@ -55,7 +55,7 @@ const description = about.lead;
     <!-- Operations -->
     <section id="operations" class="slab slab--reverse section wrap">
       <div class="slab__media">
-        <img src={about.operations.image} alt={about.operations.title} loading="lazy" />
+        <img src={about.operations.image} alt={about.operations.title} loading="lazy" decoding="async" />
       </div>
       <div class="slab__text">
         <h2>{about.operations.title}</h2>

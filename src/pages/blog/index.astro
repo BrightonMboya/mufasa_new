@@ -50,7 +50,7 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
             data-category={post.data.category}
           >
             <div class="pcard__frame">
-              <img src={post.data.image} alt={post.data.title} loading={i === 0 ? 'eager' : 'lazy'} />
+              <img src={post.data.image} alt={post.data.title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
             </div>
             <div class="pcard__body">
               <span class="pcard__meta">{post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>

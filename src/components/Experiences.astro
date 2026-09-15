@@ -15,7 +15,7 @@ import { experiences } from '../data/site';
     {experiences.map((x) => (
       <a class="excard" href={x.href}>
         <div class="excard__media">
-          <img src={x.image} alt={x.title} loading="lazy" />
+          <img src={x.image} alt={x.title} loading="lazy" decoding="async" />
         </div>
         <div class="excard__body">
           <span class="excard__place">{x.place} · {x.season}</span>

@@ -15,7 +15,7 @@ const description = trekking.intro.lead;
   <main>
     <!-- Hero -->
     <section class="thero">
-      <img class="thero__img" src={trekking.intro.heroImage} alt="Mount Kilimanjaro" fetchpriority="high" />
+      <img class="thero__img" src={trekking.intro.heroImage} alt="Mount Kilimanjaro" fetchpriority="high" decoding="async" />
       <div class="thero__scrim"></div>
       <div class="thero__content wrap">
         <span class="eyebrow" style="color: var(--color-accent-soft)">{trekking.intro.eyebrow}</span>
@@ -36,7 +36,7 @@ const description = trekking.intro.lead;
         {trekking.routes.map((r) => (
           <article class="trek">
             <div class="trek__frame">
-              <img src={r.image} alt={r.name} loading="lazy" />
+              <img src={r.image} alt={r.name} loading="lazy" decoding="async" />
             </div>
             <span class="trek__meta">{r.meta}</span>
             <h3 class="trek__name">{r.name}</h3>

@@ -7,6 +7,7 @@ import RouteMap from '../../components/RouteMap.astro';
 import JourneyEnquiryModal from '../../components/JourneyEnquiryModal.astro';
 import LodgeLightbox from '../../components/LodgeLightbox.astro';
 import { journeys, site, accommodationDirectory } from '../../data/site';
+import { journeyPhoto } from '../../data/journey-cards';
 
 export function getStaticPaths() {
   return journeys.map((j) => ({ params: { slug: j.slug }, props: { journey: j } }));
@@ -21,6 +22,8 @@ function lodgeFor(images?: string[]) {
 }
 
 const { journey } = Astro.props;
+// Same frame the listing card shows, so clicking a card doesn't swap the photo.
+const hero = journeyPhoto(journey.slug, journey.image);
 const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
 const title = `${journey.title} — ${journey.nights + 1} Days / ${journey.nights} ${journey.nights === 1 ? 'Night' : 'Nights'} in Tanzania | ${site.shortName}`;
 
@@ -46,7 +49,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
   <main>
     <!-- Cinematic hero -->
     <section class="dhero">
-      <img class="dhero__img" src={journey.image} alt={journey.title} fetchpriority="high" data-hero-img />
+      <img class="dhero__img" src={hero.src} style={{ objectPosition: hero.position }} alt={journey.title} fetchpriority="high" data-hero-img decoding="async" />
       <div class="dhero__scrim"></div>
 
       <div class="dhero__top wrap">
@@ -147,7 +150,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
                       src={bandImage}
                       alt={d.place}
                       loading={i === 0 ? 'eager' : 'lazy'}
-                    />
+                    decoding="async" />
                     <div class="day__band-scrim"></div>
                     <div class="day__band-content wrap">
                       <div class="day__band-row" data-reveal>
@@ -178,7 +181,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
                             loading="lazy"
                             class:list={['day__gallery-img', { 'is-active': gi === 0 }]}
                             data-gallery-slide
-                          />
+                          decoding="async" />
                         ))}
                         {d.images.length > 1 && (
                           <Fragment>
@@ -285,7 +288,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
             {northernCircuitPackages.map((r) => (
               <a class="rcard" href={`/journeys/${r.slug}`}>
                 <div class="rcard__frame">
-                  <img src={r.image} alt={r.packageTitle ?? r.title} loading="lazy" />
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.packageTitle ?? r.title} loading="lazy" decoding="async" />
                   <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
                 </div>
                 <span class="rcard__meta">{r.meta}</span>
@@ -302,7 +305,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
             {flyInPackages.map((r) => (
               <a class="rcard" href={`/journeys/${r.slug}`}>
                 <div class="rcard__frame">
-                  <img src={r.image} alt={r.packageTitle ?? r.title} loading="lazy" />
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.packageTitle ?? r.title} loading="lazy" decoding="async" />
                   <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
                 </div>
                 <span class="rcard__meta">{r.meta}</span>
@@ -321,7 +324,7 @@ const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug
             {related.map((r) => (
               <a class="rcard" href={`/journeys/${r.slug}`}>
                 <div class="rcard__frame">
-                  <img src={r.image} alt={r.title} loading="lazy" />
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.title} loading="lazy" decoding="async" />
                   <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
                 </div>
                 <span class="rcard__meta">{r.meta}</span>

@@ -13,18 +13,27 @@ export async function getStaticPaths() {
 const { page } = Astro.props;
 const { Content } = await render(page);
 const title = `${page.data.title} — ${site.shortName}`;
+// Pages that supply a sideImage get a two-column desktop layout; the accent
+// is dropped below the breakpoint so narrow screens keep the single column.
+const aside = page.data.sideImage;
 ---
 
 <Base title={title} description={page.data.description}>
   <Header />
   <main>
-    <section class="lhero section wrap">
-      <h1>{page.data.title}</h1>
-    </section>
-
-    <section class="lbody section wrap">
-      <div class="prose">
-        <Content />
+    <section class="lpage section wrap">
+      <div class:list={['lpage__inner', { 'lpage__inner--split': !!aside }]}>
+        <div class="lpage__text">
+          <h1>{page.data.title}</h1>
+          <div class="prose">
+            <Content />
+          </div>
+        </div>
+        {aside && (
+          <figure class="lpage__aside">
+            <img src={aside} alt={page.data.sideImageAlt ?? ''} loading="lazy" decoding="async" />
+          </figure>
+        )}
       </div>
     </section>
   </main>
@@ -32,9 +41,59 @@ const title = `${page.data.title} — ${site.shortName}`;
 </Base>
 
 <style>
-  .lhero { background-color: var(--color-ground); max-width: 900px; margin-inline: auto; padding-bottom: 0; }
-  .lhero h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: var(--fw-light); color: var(--color-ink); }
+  .lpage { background-color: var(--color-ground); }
 
-  .lbody { background-color: var(--color-ground); padding-top: 0; }
-  .lbody .prose { max-width: 900px; margin-inline: auto; }
+  /* One container for heading and body, so both share the same left edge. */
+  .lpage__inner { max-width: 900px; margin-inline: auto; }
+
+  .lpage h1 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+    margin-bottom: 1.25rem;
+  }
+
+  .lpage .prose { max-width: none; }
+  .lpage__aside { display: none; }
+
+  @media (min-width: 62rem) {
+    /* Hang the bullets in the gutter so list copy lines up with the paragraphs. */
+    .lpage .prose :global(ul) { padding-left: 0; list-style: none; }
+    .lpage .prose :global(ul > li) { position: relative; }
+    .lpage .prose :global(ul > li)::before {
+      content: '';
+      position: absolute;
+      left: -0.9rem;
+      top: 0.75em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: var(--color-slate);
+    }
+
+    .lpage__inner--split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+      gap: clamp(2.5rem, 5vw, 4.5rem);
+      align-items: start;
+      max-width: 1180px;
+    }
+
+    .lpage__aside {
+      display: block;
+      position: sticky;
+      top: 7rem;
+      margin: 0;
+      border-radius: 5px;
+      overflow: hidden;
+      background-color: var(--color-ink);
+    }
+    .lpage__aside img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      object-position: 50% 40%;
+    }
+  }
 </style>
