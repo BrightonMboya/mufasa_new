@@ -1,5 +1,11 @@
 ---
 import { site, nav } from '../data/site';
+
+/* wa.me wants the number in full international form, digits only. The message
+   is pre-filled so an enquiry arrives with context rather than just "hi". */
+const whatsappNumber = site.phone.replace(/\D/g, '');
+const whatsappText = encodeURIComponent('Hello ' + site.shortName + ", I'd like to plan a trip to Tanzania.");
+const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText;
 ---
 
 <header class="header">
@@ -9,16 +15,44 @@ import { site, nav } from '../data/site';
 
   <nav class="nav" aria-label="Primary">
     <ul class="nav__links" data-nav-links>
-      {nav.map((item) => (
-        <li><a href={item.href}>{item.label}</a></li>
+      {nav.map((item, i) => (
+        item.children ? (
+          <li class="nav__group" data-nav-group>
+            <button
+              type="button"
+              class="nav__parent"
+              aria-expanded="false"
+              aria-controls={`nav-menu-${i}`}
+              data-nav-parent
+            >
+              {item.label}
+              <svg class="nav__chev" width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true">
+                <path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <ul class="nav__menu" id={`nav-menu-${i}`}>
+              {item.children.map((child) => (
+                <li><a href={child.href}>{child.label}</a></li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          <li><a href={item.href}>{item.label}</a></li>
+        )
       ))}
     </ul>
   </nav>
 
   <div class="actions">
-    <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="callus">
-      <svg class="callus__icon" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M5.2 2.5 6.4 5 5 6.3a8 8 0 0 0 3.7 3.7L10 8.6l2.5 1.2v2.4c0 .7-.6 1.2-1.3 1.1A10.8 10.8 0 0 1 2.7 4.3C2.6 3.6 3.1 3 3.8 3l1.4-.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+    <a
+      href={whatsappHref}
+      class="callus"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Message ${site.shortName} on WhatsApp`}
+    >
+      <svg class="callus__icon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.347-.347.52-.52.174-.174.232-.298.347-.497.115-.198.057-.371-.03-.52-.086-.148-.66-1.594-.904-2.183-.24-.579-.486-.5-.667-.51-.174-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
       </svg>
       <span class="callus__number">{site.phone}</span>
     </a>
@@ -76,6 +110,72 @@ import { site, nav } from '../data/site';
     border-bottom-color: var(--color-accent);
   }
 
+  /* Journeys menu. The parent is a button, not a link: on a touch screen a
+     link would navigate before the menu could open. */
+  .nav__group { position: relative; }
+  .nav__parent {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    padding-block: 0.4rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .nav__group:hover .nav__parent,
+  .nav__parent[aria-expanded='true'] {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+  .nav__chev { transition: transform 0.2s ease; }
+  .nav__group:hover .nav__chev,
+  .nav__parent[aria-expanded='true'] .nav__chev { transform: rotate(180deg); }
+
+  .nav__menu {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    left: -1rem;
+    min-width: 11rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    list-style: none;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 14px 34px rgba(20, 24, 21, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  }
+  /* The gap between button and panel would otherwise drop the hover. */
+  .nav__menu::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -0.65rem;
+    height: 0.65rem;
+  }
+  .nav__group:hover .nav__menu,
+  .nav__group:focus-within .nav__menu,
+  .nav__menu[data-open='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .nav__menu a { display: block; white-space: nowrap; }
+
   .actions {
     display: flex;
     align-items: center;
@@ -121,7 +221,6 @@ import { site, nav } from '../data/site';
   /* Mobile: collapse nav into a dropdown */
   @media (max-width: 920px) {
     .nav__toggle { display: flex; }
-    .callus { display: none; }
     .nav__links {
       position: absolute;
       left: 0;
@@ -145,6 +244,35 @@ import { site, nav } from '../data/site';
     }
     .nav__links li { padding-block: 0.7rem; }
     .nav__links a { border-bottom: none; }
+
+    /* No room for a hover panel in the burger, so the group is a heading with
+       its three links indented beneath it. */
+    .nav__group { position: static; }
+    .nav__parent {
+      color: var(--color-slate);
+      cursor: default;
+      pointer-events: none;
+      padding-block: 0;
+    }
+    .nav__chev { display: none; }
+    .nav__menu {
+      position: static;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      min-width: 0;
+      padding: 0.35rem 0 0 0.9rem;
+      gap: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+    }
+    .nav__menu::before { content: none; }
+    .nav__menu li { padding-block: 0.5rem; }
+
+    /* WhatsApp is the fastest way to reach us from a phone, so the icon stays
+       once the number itself has been dropped. */
+    .callus { display: inline-flex; }
   }
 
   @media (max-width: 480px) {
@@ -159,5 +287,33 @@ import { site, nav } from '../data/site';
     const open = links?.getAttribute('data-open') === 'true';
     links?.setAttribute('data-open', String(!open));
     toggle.setAttribute('aria-expanded', String(!open));
+  });
+
+  /* Hover and keyboard focus open the Journeys menu in CSS; this adds click,
+     for touch and for anyone who taps rather than hovers. */
+  const groups = Array.from(document.querySelectorAll('[data-nav-group]'));
+  function closeMenus(except) {
+    groups.forEach((g) => {
+      if (g === except) return;
+      g.querySelector('[data-nav-parent]')?.setAttribute('aria-expanded', 'false');
+      g.querySelector('.nav__menu')?.removeAttribute('data-open');
+    });
+  }
+  groups.forEach((group) => {
+    const parent = group.querySelector('[data-nav-parent]');
+    const menu = group.querySelector('.nav__menu');
+    parent?.addEventListener('click', () => {
+      const open = menu?.getAttribute('data-open') === 'true';
+      closeMenus(group);
+      parent.setAttribute('aria-expanded', String(!open));
+      if (open) menu?.removeAttribute('data-open');
+      else menu?.setAttribute('data-open', 'true');
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element) || !e.target.closest('[data-nav-group]')) closeMenus(null);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenus(null);
   });
 </script>

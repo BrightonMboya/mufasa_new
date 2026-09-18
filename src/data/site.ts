@@ -16,11 +16,20 @@ export const site = {
 };
 
 /* Top-level nav, trimmed: Home lives on the logo; Safaris/Destinations/
-   Zanzibar collapse into one "Safaris" entry pointing at the full journeys
-   library (the grid there spans all of them). */
+   Zanzibar collapse into the full journeys library (the grid there spans all
+   of them). The three ways to travel with us — multi-day safaris, day trips
+   and mountain treks — sit under one "Journeys" menu rather than eating three
+   nav slots; `children` turns an entry into that menu. */
 export const nav = [
-  { label: 'Safaris', href: '/journeys' },
-  { label: 'Trekking', href: '/trekking' },
+  {
+    label: 'Journeys',
+    href: '/journeys',
+    children: [
+      { label: 'Safaris', href: '/journeys' },
+      { label: 'Day Trips', href: '/day-trips' },
+      { label: 'Trekking', href: '/trekking' },
+    ],
+  },
   { label: 'Journal', href: '/blog' },
   { label: 'About Us', href: '/about' },
 ];
@@ -812,8 +821,8 @@ export const planner = {
       kind: 'date',
       emailLabel: 'Preferred timing',
       title: 'When would you like to travel?',
-      hint: 'An approximate date is fine \u2014 we can move it later',
-      skip: "I haven't decided yet",
+      hint: 'Approximate is fine \u2014 we can shape both later',
+      skip: "I haven't decided the dates yet",
       options: [],
     },
   ],
@@ -943,8 +952,8 @@ export const migrationPlanner = {
       kind: 'date',
       emailLabel: 'Preferred date',
       title: 'When would you like to travel?',
-      hint: 'An approximate date is fine \u2014 we can move it later',
-      skip: "I haven't decided yet",
+      hint: 'Approximate is fine \u2014 we can shape both later',
+      skip: "I haven't decided the dates yet",
       options: [],
     },
   ],
@@ -987,46 +996,104 @@ export const about = {
 export const dayTrips = {
   intro: {
     eyebrow: 'Day Trips',
-    title: 'Short days out, near Arusha',
-    lead: "Not every trip needs a week. These are half- and full-day excursions around Arusha and the Kilimanjaro foothills — good on their own, or bolted onto the start or end of a longer safari.",
+    title: 'One day, out and back',
+    lead: "Not every trip needs a week. These run out of Arusha or Moshi and have you back the same evening — a crater rim, a walking safari, a waterfall and a coffee roast. Good on their own, or bolted onto the start or end of a longer safari.",
   },
+  /* Rates, durations, age ranges and guide languages come from the operator's
+     own day-trip sheet; each price is per person. `ages` and `languages` are
+     the booking constraints travellers ask about first, so they sit on the
+     card rather than behind an enquiry. `position` is the card's
+     object-position, for frames whose subject is off-centre. */
   trips: [
     {
-      slug: 'chemka-hot-spring',
-      title: 'Chemka Hot Spring',
-      duration: 'Full day',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Chemka_Hotsrings_4.jpg',
-      summary: 'A roughly 2.5-hour drive from Arusha to the turquoise waters of Chemka (Maji Moto), where a rope swing and shade trees look out toward Kilimanjaro.',
-      included: ['Local lunch (mishkaki, nyama choma, chips mayai)', 'Private 4×4 with a professional guide', 'Water, soft drinks, wine and beer', 'Umbrella and t-shirt'],
+      slug: 'ngorongoro-crater-day-trip',
+      title: 'Ngorongoro Crater Day Trip',
+      price: '$450',
+      duration: '10 hours',
+      ages: '3–120',
+      languages: 'English',
+      // Guests reading the crater from the rim with their guide; already
+      // served locally as a webp for the journey cards.
+      image: '/media/journeys/crater-view-with-guide.webp',
+      position: '50% 45%',
+      summary: 'Descend into the crater with an expert guide for a day among lion, elephant, zebra, wildebeest and hippo, all of it inside one collapsed caldera with walls rising around you.',
+      included: ['Crater fee, admission fees and taxes', '4×4 safari jeep with a professional driver-guide', 'Boxed lunch', 'Pickup and drop-off at your hotel or the airport'],
     },
     {
-      slug: 'kilimanjaro-national-park-day-trip',
-      title: 'Kilimanjaro National Park Day Trip',
-      duration: 'Full day',
-      image: 'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1200',
-      summary: "A taste of the mountain without the summit — the first leg of the Marangu route up through rainforest to Mandara Hut, with a chance of colobus and blue monkeys, then back down the same day.",
-      included: ['Park entrance fees and taxes', 'Private 4×4 with roof hatch', 'English-speaking guide, cooks and porters', 'Umbrella and t-shirt'],
+      slug: 'arusha-national-park-walking-safari',
+      title: 'Arusha National Park Private Walking Safari',
+      price: '$350',
+      duration: '8 hours',
+      ages: '0–99',
+      languages: 'English, German, Italian, French, Spanish',
+      // Walkers and Maasai guides on foot among a giraffe herd. Arusha is the
+      // park you walk, so the card shows the walk rather than the view.
+      image: '/media/journeys/giraffe-walk-with-guides.webp',
+      position: '50% 50%',
+      summary: 'Tanzania on foot. A guided walking safari through lush forest to waterfalls and the Ngurdoto Crater rim, then the flamingo-filled Momella Lakes, with Mount Meru behind you the whole way — all 30 to 60 minutes from Arusha.',
+      included: ['Park fees for non-residents, all taxes and VAT', 'All transportation and roundtrip airport transfer', 'Lunch', 'Walking guide throughout'],
     },
     {
-      slug: 'materuni-village-waterfall-and-coffee-tour-day-trip',
-      title: 'Materuni Village, Waterfall & Coffee Tour',
-      duration: 'Full day',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Materuni1.jpg',
-      summary: "A cultural day in an authentic Chagga village on Kilimanjaro's foothills — a walk through coffee and fruit plantations, a hands-on coffee-making session, and a swim at Materuni Waterfall.",
-      included: ['Coffee-plantation walk with hands-on roasting & grinding', 'Materuni Waterfall visit (swimming optional)', 'Lunch', 'Hotel pickup and return, English-speaking guide'],
+      slug: 'tarangire-day-trip',
+      title: 'Tarangire Day Trip',
+      price: '$320',
+      duration: '8 hours',
+      ages: '3–120',
+      languages: 'English',
+      // A guest watching a big tusker from the vehicle — Tarangire's draw.
+      // This frame also carries a journey card at /journeys.
+      image: '/media/journeys/guest-watching-elephant.webp',
+      position: '55% 50%',
+      summary: 'A game drive through ancient baobabs and wildlife-rich plains, in a park known for its elephant herds — along with lion, giraffe and zebra on the river circuit.',
+      included: ['Admission fees and taxes', '4×4 safari jeep with a professional driver-guide', 'Boxed lunch', 'Pickup and drop-off at your hotel or the airport'],
     },
     {
       slug: 'serval-wildlife-sanctuary-day-tour',
       title: 'Serval Wildlife Sanctuary',
-      duration: 'Full day',
-      // No verified photo of the sanctuary itself exists on Unsplash, Pexels,
-      // Flickr or Wikimedia Commons (checked) — it's a small private eco-park,
-      // not a documented landmark. This is a generic giraffe close-up standing
-      // in until real photography (or permission to use the operator's own
-      // photos) is sourced — replace before launch.
-      image: 'https://images.unsplash.com/photo-1689105167710-db23a762b151?w=1200&q=85&auto=format&fit=crop',
-      summary: 'A luxury ecotourism sanctuary near Kilimanjaro, set among 5,000 hand-planted endemic plants, with close-up access to lion, giraffe, monkey and ostrich.',
-      included: ['Park entrance and taxes', 'Local Tanzanian lunch', 'Soft drinks and 3+ litres of water', 'Transfer to/from Arusha or Moshi, guide throughout'],
+      price: '$260',
+      duration: '2 hours',
+      ages: '0–99',
+      languages: 'English',
+      // The sanctuary's own photograph from the makisala asset store: a guest
+      // hand-feeding a giraffe over the deck rail. Portrait, so the crop is
+      // pushed down to hold both her and the giraffe in the 16:10 frame.
+      image: 'https://assets.makisala.com/accommodations/8c277eed-1d29-47c1-bbb5-d0e87b53f012/10-serval-wildlife.jpg',
+      position: '50% 68%',
+      summary: 'A short, gentle visit to a sanctuary near Kilimanjaro, where the animals are close enough to photograph, pet and feed — easy with small children and easy on a spare afternoon.',
+      included: ['Close-up access to the animals for photographs, petting and feeding', 'Access to the restaurant, lunch included', 'English-speaking guide', 'Park entrance and taxes'],
+    },
+    {
+      slug: 'kilimanjaro-national-park-day-trip',
+      title: 'Kilimanjaro Day Hike to Mandara Hut',
+      price: '$250',
+      duration: '10 hours',
+      ages: '6–87',
+      languages: 'English, French',
+      image: 'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      summary: "A taste of the mountain without the summit — the first leg of the Marangu route up through rainforest to Mandara Hut, with a chance of colobus and blue monkeys, then back down the same day.",
+      included: ['Mount Kilimanjaro entry, park fees and taxes', 'All transportation', 'Lunch and drinking water', 'Registered mountain guide'],
+    },
+    {
+      slug: 'materuni-waterfalls-coffee-and-chemka-day-trip',
+      title: 'Materuni Waterfalls, Coffee Tour & Chemka Hot Springs',
+      price: '$100',
+      duration: '8–10 hours',
+      ages: '5–89',
+      languages: 'English, German, Italian, French, Spanish',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Materuni1.jpg',
+      summary: 'Three things in one day: the hike in to Materuni Waterfalls, a Chagga coffee farm where you roast and grind your own, and an afternoon in the turquoise water at Chemka. Adventure, culture and a long swim — the easiest full day out of Arusha or Moshi.',
+      included: ['Entry and admission to Materuni Waterfalls', 'All fees and taxes', 'Private transport with hotel pickup and drop-off', 'Lunch'],
+    },
+    {
+      slug: 'kikuletwa-chemka-hot-springs-day-tour',
+      title: 'Kikuletwa (Chemka) Hot Springs Day Tour',
+      price: '$90',
+      duration: '6 hours 30 minutes',
+      ages: '3–99',
+      languages: 'English',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Chemka_Hotsrings_4.jpg',
+      summary: "A straight run out to the springs for a swim. Snorkel, take the rope swing, or just sit with your feet in the water for a fish pedicure, under fig trees with Kilimanjaro somewhere behind the haze.",
+      included: ['Admission and entry fees', 'Round-trip transport from your Arusha hotel', 'Boxed lunch — some special diets on request', 'Professional English-speaking driver-guide'],
     },
   ],
 };

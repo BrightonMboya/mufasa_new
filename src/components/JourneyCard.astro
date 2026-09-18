@@ -21,7 +21,9 @@ const photo = journeyPhoto(j.slug, j.image);
       >
         <div class="jcard__frame">
           <img src={photo.src} style={{ objectPosition: photo.position }} alt="" loading="lazy" decoding="async" />
-          <span class:list={['jcard__duration', { 'jcard__duration--left': !!cardPhotos[j.slug] }]}>{j.nights} {j.nights === 1 ? 'night' : 'nights'}</span>
+          {/* Days, not nights: the titles and detail pages count days, and a
+              traveller thinks in days away. `nights` stays the stored value. */}
+          <span class:list={['jcard__duration', { 'jcard__duration--left': !!cardPhotos[j.slug] }]}>{j.nights + 1} days</span>
           <h3 class="jcard__title">{j.title}</h3>
         </div>
         <div class="jcard__body">

@@ -7,7 +7,8 @@
      multi   - chips, any number selected
      single  - chips, one selected, auto-advances
      number  - a single count (travellers); always has a value
-     date    - a date input, with an optional skip link
+     date    - a date input plus a trip-length question, with an optional
+               skip link for the date
 
    `layout: 'list'` stacks the chips full-width, for options too wordy to sit
    side by side. `emailLabel` names the step's row in the lead email and falls
@@ -28,6 +29,13 @@ export interface PlannerStep {
   min?: number;
   max?: number;
   initial?: number;
+  /* Date steps also ask how many days the trip is; `duration: false` drops it. */
+  duration?: boolean;
+  durationLabel?: string;
+  durationMin?: number;
+  durationMax?: number;
+  durationInitial?: number;
+  durationEmailLabel?: string;
 }
 
 interface Props {
@@ -59,6 +67,7 @@ const totalSteps = steps.length;
 
 // Never offer a date in the past.
 const minDate = new Date().toISOString().slice(0, 10);
+
 ---
 
 <main class="planner" data-planner>
@@ -99,6 +108,29 @@ const minDate = new Date().toISOString().slice(0, 10);
               </span>
             </label>
             <p class="pl-date__pretty" data-date-pretty></p>
+            {step.duration !== false && (
+              <div class="pl-dur" data-dur data-step={step.id}>
+                <span class="pl-dur__label">{step.durationLabel ?? 'And how many days on safari?'}</span>
+                <div class="pl-count pl-count--dur">
+                  <button type="button" class="pl-count__btn" data-days-step="-1" aria-label="One day fewer">&#8722;</button>
+                  <label class="pl-count__field">
+                    <span class="pl-sr">Number of days</span>
+                    <input
+                      type="number"
+                      class="pl-count__input"
+                      data-days-field
+                      inputmode="numeric"
+                      min={step.durationMin ?? 2}
+                      max={step.durationMax ?? 30}
+                      value={step.durationInitial ?? 7}
+                    />
+                  </label>
+                  <button type="button" class="pl-count__btn" data-days-step="1" aria-label="One day more">+</button>
+                  <span class="pl-dur__unit" data-days-unit>days</span>
+                </div>
+                <p class="pl-dur__span" data-days-span></p>
+              </div>
+            )}
           </div>
         )}
 
@@ -217,12 +249,22 @@ const minDate = new Date().toISOString().slice(0, 10);
     const thanksTitle = root.querySelector('[data-thanks-title]');
     const total = stepScreens.length;
 
+    /* A date step carries two answers — the date and the trip length — so its
+       length lives under its own key rather than a second step. */
+    const durKey = (id) => id + '__days';
+    const hasDuration = (s) => s.kind === 'date' && s.duration !== false;
+
     // One slot per configured step, so the shape follows the config.
-    const blank = () => Object.fromEntries(steps.map((s) => [s.id, []]));
+    const blank = () =>
+      Object.fromEntries(
+        steps.flatMap((s) => (hasDuration(s) ? [[s.id, []], [durKey(s.id), []]] : [[s.id, []]]))
+      );
     const answers = blank();
-    // A count step starts at its default rather than empty.
+    // Counts start at their default rather than empty, so a day count always
+    // comes through even when the traveller just taps past the step.
     steps.forEach((s) => {
       if (s.kind === 'number') answers[s.id] = [String(s.initial ?? 2)];
+      if (hasDuration(s)) answers[durKey(s.id)] = [String(s.durationInitial ?? 7)];
     });
 
     // index: 0..total-1 = steps, total = contact, total+1 = thanks
@@ -338,6 +380,8 @@ const minDate = new Date().toISOString().slice(0, 10);
       const iso = answers[dateStep.id][0] || '';
       if (dateField) dateField.value = iso;
       if (datePretty) datePretty.textContent = longDate(iso);
+      // The day span reads from the date, so it follows every date change.
+      root.querySelectorAll('[data-dur]').forEach((g) => g.repaint && g.repaint());
     }
 
     if (dateField && dateStep) {
@@ -346,6 +390,64 @@ const minDate = new Date().toISOString().slice(0, 10);
         syncArrival();
       });
     }
+
+    // Trip length: an exact day count, so nobody has to ask "how many, exactly?"
+    root.querySelectorAll('[data-dur]').forEach((group) => {
+      const key = durKey(group.dataset.step);
+      const field = group.querySelector('[data-days-field]');
+      const unit = group.querySelector('[data-days-unit]');
+      const span = group.querySelector('[data-days-span]');
+      const min = Number(field.min || 2);
+      const max = Number(field.max || 30);
+
+      /* "Friday, 12 June → Sunday, 21 June 2026" — the last day on safari,
+         counting the arrival day as day one. */
+      function daySpan() {
+        const iso = dateStep ? answers[dateStep.id][0] : '';
+        const days = Number(answers[key][0]);
+        if (!iso || !Number.isFinite(days)) return '';
+        const end = new Date(iso + 'T00:00:00');
+        if (Number.isNaN(end.getTime())) return '';
+        end.setDate(end.getDate() + days - 1);
+        // Local parts, not toISOString(): east of UTC that would slip a day.
+        const pad = (n) => String(n).padStart(2, '0');
+        const iso2 = end.getFullYear() + '-' + pad(end.getMonth() + 1) + '-' + pad(end.getDate());
+        return longDate(iso) + ' \u2192 ' + longDate(iso2);
+      }
+
+      function paint() {
+        const days = Number(answers[key][0]);
+        if (unit) unit.textContent = days === 1 ? 'day' : 'days';
+        if (span) span.textContent = daySpan();
+        group.querySelectorAll('[data-days-step]').forEach((b) => {
+          const dir = Number(b.dataset.daysStep);
+          b.disabled = dir < 0 ? days <= min : days >= max;
+        });
+      }
+      // Kept on the group so the date field can refresh the span it derives.
+      group.repaint = paint;
+
+      function commit(n) {
+        const clamped = Math.min(max, Math.max(min, Number.isFinite(n) ? n : min));
+        field.value = String(clamped);
+        answers[key] = [String(clamped)];
+        paint();
+      }
+
+      group.querySelectorAll('[data-days-step]').forEach((b) =>
+        b.addEventListener('click', () => commit(Number(field.value) + Number(b.dataset.daysStep)))
+      );
+      // As with the traveller count, typing is only clamped once the field settles.
+      field.addEventListener('input', () => {
+        const n = Number(field.value);
+        if (Number.isFinite(n) && n >= min && n <= max) {
+          answers[key] = [String(n)];
+          paint();
+        }
+      });
+      field.addEventListener('blur', () => commit(Number(field.value)));
+      commit(Number(field.value));
+    });
 
     function syncNext(screen) {
       const next = screen.querySelector('.pl-next');
@@ -389,6 +491,12 @@ const minDate = new Date().toISOString().slice(0, 10);
           const s = steps.find((x) => x.id === f.closest('[data-screen]').dataset.stepId);
           f.value = String((s && s.initial) ?? 2);
         });
+        root.querySelectorAll('[data-dur]').forEach((g) => {
+          const s = steps.find((x) => x.id === g.dataset.step);
+          const initial = String((s && s.durationInitial) ?? 7);
+          g.querySelector('[data-days-field]').value = initial;
+          answers[durKey(g.dataset.step)] = [initial];
+        });
         syncArrival();
         root.querySelectorAll('[data-option]').forEach((c) => {
           delete c.dataset.selected;
@@ -421,6 +529,12 @@ const minDate = new Date().toISOString().slice(0, 10);
           value = picked.map((v) => labelFor(s.id, v)).join(', ') || '—';
         }
         rows[s.emailLabel || s.title] = value;
+        if (hasDuration(s)) {
+          const days = answers[durKey(s.id)][0];
+          rows[s.durationEmailLabel || 'Trip length'] = days
+            ? days + (days === '1' ? ' day' : ' days')
+            : 'Not sure yet';
+        }
       });
       return rows;
     }
@@ -643,12 +757,15 @@ const minDate = new Date().toISOString().slice(0, 10);
     align-items: center;
     gap: 1.25rem;
     width: 100%;
-    max-width: 24rem;
   }
   .pl-date__field {
     position: relative;
     display: block;
     width: 100%;
+    max-width: 24rem;
+  }
+  .pl-date__pretty + .pl-dur {
+    margin-top: 0.5rem;
   }
   .pl-date__input {
     /* Keep the native picker chrome light to match the planner. */
@@ -700,6 +817,52 @@ const minDate = new Date().toISOString().slice(0, 10);
     font-size: 1.25rem;
     font-style: italic;
     color: var(--color-accent);
+  }
+
+  /* Trip length, in the same step as the date */
+  .pl-dur {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    /* The date field is narrow; the bands need the full step width. */
+    max-width: none;
+  }
+  .pl-dur__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  /* The unit sits outside the stepper, so the buttons stay evenly spaced
+     around the number. */
+  .pl-count--dur { position: relative; }
+  .pl-dur__unit {
+    position: absolute;
+    left: calc(100% + 0.75rem);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+    white-space: nowrap;
+  }
+  .pl-dur__span {
+    min-height: 1.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-slate);
+  }
+  @media (max-width: 30rem) {
+    /* No room beside the stepper on a phone — put the unit under it. */
+    .pl-count--dur { flex-wrap: wrap; }
+    .pl-dur__unit {
+      position: static;
+      left: auto;
+      width: 100%;
+      text-align: center;
+    }
   }
 
   /* Count step (travellers) */
