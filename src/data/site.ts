@@ -645,14 +645,13 @@ export const experiences = [
   },
 ];
 
-/* Trekking page. Images are real, verified Kilimanjaro / Meru photos
-   (source: Pexels, free / no attribution required). */
+/* Trekking page. Images are our own Kilimanjaro / Meru photographs,
+   served from /public/media/trekking. */
 export const trekking = {
   intro: {
     eyebrow: 'Trekking',
     title: 'The mountains, walked slowly',
-    heroImage:
-      'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    heroImage: '/media/trekking/kibo-from-the-saddle.webp',
     lead: 'Kilimanjaro is a walk, not a climb — and the difference between a summit and a hard week is acclimatisation, guiding, and time. We route every trek long, so the mountain lets you up.',
     body: "Our mountain crews are the same year to year: lead guides with hundreds of summits, cooks who feed a camp at altitude, and porters paid and equipped to the KPAP standard. We never sell the shortest route, because the shortest route is where people fail.",
   },
@@ -662,8 +661,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 8 Days',
       days: 8,
       priceFrom: '$3,450',
-      image:
-        'https://images.pexels.com/photos/35568138/pexels-photo-35568138.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/moorland-traverse.webp',
       summary:
         'The long western approach, and the one with the highest success rate. Eight days lets you sleep low and climb high across the Shira Plateau before the summit night.',
       highlights: ['Highest success rate', 'Quietest first days', 'Best acclimatisation profile'],
@@ -673,8 +671,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 7 Days',
       days: 7,
       priceFrom: '$3,900',
-      image:
-        'https://images.pexels.com/photos/37808650/pexels-photo-37808650.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/summit-day-scramble.webp',
       summary:
         'The classic "Whiskey" route — steeper and more direct than Lemosho, through five climate zones from rainforest to the roof of Africa. Seven days for walkers who are fit and short on time.',
       highlights: ['Five climate zones', 'Dramatic Barranco Wall', 'Well-supported classic'],
@@ -684,8 +681,7 @@ export const trekking = {
       meta: 'Arusha N.P. · 4 Days',
       days: 4,
       priceFrom: '$2,100',
-      image:
-        'https://images.pexels.com/photos/12738166/pexels-photo-12738166.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/meru-crater-slopes.webp',
       summary:
         'A wild, quiet 4,566m volcano through Arusha National Park — walked with an armed ranger past buffalo and giraffe. The best acclimatisation there is before Kilimanjaro, and a fine trek in its own right.',
       highlights: ['Wildlife on the walk', 'Perfect Kili warm-up', 'Knife-edge summit ridge'],
@@ -695,8 +691,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 5 Days',
       days: 5,
       priceFrom: '$2,400',
-      image:
-        'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/summit-glacier-wall.webp',
       summary:
         'The only Kilimanjaro route with hut accommodation — no camping. A gradual, scenic climb through rainforest, moorland and alpine desert, with two nights at Horombo before the summit push.',
       highlights: ['Hut-based throughout (no tents)', 'Gradual acclimatisation profile', 'Uhuru Peak, 5,896m'],
@@ -706,8 +701,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 6 Days',
       days: 6,
       priceFrom: '$2,700',
-      image:
-        'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/snowline-ascent.webp',
       summary:
         'The 6-day Marangu, with an extra acclimatisation day at Horombo Hut (3,720m) added to the direct, moderate path — for walkers who want the hut route with a better shot at the summit.',
       highlights: ['Extra night at Horombo Hut', 'No camping required', 'Colobus monkeys along the trail'],
@@ -717,8 +711,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 6 Days',
       days: 6,
       priceFrom: '$1,590',
-      image:
-        'https://images.pexels.com/photos/37808650/pexels-photo-37808650.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/steep-scree-ascent.webp',
       summary:
         'The classic "Whiskey" route in its 6-day form, through rainforest, heather and alpine desert to Stella Point and on to Uhuru Peak — with views across all three of Kilimanjaro\'s peaks.',
       highlights: ['Multiple ecological zones', 'Crosses Stella Point', 'Views of Kibo, Mawenzi & Shira'],
@@ -728,8 +721,7 @@ export const trekking = {
       meta: 'Kilimanjaro · 7 Days',
       days: 7,
       priceFrom: '$2,700',
-      image:
-        'https://images.pexels.com/photos/35568138/pexels-photo-35568138.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/moorland-traverse.webp',
       summary:
         "One of Kilimanjaro's most scenic and remote approaches, from the west — pristine rainforest, giant heather moorland, and Mount Meru appearing to float above the clouds. Built-in extra days lift the summit success rate.",
       highlights: ['Remote western approach', 'Extra acclimatisation days', 'Dawn summit from Barafu Camp'],
@@ -739,8 +731,7 @@ export const trekking = {
       meta: 'Arusha N.P. · 3 Days',
       days: 3,
       priceFrom: '$1,400',
-      image:
-        'https://images.pexels.com/photos/12738166/pexels-photo-12738166.jpeg?auto=compress&cs=tinysrgb&w=1600',
+      image: '/media/trekking/crater-rim-ascent.webp',
       summary:
         "A shorter, more intense version of Meru — wildlife on the lower slopes, then a steep 1:30am summit push to the 4,566m Ash Tray crater rim for sunrise. A genuine technical challenge in a fraction of the time.",
       highlights: ['1:30am summit push', 'Sunrise over the Ash Tray crater', 'Half the time of the standard route'],
@@ -1069,7 +1060,7 @@ export const dayTrips = {
       duration: '10 hours',
       ages: '6–87',
       languages: 'English, French',
-      image: 'https://images.pexels.com/photos/8427984/pexels-photo-8427984.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      image: '/media/trekking/kibo-from-the-saddle.webp',
       summary: "A taste of the mountain without the summit — the first leg of the Marangu route up through rainforest to Mandara Hut, with a chance of colobus and blue monkeys, then back down the same day.",
       included: ['Mount Kilimanjaro entry, park fees and taxes', 'All transportation', 'Lunch and drinking water', 'Registered mountain guide'],
     },
