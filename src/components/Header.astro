@@ -16,7 +16,41 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
   <nav class="nav" aria-label="Primary">
     <ul class="nav__links" data-nav-links>
       {nav.map((item, i) => (
-        item.children ? (
+        item.cards ? (
+          <li class="nav__group nav__group--mega" data-nav-group>
+            <button
+              type="button"
+              class="nav__parent"
+              aria-expanded="false"
+              aria-controls={`nav-menu-${i}`}
+              data-nav-parent
+            >
+              {item.label}
+              <svg class="nav__chev" width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true">
+                <path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="nav__menu mega" id={`nav-menu-${i}`}>
+              {item.cards.map((card) => (
+                <a href={card.href} class="dcard" style={`--tint: ${card.tint}`}>
+                  <span class="dcard__name">{card.label}</span>
+                  <span class="dcard__blurb">{card.blurb}</span>
+                  <img class="dcard__img" src={card.image} alt="" loading="lazy" decoding="async" />
+                </a>
+              ))}
+              {item.cta && (
+              <a href={item.cta.href} class="dcard dcard--cta" style={`--tint: ${item.cta.tint}`}>
+                <span class="dcard__name">
+                  {item.cta.label}
+                  <svg width="16" height="11" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M1 5h12M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="dcard__blurb">{item.cta.blurb}</span>
+                <img class="dcard__img" src={item.cta.image} alt="" loading="lazy" decoding="async" />
+              </a>
+              )}
+            </div>
+          </li>
+        ) : item.children ? (
           <li class="nav__group" data-nav-group>
             <button
               type="button"
@@ -176,6 +210,108 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
   }
   .nav__menu a { display: block; white-space: nowrap; }
 
+  /* Destinations mega-menu: three country cards over a wide trip-planner
+     card, hung from the header itself (the group goes static) so it can be
+     centred on the page. Each card is washed in its tint, with its photo
+     fading in from the bottom-right corner. */
+  .nav__group--mega { position: static; }
+  .mega {
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    width: min(64rem, calc(100vw - 2 * var(--gutter-page)));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    transform: translate(-50%, -4px);
+  }
+  .nav__group:hover .mega,
+  .nav__group:focus-within .mega,
+  .mega[data-open='true'] { transform: translate(-50%, 0); }
+  .mega::before { top: -1.2rem; height: 1.2rem; }
+
+  .nav__links .dcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    height: 16rem;
+    padding: 1.4rem 1.5rem;
+    overflow: hidden;
+    white-space: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    border: 1px solid color-mix(in srgb, var(--tint) 22%, var(--color-hairline));
+    border-radius: 4px;
+    background: linear-gradient(
+      165deg,
+      var(--color-surface) 30%,
+      color-mix(in srgb, var(--tint) 38%, var(--color-surface)) 100%
+    );
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .nav__links .dcard:hover {
+    color: var(--color-ink);
+    border-color: color-mix(in srgb, var(--tint) 55%, var(--color-hairline));
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--tint) 18%, transparent);
+  }
+  .dcard__name {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+  }
+  .dcard__name svg { transition: transform 0.2s ease; }
+  .dcard:hover .dcard__name svg { transform: translateX(3px); }
+  .dcard__blurb {
+    position: relative;
+    z-index: 1;
+    max-width: 17rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-slate);
+  }
+  .dcard__img {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 88%;
+    height: 58%;
+    object-fit: cover;
+    /* Fade toward the text corner so the photo reads as part of the wash. */
+    -webkit-mask-image: radial-gradient(120% 120% at 100% 100%, #000 45%, transparent 85%);
+    mask-image: radial-gradient(120% 120% at 100% 100%, #000 45%, transparent 85%);
+    opacity: 0.92;
+    transition: transform 0.5s ease, opacity 0.3s ease;
+  }
+  .dcard:hover .dcard__img { transform: scale(1.04); opacity: 1; }
+
+  /* The planner card runs the full width, text left and the team right. */
+  .nav__links .dcard--cta {
+    grid-column: 1 / -1;
+    height: 8.5rem;
+    justify-content: center;
+    background: linear-gradient(
+      100deg,
+      var(--color-surface) 35%,
+      color-mix(in srgb, var(--tint) 28%, var(--color-surface)) 100%
+    );
+  }
+  .dcard--cta .dcard__blurb { max-width: 26rem; }
+  .dcard--cta .dcard__img {
+    width: 50%;
+    height: 100%;
+    object-position: center 35%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
+  }
+
   .actions {
     display: flex;
     align-items: center;
@@ -239,7 +375,8 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
       z-index: 30;
     }
     .nav__links[data-open='true'] {
-      max-height: 70vh;
+      max-height: 80vh;
+      overflow-y: auto; /* the destinations list runs long */
       padding-block: 0.75rem;
     }
     .nav__links li { padding-block: 0.7rem; }
@@ -269,6 +406,28 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
     }
     .nav__menu::before { content: none; }
     .nav__menu li { padding-block: 0.5rem; }
+
+    /* In the burger the cards collapse to plain links. */
+    .mega {
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      padding: 0.35rem 0 0 0.9rem;
+      transform: none;
+    }
+    .nav__group:hover .mega,
+    .nav__group:focus-within .mega { transform: none; }
+    .nav__links .dcard,
+    .nav__links .dcard--cta {
+      height: auto;
+      padding: 0.5rem 0;
+      border: none;
+      background: none;
+      box-shadow: none;
+    }
+    .dcard__name { font-family: inherit; font-size: 0.8125rem; font-weight: var(--fw-medium); letter-spacing: 0.1em; text-transform: uppercase; }
+    .dcard--cta .dcard__name { color: var(--color-accent); }
+    .dcard__blurb, .dcard__img { display: none; }
 
     /* WhatsApp is the fastest way to reach us from a phone, so the icon stays
        once the number itself has been dropped. */

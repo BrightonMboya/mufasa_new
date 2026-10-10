@@ -19,16 +19,38 @@ export const site = {
    Zanzibar collapse into the full journeys library (the grid there spans all
    of them). The three ways to travel with us — multi-day safaris, day trips
    and mountain treks — sit under one "Journeys" menu rather than eating three
-   nav slots; `children` turns an entry into that menu. */
+   nav slots; `cards` turns an entry into a card menu (optionally with a
+   wide `cta` card beneath). */
 export const nav = [
   {
     label: 'Journeys',
     href: '/journeys',
-    children: [
-      { label: 'Safaris', href: '/journeys' },
-      { label: 'Day Trips', href: '/day-trips' },
-      { label: 'Trekking', href: '/trekking' },
+    cards: [
+      { label: 'Safaris', blurb: 'Multi-day journeys through the parks, built around you.', href: '/journeys', image: '/media/nav/safaris.webp', tint: '#c98a4b' },
+      { label: 'Day Trips', blurb: 'One day out and back from Arusha or Kilimanjaro.', href: '/day-trips', image: '/media/nav/day-trips.webp', tint: '#8a9a5b' },
+      { label: 'Trekking', blurb: 'Kilimanjaro and Mount Meru, with crews who know the mountain.', href: '/trekking', image: '/media/nav/trekking.webp', tint: '#6f8fae' },
     ],
+  },
+  {
+    label: 'Destinations',
+    href: '/destinations',
+    /* Mega-menu: a card per country, each washed in its own tint with the
+       photo fading in from the corner, and a wide trip-planner card beneath.
+       Kenya and Rwanda have no pages yet, so they open the planner. The Kenya
+       (Thomas Fuhrmann) and gorilla (Charles J. Sharp) photos are Wikimedia
+       Commons, CC BY-SA 4.0 — they need a credit, or replacing, before launch. */
+    cards: [
+      { label: 'Tanzania & Zanzibar', blurb: 'The Serengeti migration, the Ngorongoro Crater, and slow days on the Indian Ocean.', href: '/destinations', image: '/media/nav/tanzania.webp', tint: '#c2ad7a' },
+      { label: 'Kenya', blurb: 'The Masai Mara, river crossings, and elephants under Kilimanjaro.', href: '/trip-planner', image: '/media/nav/kenya.webp', tint: '#6f9150' },
+      { label: 'Rwanda', blurb: 'An hour with the mountain gorillas in the Virunga volcanoes.', href: '/trip-planner', image: '/media/nav/rwanda.webp', tint: '#2b2c29' },
+    ],
+    cta: {
+      label: 'Talk to a trip planner',
+      blurb: 'Tell us when you can travel and what you want to see. A specialist in Arusha replies within a few hours.',
+      href: '/trip-planner',
+      image: '/media/about/about-hero.webp',
+      tint: '#2c6a5a',
+    },
   },
   { label: 'Journal', href: '/blog' },
   { label: 'About Us', href: '/about' },
@@ -955,9 +977,12 @@ export const about = {
     eyebrow: 'About Us',
     title: 'The value of experience',
   },
-  lead: 'King Mufasa Expeditions is a Tanzanian-owned house of travel specialists based in Arusha. We believe travel is transformative — so we craft every itinerary by hand, and stand behind it personally.',
+  lead: {
+    title: 'Everything the light touches is our kingdom.',
+    body: 'Inspired by Tanzania’s natural beauty, wild places, and unforgettable experiences.',
+  },
   story: [
-    "The company is led by Davis Peter, Founder & CEO, and Anneth Benedict, Manager — a small, local team who reply to every enquiry within a few hours rather than routing you through a call centre. Whether the trip is built around wildlife, culture, or a summit, our specialists tailor it to what you actually want, not a fixed package.",
+    "King Mufasa Expeditions is led by Davis Peter, Founder & CEO, and Anneth Benedict, Manager, alongside a dedicated team of Tanzania travel specialists committed to delivering exceptional, personalized experiences. We pride ourselves on prompt communication, attentive service, and a genuine understanding of what makes every journey special. Whether your dream is to witness the Great Migration, explore Tanzania’s rich cultures, or reach the summit of Mount Kilimanjaro, we carefully tailor every itinerary to your interests, preferences, and expectations creating a journey that is uniquely yours, rather than simply offering a standard package.",
     "We work exclusively with lodges, camps, and hotels chosen for the excellence of their personalised service, move between them in our own well-maintained, safari-prepared Land Cruisers, and put you with guides who are qualified, experienced, and deeply familiar with the ecosystems they drive.",
   ],
   stats: [
@@ -972,8 +997,12 @@ export const about = {
     image: '/media/about/guides-toast.webp',
   },
   operations: {
-    title: 'How we work',
-    body: "Every camp and hotel we use is chosen for the excellence of its personalised service, not just its view. We travel in our own safari-prepared Land Cruisers, and our local Tanzanian staff reply to every enquiry and reservation within a few hours. We're listed and reviewed on TripAdvisor, GetYourGuide, SafariGo, and Google — the same platforms our guests use to check on us before they book.",
+    title: 'How We Work',
+    body: [
+      'At King Mufasa Expeditions, every journey is planned with care and attention to detail. As a locally owned Tanzanian safari company, we combine our local knowledge, experienced guides, and personal service to create unforgettable journeys across Tanzania.',
+      'We listen to your ideas, understand your interests, and design each itinerary around your needs. From choosing quality lodges and camps to arranging comfortable safari vehicles and knowledgeable guides, we take care of every detail to make your journey smooth and enjoyable.',
+      'Our team is here to support you from your first enquiry until the end of your adventure. We value honest communication, reliable service, and attention to the little things that make a big difference.',
+    ],
     image:
       'https://images.unsplash.com/photo-1557756006-90a218bcc7e1?w=1200&q=80&auto=format&fit=crop',
   },
@@ -1464,8 +1493,6 @@ export const destinations = [
 ];
 
 export const enquiry = {
-  image:
-    'https://images.unsplash.com/photo-1772224607566-13144baab071?w=1600&q=80&auto=format&fit=crop',
   title: 'Tell us when you can leave, and we will do the rest.',
   body: 'A first conversation takes about twenty minutes and costs nothing. You will speak with the person who designs the route, not a call centre.',
 };

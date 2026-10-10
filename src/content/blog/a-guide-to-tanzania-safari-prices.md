@@ -3,7 +3,7 @@ title: "A Guide to Tanzania Safari Prices"
 description: "Understanding Tanzania safari pricing in 2026 involves three accommodation tiers ranging from budget camping at $200-$350 per person daily to luxury lodges at $750-$1,500+, with costs influenced by government fees, seasonality, and logistics."
 category: "Safari"
 date: 2026-01-31
-image: "https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=1600&q=80&auto=format&fit=crop"
+image: "/media/blog/tanzania-safari-prices.webp"
 ---
 ## A Guide to Tanzania Safari Prices
 

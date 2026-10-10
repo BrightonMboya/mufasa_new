@@ -6,7 +6,7 @@ import Enquiry from '../components/Enquiry.astro';
 import { about, site } from '../data/site';
 
 const title = `About — ${site.name}`;
-const description = about.lead;
+const description = `${about.lead.title} ${about.lead.body}`;
 ---
 
 <Base title={title} description={description}>
@@ -23,7 +23,10 @@ const description = about.lead;
 
     <!-- Lead + story -->
     <section class="story section wrap">
-      <p class="story__lead">{about.lead}</p>
+      <div class="story__lead">
+        <h2 class="story__title">{about.lead.title}</h2>
+        <p class="story__tagline">{about.lead.body}</p>
+      </div>
       <div class="story__body">
         {about.story.map((p) => <p>{p}</p>)}
       </div>
@@ -59,7 +62,7 @@ const description = about.lead;
       </div>
       <div class="slab__text">
         <h2>{about.operations.title}</h2>
-        <p>{about.operations.body}</p>
+        {about.operations.body.map((p) => <p>{p}</p>)}
       </div>
     </section>
 
@@ -107,12 +110,22 @@ const description = about.lead;
     background-color: var(--color-ground);
   }
   .story__lead {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .story__title {
     font-family: var(--font-display);
     font-weight: var(--fw-light);
-    font-size: clamp(1.75rem, 3.5vw, 2.625rem);
-    line-height: 1.28;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
     letter-spacing: -0.02em;
     color: var(--color-ink);
+  }
+  .story__tagline {
+    color: var(--color-slate);
+    font-size: 1.125rem;
+    line-height: 1.6;
   }
   .story__body {
     display: flex;

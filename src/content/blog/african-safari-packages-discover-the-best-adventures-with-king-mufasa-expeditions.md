@@ -3,7 +3,7 @@ title: "African Safari Packages: Discover the Best Adventures with King Mufasa E
 description: "A comprehensive guide to African safari packages in Tanzania, covering inclusions, pricing tiers, and booking strategies for 2026."
 category: "Safari"
 date: 2026-01-31
-image: "https://images.unsplash.com/photo-1504173010664-32509aeebb62?w=1600&q=80&auto=format&fit=crop"
+image: "/media/blog/african-safari-packages.webp"
 ---
 ## African Safari Packages: Discover the Best Adventures with King Mufasa Expeditions
 

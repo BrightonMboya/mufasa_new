@@ -2,10 +2,24 @@
 import { site, footerLinks } from '../data/site';
 ---
 
-<footer class="footer section wrap">
-  <div class="footer__inner">
+<!-- The footer sits in the sky of a Serengeti photo: links over the deep
+     blue, the horizon and elephants below them. -->
+<footer class="footer">
+  <img
+    class="footer__scene"
+    src="/media/footer/elephants.webp"
+    srcset="/media/footer/elephants-960.webp 960w, /media/footer/elephants.webp 1920w"
+    sizes="100vw"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="footer__inner wrap">
     <div class="footer__brand">
-      <img class="footer__mark" src={site.logo} alt={site.name} width="1263" height="350" loading="lazy" decoding="async" />
+      <!-- The logo is drawn for a light ground, so over the sky the name is set
+           as type; the plain mobile footer keeps the logo. -->
+      <a href="/" class="footer__mark">{site.name}</a>
+      <img class="footer__logo" src={site.logo} alt={site.name} width="1263" height="350" loading="lazy" decoding="async" />
       <p>{site.address[0]}<br />{site.address[1]}</p>
     </div>
 
@@ -27,15 +41,41 @@ import { site, footerLinks } from '../data/site';
 
 <style>
   .footer {
-    background-color: var(--color-ground);
-    padding-block: clamp(3.5rem, 6vw, 5.375rem) 3.375rem;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* The links take what they need; below them a band is reserved for the
+       horizon and herd, so the links stay in the sky at every width. */
+    padding-bottom: clamp(17rem, 34vw, 32rem);
+    width: 100%;
+    background-color: #0f4a78; /* the photo's sky, while it loads */
+    color: #f7f4ee;
   }
+  .footer__scene {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+  /* Deepen the top of the sky a touch so the links always read. */
+  .footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(6, 34, 60, 0.35) 0%, rgba(6, 34, 60, 0) 45%);
+  }
+
   .footer__inner {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 5rem;
     flex-wrap: wrap;
+    padding-top: clamp(3.5rem, 6vw, 5.375rem);
   }
   .footer__brand {
     display: flex;
@@ -44,13 +84,16 @@ import { site, footerLinks } from '../data/site';
     max-width: 360px;
   }
   .footer__mark {
-    height: clamp(42px, 5vw, 52px);
-    width: auto;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.4vw, 1.875rem);
+    font-weight: var(--fw-light);
+    line-height: 1.15;
+    color: #f7f4ee;
   }
   .footer__brand p {
     font-size: 0.9375rem;
     line-height: 1.6;
-    color: var(--color-slate);
+    color: rgba(247, 244, 238, 0.75);
   }
 
   .footer__cols {
@@ -68,15 +111,35 @@ import { site, footerLinks } from '../data/site';
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-accent);
+    color: rgba(247, 244, 238, 0.6);
     margin-bottom: 0.25rem;
   }
   .footer__col a {
     font-size: 0.9375rem;
-    color: var(--color-ink);
-    transition: color 0.2s ease;
+    color: #f7f4ee;
+    transition: opacity 0.2s ease;
   }
   .footer__col a:hover {
-    color: var(--color-accent);
+    opacity: 0.7;
+  }
+
+  .footer__logo { display: none; }
+
+  /* Phones: no room for the scene under the stacked links, so it's the plain
+     footer on the page ground. The lazy photo isn't rendered, so isn't fetched. */
+  @media (max-width: 720px) {
+    .footer {
+      padding-block: 3.5rem 3.375rem;
+      background-color: var(--color-ground);
+      color: var(--color-ink);
+    }
+    .footer__scene,
+    .footer::before,
+    .footer__mark { display: none; }
+    .footer__inner { gap: 2.5rem; padding-top: 0; }
+    .footer__logo { display: block; height: 42px; width: auto; }
+    .footer__brand p { color: var(--color-slate); }
+    .footer__heading { color: var(--color-accent); }
+    .footer__col a { color: var(--color-ink); }
   }
 </style>
