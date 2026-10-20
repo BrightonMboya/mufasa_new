@@ -6,7 +6,7 @@ import Enquiry from '../../components/Enquiry.astro';
 import RouteMap from '../../components/RouteMap.astro';
 import JourneyEnquiryModal from '../../components/JourneyEnquiryModal.astro';
 import LodgeLightbox from '../../components/LodgeLightbox.astro';
-import { journeys, site, accommodationDirectory } from '../../data/site';
+import { journeys, site, accommodationDirectory, journeyCountry } from '../../data/site';
 import { journeyPhoto } from '../../data/journey-cards';
 
 export function getStaticPaths() {
@@ -25,7 +25,7 @@ const { journey } = Astro.props;
 // Same frame the listing card shows, so clicking a card doesn't swap the photo.
 const hero = journeyPhoto(journey.slug, journey.image);
 const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
-const title = `${journey.title} — ${journey.nights + 1} Days / ${journey.nights} ${journey.nights === 1 ? 'Night' : 'Nights'} in Tanzania | ${site.shortName}`;
+const title = `${journey.title} — ${journey.nights + 1} Days / ${journey.nights} ${journey.nights === 1 ? 'Night' : 'Nights'} in ${journeyCountry(journey)} | ${site.shortName}`;
 
 // north-to-sea is our packages hub: hero only, then every priced package
 // split by how you reach it — overland from Arusha, or flown in from Zanzibar.
@@ -41,7 +41,13 @@ const FEATURED_SLUGS = [
   '5-days-tanzania-family-safari',
   '7-days-tanzania-family-safari',
 ];
-const related = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug !== journey.slug);
+const featured = journeys.filter((j) => FEATURED_SLUGS.includes(j.slug) && j.slug !== journey.slug);
+// Kenya and Rwanda pages lead with their own country's other routes.
+const country = journeyCountry(journey);
+const sameCountry = country === 'Tanzania'
+  ? []
+  : journeys.filter((j) => journeyCountry(j) === country && j.slug !== journey.slug);
+const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
 ---
 
 <Base title={title} description={journey.summary}>

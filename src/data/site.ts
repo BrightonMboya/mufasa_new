@@ -19,38 +19,16 @@ export const site = {
    Zanzibar collapse into the full journeys library (the grid there spans all
    of them). The three ways to travel with us — multi-day safaris, day trips
    and mountain treks — sit under one "Journeys" menu rather than eating three
-   nav slots; `cards` turns an entry into a card menu (optionally with a
-   wide `cta` card beneath). */
+   nav slots; `children` turns an entry into that menu. */
 export const nav = [
   {
     label: 'Journeys',
     href: '/journeys',
-    cards: [
-      { label: 'Safaris', blurb: 'Multi-day journeys through the parks, built around you.', href: '/journeys', image: '/media/nav/safaris.webp', tint: '#c98a4b' },
-      { label: 'Day Trips', blurb: 'One day out and back from Arusha or Kilimanjaro.', href: '/day-trips', image: '/media/nav/day-trips.webp', tint: '#8a9a5b' },
-      { label: 'Trekking', blurb: 'Kilimanjaro and Mount Meru, with crews who know the mountain.', href: '/trekking', image: '/media/nav/trekking.webp', tint: '#6f8fae' },
+    children: [
+      { label: 'Safaris', href: '/journeys' },
+      { label: 'Day Trips', href: '/day-trips' },
+      { label: 'Trekking', href: '/trekking' },
     ],
-  },
-  {
-    label: 'Destinations',
-    href: '/destinations',
-    /* Mega-menu: a card per country, each washed in its own tint with the
-       photo fading in from the corner, and a wide trip-planner card beneath.
-       Kenya and Rwanda have no pages yet, so they open the planner. The Kenya
-       (Thomas Fuhrmann) and gorilla (Charles J. Sharp) photos are Wikimedia
-       Commons, CC BY-SA 4.0 — they need a credit, or replacing, before launch. */
-    cards: [
-      { label: 'Tanzania & Zanzibar', blurb: 'The Serengeti migration, the Ngorongoro Crater, and slow days on the Indian Ocean.', href: '/destinations', image: '/media/nav/tanzania.webp', tint: '#c2ad7a' },
-      { label: 'Kenya', blurb: 'The Masai Mara, river crossings, and elephants under Kilimanjaro.', href: '/trip-planner', image: '/media/nav/kenya.webp', tint: '#6f9150' },
-      { label: 'Rwanda', blurb: 'An hour with the mountain gorillas in the Virunga volcanoes.', href: '/trip-planner', image: '/media/nav/rwanda.webp', tint: '#2b2c29' },
-    ],
-    cta: {
-      label: 'Talk to a trip planner',
-      blurb: 'Tell us when you can travel and what you want to see. A specialist in Arusha replies within a few hours.',
-      href: '/trip-planner',
-      image: '/media/about/about-hero.webp',
-      tint: '#2c6a5a',
-    },
   },
   { label: 'Journal', href: '/blog' },
   { label: 'About Us', href: '/about' },
@@ -620,7 +598,179 @@ export const journeys = [
       'https://images.unsplash.com/photo-1766603636766-1f4662469448?w=1200&q=80&auto=format&fit=crop',
     ],
   },
+
+  /* Beyond Tanzania. `country` is only set on these — everything above is
+     Tanzania, and journeyCountry() supplies that default. Inclusions are
+     taken from what each itinerary promises day by day. */
+  {
+    slug: '3-day-into-the-wild-masai-mara-safari',
+    country: 'Kenya',
+    meta: 'Kenya · 3 Days / 2 Nights',
+    category: 'Kenya Safari',
+    title: 'Into the Wild Masai Mara',
+    packageTitle: '3-Day Into the Wild Masai Mara Safari',
+    nights: 2,
+    season: 'Jul — Oct',
+    priceFrom: '$1,890',
+    image: '/media/kenya/masai-mara.webp',
+    summary:
+      "Three days in Kenya's wild heart — through the Great Rift Valley to the Masai Mara, a full day on the plains in search of the Big Five, and a morning with the Maasai before the road back to Nairobi.",
+    days: [
+      { days: 'Day 01', place: 'Masai Mara National Reserve', nights: 1, bandImage: '/media/kenya/masai-mara.webp', note: 'Met on arrival in Nairobi, then the scenic road through the Great Rift Valley to the Masai Mara, arriving for lunch at camp. Time to settle in before an afternoon game drive across the savannah in search of the Big Five, back at camp as the sun goes down. Overnight at Zebra Plains Mara Camp.', optional: false },
+      { days: 'Day 02', place: 'Masai Mara National Reserve', nights: 1, bandImage: '/media/kenya/mara-plains.webp', note: 'A full day on the plains with a picnic lunch — lion, elephant, cheetah, buffalo and giraffe, with your guide taking you into the most wildlife-rich corners of the reserve. A stop at a viewpoint to watch the sun set over the Mara before dinner. Overnight at Zebra Plains Mara Camp.', optional: false },
+      { days: 'Day 03', place: 'Nairobi', nights: 0, bandImage: '/media/kenya/nairobi.webp', note: 'After breakfast, a visit to a traditional Maasai village to learn their customs and daily life, then the drive back to Nairobi. Dropped at the airport or your city hotel in the late afternoon.', optional: false },
+    ],
+    included: [
+      'Meet-and-greet in Nairobi and road transfers throughout',
+      'Two nights at Zebra Plains Mara Camp',
+      'Meals as described, including a picnic lunch on the full day',
+      'Game drives with a professional driver-guide',
+      'Masai Mara park fees',
+      'Maasai village visit',
+    ],
+    excluded: [
+      'International flights and Kenya eTA',
+      'Travel insurance',
+      'Drinks and personal items',
+      'Gratuities for guide and camp staff',
+    ],
+    gallery: [],
+  },
+  {
+    slug: '6-day-discover-amboseli-lake-naivasha-masai-mara',
+    country: 'Kenya',
+    meta: 'Kenya · 6 Days / 5 Nights',
+    category: 'Kenya Safari',
+    title: 'Amboseli, Naivasha & the Mara',
+    packageTitle: '6-Day Discover Amboseli, Lake Naivasha & Masai Mara',
+    nights: 5,
+    season: 'Jul — Oct',
+    priceFrom: '$3,500',
+    image: '/media/kenya/amboseli.webp',
+    summary:
+      "Kenya's three great landscapes in one loop from Nairobi — elephants beneath Kilimanjaro in Amboseli, a boat and a walk among giraffe at Lake Naivasha, then two nights on the plains of the Masai Mara.",
+    days: [
+      { days: 'Day 01', place: 'Amboseli National Park', nights: 1, bandImage: '/media/kenya/amboseli.webp', note: 'Met at your Nairobi hotel or the airport, then south through the Kenyan countryside to Amboseli, arriving for lunch. An evening game drive among the park\'s great elephant herds, lion, giraffe and zebra, with Kilimanjaro on the skyline in the last light. Overnight at Praro Amboseli Camp.', optional: false },
+      { days: 'Day 02', place: 'Amboseli National Park', nights: 1, bandImage: '/media/kenya/amboseli-2.webp', note: 'A full day of game viewing with a picnic lunch — elephant, lion, cheetah, giraffe and the park\'s rich birdlife, all against the mountain. Back at camp in the late afternoon to enjoy the property. Overnight at Praro Amboseli Camp.', optional: false },
+      { days: 'Day 03', place: 'Lake Naivasha', nights: 1, bandImage: '/media/kenya/naivasha.webp', note: 'An early start for the drive to Lake Naivasha, arriving for lunch. In the afternoon, a boat out across the lake for hippo and birdlife, then a guided walking safari on Crescent Island among giraffe, zebra and antelope. Overnight at Lake Naivasha Simba Lodge.', optional: false },
+      { days: 'Day 04', place: 'Masai Mara National Reserve', nights: 1, bandImage: '/media/kenya/masai-mara.webp', note: 'Through the Great Rift Valley to the Masai Mara, arriving for lunch, then an afternoon game drive across the plains in search of the Big Five. Back at camp at sunset. Overnight at Zebra Plains Mara Camp.', optional: false },
+      { days: 'Day 05', place: 'Masai Mara National Reserve', nights: 1, bandImage: '/media/kenya/mara-plains.webp', note: 'A full day on the Mara with a picnic lunch, deep into the reserve\'s most wildlife-rich country for lion, elephant, cheetah, buffalo and giraffe. A sunset stop on the way back to camp. Overnight at Zebra Plains Mara Camp.', optional: false },
+      { days: 'Day 06', place: 'Nairobi', nights: 0, bandImage: '/media/kenya/nairobi.webp', note: 'After breakfast, a visit to a traditional Maasai village, then the drive back to Nairobi. Dropped at your hotel or the airport in the late afternoon.', optional: false },
+    ],
+    included: [
+      'Meet-and-greet in Nairobi and road transfers throughout',
+      'Five nights at Praro Amboseli Camp, Lake Naivasha Simba Lodge and Zebra Plains Mara Camp',
+      'Meals as described, including picnic lunches on full days',
+      'Game drives with a professional driver-guide',
+      'Park fees for Amboseli and the Masai Mara',
+      'Lake Naivasha boat ride and Crescent Island walking safari',
+      'Maasai village visit',
+    ],
+    excluded: [
+      'International flights and Kenya eTA',
+      'Travel insurance',
+      'Drinks and personal items',
+      'Gratuities for guide and camp staff',
+    ],
+    gallery: [],
+  },
+  {
+    slug: '2-day-akagera-luxury-safari-and-boat-cruise',
+    country: 'Rwanda',
+    meta: 'Rwanda · 2 Days / 1 Night',
+    category: 'Rwanda Safari',
+    title: 'Akagera Safari & Lake Ihema Cruise',
+    packageTitle: '2-Day Akagera Luxury Safari in Rwanda & Boat Cruise',
+    nights: 1,
+    season: 'Jun — Sep',
+    priceFrom: '$1,150',
+    image: '/media/rwanda/akagera.webp',
+    summary:
+      "Rwanda's only savannah park and its only Big Five destination — a sunset boat on Lake Ihema among hippo and crocodile, then a full day of game driving for lion, rhino, elephant and giraffe.",
+    days: [
+      { days: 'Day 01', place: 'Akagera National Park', nights: 1, bandImage: '/media/rwanda/lake-ihema.webp', note: 'Met at Kigali airport or your hotel for the two-and-a-half-hour drive east to Akagera, with stops along the way for the scenery and photographs. Check in at the lodge, then a sunset boat cruise on Lake Ihema for hippo and crocodile in the water and along the shore. Overnight at Ruzizi Tented Lodge.', optional: false },
+      { days: 'Day 02', place: 'Akagera National Park', nights: 0, bandImage: '/media/rwanda/akagera.webp', note: 'An early breakfast, then a full day of game driving in search of the Big Five — lion, rhino, elephant, buffalo and leopard — with kob, giraffe, zebra and baboon, and more than 500 bird species in the park. Transfer back to Kigali in the evening.', optional: false },
+    ],
+    included: [
+      'Pickup at Kigali airport or your hotel and return transfer',
+      'One night at Ruzizi Tented Lodge',
+      'Lake Ihema boat cruise',
+      'Full-day game drive with a driver-guide',
+      'Akagera park fees',
+    ],
+    excluded: [
+      'International flights and Rwanda visa',
+      'Travel insurance',
+      'Drinks and personal items',
+      'Gratuities for guide and lodge staff',
+    ],
+    gallery: [],
+  },
+  {
+    slug: '4-day-rwanda-gorilla-trekking',
+    country: 'Rwanda',
+    meta: 'Rwanda · 4 Days / 3 Nights',
+    category: 'Gorilla Trekking',
+    title: 'Rwanda Gorilla Trekking',
+    packageTitle: '4-Day Rwanda Gorilla Trekking',
+    nights: 3,
+    season: 'Jun — Sep',
+    priceFrom: '$5,620',
+    image: '/media/rwanda/gorilla.webp',
+    summary:
+      'An hour with a mountain gorilla family in the Virunga volcanoes — with a day in Kigali to begin, the Dian Fossey campus on the way north, and golden monkeys in the bamboo before the flight home.',
+    days: [
+      { days: 'Day 01', place: 'Kigali', nights: 1, bandImage: '/media/rwanda/kigali.webp', note: 'VIP meet-and-greet at Kigali International Airport, with fast-track through visa and luggage. Your private guide takes you through the city\'s markets, galleries and the Genocide Memorial, then a coffee masterclass at Question Coffee and lunch at the Hôtel des Mille Collines. Overnight at Kigali Serena Hotel.', optional: false },
+      { days: 'Day 02', place: 'Volcanoes National Park', nights: 1, bandImage: '/media/rwanda/volcanoes.webp', note: 'North through the Land of a Thousand Hills to Musanze, past coffee and banana plantations, about three hours. A visit to the Ellen DeGeneres Campus of the Dian Fossey Gorilla Fund to learn about the gorillas and the work done to protect them, then a quiet afternoon at the hotel. Overnight at Virunga Inn Resort & Spa.', optional: false },
+      { days: 'Day 03', place: 'Gorilla Trek', nights: 1, bandImage: '/media/rwanda/gorilla.webp', note: 'An early briefing at park headquarters, then into the forest with a ranger to find a gorilla family and spend one hour in their company. Your permit is included, along with a porter from the local community to carry your daypack on the harder trails. Afternoon at leisure. Overnight at Virunga Inn Resort & Spa.', optional: false },
+      { days: 'Day 04', place: 'Golden Monkeys & Kigali', nights: 0, bandImage: '/media/rwanda/golden-monkey.webp', note: 'Back to park headquarters for a golden monkey trek — playful troops in the bamboo, with other primates, birds and forest plants along the way. Lunch at the hotel, then the drive to Kigali International Airport for your flight home.', optional: false },
+    ],
+    included: [
+      'VIP meet-and-greet and fast-track at Kigali International Airport',
+      'A private guide and vehicle throughout',
+      'Three nights at Kigali Serena Hotel and Virunga Inn Resort & Spa',
+      'Gorilla permit and golden monkey permit',
+      'One porter per person on the gorilla trek',
+      'Kigali city tour, Genocide Memorial entry and Question Coffee masterclass',
+      'Dian Fossey Gorilla Fund campus visit',
+    ],
+    excluded: [
+      'International flights and Rwanda visa',
+      'Travel insurance',
+      'Drinks and personal items',
+      'Gratuities for guide, rangers and hotel staff',
+    ],
+    gallery: [],
+  },
 ];
+
+/* Every journey without an explicit `country` is a Tanzania route. */
+export const COUNTRIES = ['Tanzania', 'Kenya', 'Rwanda'] as const;
+export function journeyCountry(j: { country?: string }) {
+  return j.country ?? 'Tanzania';
+}
+
+/* "Beyond Tanzania" — the homepage panel that sits ahead of the signature
+   experiences. One card per neighbour, each opening the itineraries page
+   already filtered to that country. */
+export const beyondTanzania = {
+  title: 'Two neighbours worth the crossing',
+  body: 'The same team, the same standard of guiding — carried over the border to the Masai Mara and into the Virunga volcanoes.',
+  countries: [
+    {
+      name: 'Kenya',
+      line: 'The Masai Mara, Amboseli and Lake Naivasha',
+      image: '/media/kenya/masai-mara.webp',
+      href: '/journeys?country=kenya',
+    },
+    {
+      name: 'Rwanda',
+      line: 'Mountain gorillas, golden monkeys and Akagera',
+      image: '/media/rwanda/gorilla.webp',
+      href: '/journeys?country=rwanda',
+    },
+  ],
+};
 
 /* Signature experiences — the bestseller reasons people come to Tanzania.
    These lead the homepage in place of accommodation: we are a tour operator,

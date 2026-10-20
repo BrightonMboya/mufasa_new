@@ -8,8 +8,10 @@ interface Props {
   /* What the tab filter matches this card against. Defaults to the journey's
      own category; the homepage groups by how you reach the route instead. */
   filterGroup?: string;
+  /* Set on the catalogue, where cards also filter by country. */
+  country?: string;
 }
-const { journey: j, showPrice = false, filterGroup } = Astro.props;
+const { journey: j, showPrice = false, filterGroup, country } = Astro.props;
 const photo = journeyPhoto(j.slug, j.image);
 ---
 
@@ -17,6 +19,7 @@ const photo = journeyPhoto(j.slug, j.image);
         class:list={['jcard', { 'jcard--catalog': showPrice }]}
         href={`/journeys/${j.slug}`}
         data-category={filterGroup ?? j.category}
+        data-country={country}
         data-search={`${j.title} ${j.category} ${j.summary} ${j.days.map((d) => d.place).join(' ')}`.toLowerCase()}
       >
         <div class="jcard__frame">

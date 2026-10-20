@@ -4,10 +4,10 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
-import { journeys as allJourneys, site } from '../../data/site';
+import { journeys as allJourneys, site, COUNTRIES, journeyCountry } from '../../data/site';
 
 const title = `All Journeys — ${site.shortName}`;
-const description = 'Every safari and itinerary we run, from short crater fly-ins to the full nine-day route through the north.';
+const description = 'Every safari and itinerary we run across Tanzania, Kenya and Rwanda, from short crater fly-ins to gorilla treks in the Virunga volcanoes.';
 
 /* "North to Sea" is the collection the northern packages sit inside, not a
    route of its own, so the catalogue lists its contents instead of the
@@ -15,6 +15,16 @@ const description = 'Every safari and itinerary we run, from short crater fly-in
 const HUB_SLUGS = ['north-to-sea'];
 const journeys = allJourneys.filter((j) => !HUB_SLUGS.includes(j.slug));
 const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))];
+
+/* Country is the first cut, category the second. Each category tab records
+   which countries it has routes in, so the script can hide tabs that would
+   come up empty for the chosen country. */
+const countries = COUNTRIES.map((c) => ({
+  name: c,
+  count: journeys.filter((j) => journeyCountry(j) === c).length,
+}));
+const categoryCountries = (category: string) =>
+  Array.from(new Set(journeys.filter((j) => j.category === category).map(journeyCountry))).join(',');
 ---
 
 <Base title={title} description={description}>
@@ -24,11 +34,22 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
       <div class="jhero__content wrap">
         <span class="eyebrow" style="color: var(--color-accent-soft)">All Journeys</span>
         <h1>Every route we run</h1>
-        <p class="jhero__lead">From short crater fly-ins to the full nine-day route through the north — the complete library, not just the highlights.</p>
+        <p class="jhero__lead">Tanzania, Kenya and Rwanda — from short crater fly-ins to the Masai Mara and the gorillas of the Virunga volcanoes. The complete library, not just the highlights.</p>
       </div>
     </section>
 
     <section class="journeys section wrap">
+      <div class="countries" role="group" aria-label="Filter by country">
+        <button type="button" class="country country--active" aria-pressed="true" data-country="All">
+          All countries <span class="country__count">{journeys.length}</span>
+        </button>
+        {countries.map((c) => (
+          <button type="button" class="country" aria-pressed="false" data-country={c.name}>
+            {c.name} <span class="country__count">{c.count}</span>
+          </button>
+        ))}
+      </div>
+
       <div class="journeys__tabs" role="tablist" aria-label="Journey categories">
         {filters.map((f, i) => (
           <button
@@ -36,6 +57,7 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
             role="tab"
             aria-selected={i === 0}
             data-filter={f}
+            data-countries={f === 'All' ? undefined : categoryCountries(f)}
           >
             {f}
           </button>
@@ -43,7 +65,7 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
       </div>
 
       <div class="journeys__grid" data-journeys-grid>
-        {journeys.map((j) => <JourneyCard journey={j} showPrice />)}
+        {journeys.map((j) => <JourneyCard journey={j} showPrice country={journeyCountry(j)} />)}
       </div>
     </section>
 
@@ -65,6 +87,46 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
   .jhero__lead { color: rgba(247, 244, 238, 0.8); line-height: 1.6; font-size: 1.0625rem; }
 
   .journeys { background-color: var(--color-surface); }
+
+  /* Country switch: a pill row above the category tabs. */
+  .countries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  }
+  .country {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.3rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-full);
+    background-color: transparent;
+    font-size: 0.9375rem;
+    font-weight: var(--fw-medium);
+    color: var(--color-ink);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .country:hover { border-color: var(--color-accent); }
+  .country--active,
+  .country--active:hover {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .country__count {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+  .country:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  @media (max-width: 640px) {
+    .countries { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter-page)); padding-inline: var(--gutter-page); }
+    .country { flex-shrink: 0; padding: 0.6rem 1.1rem; }
+  }
+  .tab[hidden] { display: none; }
   .journeys__tabs {
     display: flex;
     flex-wrap: wrap;
@@ -105,19 +167,59 @@ const filters = ['All', ...Array.from(new Set(journeys.map((j) => j.category)))]
 </style>
 
 <script>
+  const countryButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.country'));
   const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab'));
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.jcard'));
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      tabs.forEach((t) => {
-        t.classList.toggle('tab--active', t === tab);
-        t.setAttribute('aria-selected', String(t === tab));
-      });
-      const category = tab.dataset.filter ?? 'All';
-      cards.forEach((card) => {
-        card.hidden = category !== 'All' && card.dataset.category !== category;
-      });
+  let country = 'All';
+  let category = 'All';
+
+  function render() {
+    countryButtons.forEach((b) => {
+      const on = b.dataset.country === country;
+      b.classList.toggle('country--active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    // A category with no routes in this country would only ever show an empty grid.
+    tabs.forEach((t) => {
+      const list = t.dataset.countries;
+      t.hidden = country !== 'All' && !!list && !list.split(',').includes(country);
+    });
+    if (tabs.find((t) => t.dataset.filter === category)?.hidden) category = 'All';
+    tabs.forEach((t) => {
+      const on = (t.dataset.filter ?? 'All') === category;
+      t.classList.toggle('tab--active', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    cards.forEach((card) => {
+      card.hidden =
+        (country !== 'All' && card.dataset.country !== country) ||
+        (category !== 'All' && card.dataset.category !== category);
+    });
+  }
+
+  // ?country=kenya arrives from the homepage cards; keep the URL in step so a
+  // filtered view can be shared.
+  const fromUrl = new URLSearchParams(location.search).get('country')?.toLowerCase();
+  const match = countryButtons.find((b) => b.dataset.country?.toLowerCase() === fromUrl);
+  if (match) country = match.dataset.country ?? 'All';
+
+  countryButtons.forEach((b) => {
+    b.addEventListener('click', () => {
+      country = b.dataset.country ?? 'All';
+      const url = new URL(location.href);
+      if (country === 'All') url.searchParams.delete('country');
+      else url.searchParams.set('country', country.toLowerCase());
+      history.replaceState(null, '', url);
+      render();
     });
   });
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      category = tab.dataset.filter ?? 'All';
+      render();
+    });
+  });
+
+  render();
 </script>
