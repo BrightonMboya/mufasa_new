@@ -3,7 +3,8 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
-import { site } from '../../data/site';
+import JourneyCard from '../../components/JourneyCard.astro';
+import { site, journeys } from '../../data/site';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -14,6 +15,21 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const title = `${post.data.title} — ${site.shortName}`;
+
+/* Readers finish a post wanting to go; hand them three bookable routes.
+   Curated so the set spans the migration, a classic circuit and a short
+   fly-in from Zanzibar rather than three near-identical northern loops. */
+const FEATURED_SLUGS = [
+  '6-day-the-great-wildebeest-migration-safari',
+  '7-day-private-luxury-safari-to-tanzania-premier-parks',
+  '3-day-luxury-fly-in-fly-out-safari-from-zanzibar',
+];
+const featured = FEATURED_SLUGS.map((slug) => {
+  const journey = journeys.find((j) => j.slug === slug);
+  // Fail the build rather than ship a post with a silently missing card.
+  if (!journey) throw new Error(`Blog featured itineraries: unknown slug "${slug}"`);
+  return journey;
+});
 ---
 
 <Base title={title} description={post.data.description}>
@@ -41,6 +57,17 @@ const title = `${post.data.title} — ${site.shortName}`;
           <a href="/#enquiry" class="pill pill--accent">Make an enquiry</a>
         </div>
       </aside>
+    </section>
+
+    <!-- Featured itineraries -->
+    <section class="featured section wrap">
+      <div class="featured__head">
+        <h2>Featured Itineraries</h2>
+        <a href="/journeys" class="pill pill--accent">See all Itineraries</a>
+      </div>
+      <div class="featured__grid">
+        {featured.map((j) => <JourneyCard journey={j} />)}
+      </div>
     </section>
 
     <Enquiry />
@@ -121,6 +148,41 @@ const title = `${post.data.title} — ${site.shortName}`;
     color: var(--color-slate);
     line-height: 1.6;
     font-size: 0.9375rem;
+  }
+
+  /* Featured itineraries */
+  .featured {
+    background-color: var(--color-surface);
+  }
+  .featured__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .featured__head h2 {
+    font-style: italic;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: var(--fw-light);
+    color: var(--color-ink);
+  }
+  .featured__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  @media (min-width: 641px) and (max-width: 1050px) {
+    .featured__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .featured__grid {
+      grid-template-columns: 1fr;
+      max-width: 460px;
+      margin-inline: auto;
+      gap: 1.75rem;
+    }
   }
 
   @media (max-width: 860px) {

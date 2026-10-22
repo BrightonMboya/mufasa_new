@@ -3,7 +3,7 @@ title: "Mandatory Travel Insurance for Tanzania: NIC and ZIC Explained"
 description: "From 1 October 2026, foreign visitors to Tanzania need mandatory inbound travel insurance. Which policy you need — NIC or ZIC — depends on your first point of entry."
 category: "Safari"
 date: 2026-10-10
-image: "/media/blog/tanzania-travel-insurance.webp"
+image: "/media/blog/passport-entry-stamps.webp"
 ---
 If you are planning to visit Tanzania for a safari, Mount Kilimanjaro trek, Zanzibar holiday, or any other type of trip, you should be aware of Tanzania's Mandatory Inbound Travel Insurance requirement.
 

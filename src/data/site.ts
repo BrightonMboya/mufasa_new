@@ -760,13 +760,16 @@ export const beyondTanzania = {
     {
       name: 'Kenya',
       line: 'The Masai Mara, Amboseli and Lake Naivasha',
-      image: '/media/kenya/masai-mara.webp',
+      // Maasai guide walking two guests through the Mara — Cottar's 1920s Camp
+      // (partner library: ref2-120-cottars.jpg).
+      image: '/media/kenya/mara-walk-with-maasai-guide.webp',
       href: '/journeys?country=kenya',
     },
     {
       name: 'Rwanda',
       line: 'Mountain gorillas, golden monkeys and Akagera',
-      image: '/media/rwanda/gorilla.webp',
+      // Infant mountain gorilla in its mother's arm — Bob Brewer, Unsplash.
+      image: '/media/rwanda/_preview-getty-168315322.jpg', // PREVIEW ONLY — watermarked Getty comp, replace before going live
       href: '/journeys?country=rwanda',
     },
   ],
@@ -1643,6 +1646,8 @@ export const destinations = [
 ];
 
 export const enquiry = {
+  image:
+    'https://images.unsplash.com/photo-1772224607566-13144baab071?w=1600&q=80&auto=format&fit=crop',
   title: 'Tell us when you can leave, and we will do the rest.',
   body: 'A first conversation takes about twenty minutes and costs nothing. You will speak with the person who designs the route, not a call centre.',
 };
