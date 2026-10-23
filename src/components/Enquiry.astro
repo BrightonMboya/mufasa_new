@@ -2,68 +2,44 @@
 import { enquiry, site } from '../data/site';
 ---
 
-<section id="enquiry" class="enquiry">
-  <img class="enquiry__img" src={enquiry.image} alt="" loading="lazy" decoding="async" />
-  <div class="enquiry__scrim"></div>
+<!-- A plain band, no photo: the footer below is a full-bleed scene, and two
+     photo sections back to back fight each other. -->
+<section id="enquiry" class="enquiry section">
   <div class="enquiry__content wrap">
     <h2>{enquiry.title}</h2>
     <p>{enquiry.body}</p>
     <div class="enquiry__cta">
       <a href="/trip-planner" class="pill pill--accent">Start the conversation</a>
-      <a href={`mailto:${site.email}`} class="pill pill--ghost">Email us</a>
+      <a href={`mailto:${site.email}`} class="pill pill--outline">Email us</a>
     </div>
   </div>
 </section>
 
 <style>
-  .enquiry {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 620px;
-    overflow: hidden;
-    background-color: var(--color-ink);
-    isolation: isolate;
-  }
-  .enquiry__img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2;
-  }
-  .enquiry__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(
-      90deg,
-      rgba(20, 24, 21, 0.88) 0%,
-      rgba(20, 24, 21, 0.72) 46%,
-      rgba(20, 24, 21, 0.15) 100%
-    );
-  }
+  .enquiry { background-color: #f8f4ee; }
   .enquiry__content {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1.75rem;
-    max-width: 920px;
+    max-width: 760px;
+    margin-inline: auto;
+    padding-block: clamp(1rem, 3vw, 2.5rem);
+    text-align: center;
   }
   .enquiry__content h2 {
-    max-width: 920px;
     font-size: clamp(2.25rem, 5vw, 3.5rem);
     font-weight: var(--fw-light);
-    color: var(--color-on-accent);
+    color: var(--color-ink);
     line-height: 1.1;
   }
   .enquiry__content p {
     max-width: 540px;
-    color: rgba(247, 244, 238, 0.72);
+    color: var(--color-slate);
   }
   .enquiry__cta {
     display: flex;
+    justify-content: center;
     gap: 0.875rem;
     flex-wrap: wrap;
     margin-top: 0.5rem;

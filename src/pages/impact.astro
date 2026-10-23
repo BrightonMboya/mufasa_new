@@ -1,0 +1,247 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Enquiry from '../components/Enquiry.astro';
+import { impact, site } from '../data/site';
+
+const title = `${impact.eyebrow} — ${site.name}`;
+const [lead, ...rest] = impact.intro;
+const [first, second] = impact.sections;
+---
+
+<Base title={title} description={impact.teaser.body}>
+  <Header />
+  <main>
+    <!-- Hero — copy on ink, photograph filling the other half. -->
+    <section class="ihero">
+      <div class="ihero__text">
+        <span class="eyebrow">{impact.eyebrow}</span>
+        <h1>{impact.title}</h1>
+        <p class="ihero__subtitle">{impact.subtitle}</p>
+      </div>
+      <img class="ihero__img" src={impact.hero.image} alt={impact.hero.imageAlt} decoding="async" fetchpriority="high" />
+    </section>
+
+    <!-- Intro: the opening paragraph set large, the other two beside it. -->
+    <section class="intro section wrap">
+      <p class="intro__lead">{lead}</p>
+      <div class="intro__body">
+        {rest.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <!-- From the field — a portrait spanning two rows, four landscapes beside it. -->
+    <section class="field wrap" aria-label="From the field">
+      {impact.gallery.map((g) => (
+        <figure><img src={g.image} alt={g.alt} loading="lazy" decoding="async" /></figure>
+      ))}
+    </section>
+
+    <section class="slab section wrap">
+      <div class="slab__media">
+        <img src={first.image} alt={first.imageAlt} loading="lazy" decoding="async" />
+      </div>
+      <div class="slab__text">
+        <span class="eyebrow">01</span>
+        <h2>{first.heading}</h2>
+        {first.body.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <!-- Pull quote over a full-bleed photograph. -->
+    <section class="quote">
+      <img src={impact.quote.image} alt={impact.quote.imageAlt} loading="lazy" decoding="async" />
+      <blockquote class="wrap">“{impact.quote.text}”</blockquote>
+    </section>
+
+    <section class="slab slab--reverse section wrap">
+      <div class="slab__media">
+        <img src={second.image} alt={second.imageAlt} loading="lazy" decoding="async" />
+      </div>
+      <div class="slab__text">
+        <span class="eyebrow">02</span>
+        <h2>{second.heading}</h2>
+        {second.body.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <!-- Sign-off -->
+    <section class="signoff section wrap">
+      <p><span>{site.name}</span> {impact.signoff}</p>
+    </section>
+
+    <Enquiry />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* Hero */
+  .ihero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--color-ink);
+  }
+  .ihero__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem);
+  }
+  .ihero .eyebrow { color: var(--color-accent-soft); }
+  .ihero h1 {
+    font-size: clamp(2.75rem, 5.2vw, 4.5rem);
+    color: var(--color-on-accent);
+    font-weight: var(--fw-light);
+    line-height: 1.06;
+    text-wrap: balance;
+  }
+  .ihero__subtitle {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+    color: rgba(247, 244, 238, 0.72);
+  }
+  .ihero__img {
+    width: 100%;
+    height: 100%;
+    min-height: clamp(420px, 44vw, 640px);
+    object-fit: cover;
+    object-position: 60% 40%;
+  }
+
+  /* Intro */
+  .intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 6vw, 5.5rem);
+    align-items: start;
+  }
+  .intro__lead {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.3125rem, 2vw, 1.625rem);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .intro__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    color: var(--color-slate);
+    line-height: 1.7;
+  }
+
+  /* From the field */
+  .field {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 1fr;
+    grid-template-rows: repeat(2, clamp(200px, 20vw, 300px));
+    gap: 0.75rem;
+  }
+  .field figure { margin: 0; overflow: hidden; }
+  .field figure:first-child { grid-row: span 2; }
+  .field img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .field figure:hover img { transform: scale(1.04); }
+
+  /* Slabs — photo beside a heading and its paragraphs. */
+  .slab {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .slab--reverse { grid-template-columns: 1fr 1.1fr; }
+  .slab--reverse .slab__media { order: 2; }
+  .slab__media { overflow: hidden; }
+  .slab__media img {
+    width: 100%;
+    height: clamp(380px, 40vw, 560px);
+    object-fit: cover;
+    object-position: center 30%;
+  }
+  .slab__text { display: flex; flex-direction: column; gap: 1.25rem; }
+  .slab__text .eyebrow { color: var(--color-accent-deep); }
+  .slab__text h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--fw-light);
+    line-height: 1.12;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  .slab__text p { color: var(--color-slate); line-height: 1.7; }
+
+  /* Quote band */
+  .quote {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: clamp(380px, 42vw, 560px);
+    overflow: hidden;
+    text-align: center;
+  }
+  .quote img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .quote::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(12, 16, 13, 0.55);
+  }
+  .quote blockquote {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: 960px;
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-style: italic;
+    font-size: clamp(1.75rem, 3.8vw, 3rem);
+    line-height: 1.25;
+    color: var(--color-on-accent);
+    text-wrap: balance;
+  }
+
+  /* Sign-off */
+  .signoff {
+    background-color: var(--color-accent-deep);
+    text-align: center;
+  }
+  .signoff p {
+    max-width: 900px;
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.25;
+    color: var(--color-sand);
+    text-wrap: balance;
+  }
+  .signoff span { color: var(--color-on-accent); }
+
+  @media (max-width: 860px) {
+    .ihero, .intro, .slab, .slab--reverse { grid-template-columns: 1fr; }
+    .ihero__img { min-height: 0; height: 320px; order: -1; }
+    .slab--reverse .slab__media { order: 0; }
+    .slab__media img { height: 300px; }
+    .field {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: none;
+      grid-auto-rows: 180px;
+    }
+    .field figure:first-child { grid-row: span 2; }
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+import { impact } from '../data/site';
+---
+
+<!-- Half copy on deep green, half photograph. Below 860px the photo moves
+     under the copy rather than shrinking to a sliver. -->
+<section id="impact" class="impact">
+  <div class="impact__text">
+    <span class="eyebrow">{impact.eyebrow}</span>
+    <h2>{impact.title}</h2>
+    <p>{impact.teaser.body}</p>
+    <a href={impact.teaser.cta.href} class="pill pill--sand">{impact.teaser.cta.label}</a>
+  </div>
+  <img
+    class="impact__img"
+    src={impact.teaser.image}
+    alt={impact.teaser.imageAlt}
+    loading="lazy"
+    decoding="async"
+  />
+</section>
+
+<style>
+  .impact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--color-accent-deep);
+  }
+  .impact__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 7vw, 7rem);
+  }
+  .impact__text .eyebrow {
+    color: var(--color-accent-soft);
+  }
+  .impact__text h2 {
+    font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+    font-weight: var(--fw-light);
+    line-height: 1.12;
+    color: var(--color-on-accent);
+    text-wrap: balance;
+  }
+  .impact__text p {
+    max-width: 34rem;
+    line-height: 1.7;
+    color: rgba(247, 244, 238, 0.78);
+  }
+  .impact__text .pill {
+    margin-top: 0.5rem;
+  }
+  .impact__img {
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+    object-fit: cover;
+  }
+
+  @media (max-width: 860px) {
+    .impact { grid-template-columns: 1fr; }
+    .impact__img { min-height: 0; height: 300px; }
+  }
+</style>

@@ -1161,6 +1161,67 @@ export const about = {
   },
 };
 
+/* Our Impact — the King Mufasa Healthcare Initiative. `teaser` is the homepage
+   band (ImpactSplit.astro); the rest is the /impact page. Copy is the
+   operator's own, verbatim. Photos are field outreach in Monduli from Primetel
+   Health (health.primetel.tech). */
+export const impact = {
+  eyebrow: 'Our Impact',
+  title: 'Better Healthcare for Rural Communities',
+  subtitle: 'The King Mufasa Healthcare Initiative',
+  teaser: {
+    body: 'Through the King Mufasa Healthcare Initiative, we have donated medical equipment to a rural healthcare facility in Tanzania to support local healthcare workers and contribute to the well-being of the surrounding community.',
+    cta: { label: 'Learn More', href: '/impact' },
+    image: '/media/impact/health-worker-with-elders.webp',
+    imageAlt: 'A health worker sitting with Maasai elders outside a rural clinic',
+  },
+  /* The first paragraph leads on its own; the other two sit beside it. */
+  intro: [
+    'At King Mufasa Expeditions, we believe that tourism should create positive and lasting benefits for the people of Tanzania. Our commitment goes beyond providing memorable safaris and adventures. We also believe in supporting the communities that make our country such a special place to visit.',
+    'Through the King Mufasa Healthcare Initiative, we have donated medical equipment to a rural healthcare facility in Tanzania to support local healthcare workers and contribute to the well-being of the surrounding community.',
+    'Access to essential medical equipment is important for healthcare professionals to examine patients, identify health concerns, and provide appropriate care. By supporting local healthcare facilities, we aim to help strengthen the resources available to medical teams serving families in rural communities.',
+  ],
+  hero: {
+    image: '/media/impact/blood-pressure-check.webp',
+    imageAlt: 'A clinician in a white coat taking an elderly woman\'s blood pressure',
+  },
+  sections: [
+    {
+      heading: 'Making a Difference Where It Matters',
+      body: [
+        'Our initiative focuses on supporting rural hospitals and dispensaries with medical equipment based on their needs. We believe that even a small contribution can be valuable when it helps healthcare professionals do their work and serve their communities.',
+        'We are proud to have taken this step and see it as the beginning of a continued commitment to community well-being. We aim to build relationships with local healthcare providers, understand their priorities, and explore opportunities to support more facilities in the future.',
+      ],
+      image: '/media/impact/stethoscope-exam.webp',
+      imageAlt: 'A clinician listening to a patient\'s chest with a stethoscope',
+    },
+    {
+      heading: 'Our Commitment to Tanzania',
+      body: [
+        'For us, responsible tourism means caring for the destinations we visit and the people who call them home. Through our healthcare initiative, we want our positive impact to reach beyond tourism and contribute to stronger, healthier communities.',
+      ],
+      image: '/media/impact/home-visit-outreach.webp',
+      imageAlt: 'A health worker visiting an elderly woman outside her mud-walled home',
+    },
+  ],
+  /* The closing line of "Our Commitment to Tanzania", lifted out as a pull
+     quote over a full-bleed photograph. */
+  quote: {
+    text: 'Every step matters, and we believe that working together can create meaningful change.',
+    image: '/media/impact/field-gathering.webp',
+    imageAlt: 'Villagers seated on open ground for a community health session',
+  },
+  /* "From the field" mosaic. The first is portrait and spans two rows. */
+  gallery: [
+    { image: '/media/impact/field-screening.webp', alt: 'A health worker in a red shirt speaking with a Maasai woman' },
+    { image: '/media/impact/elder-addressing-gathering.webp', alt: 'A Maasai elder addressing a community gathering under a tree' },
+    { image: '/media/impact/village-home-visit.webp', alt: 'Health workers greeting a woman outside her home' },
+    { image: '/media/impact/community-circle.webp', alt: 'Health workers seated in a circle with members of the community' },
+    { image: '/media/impact/health-worker-with-elders.webp', alt: 'A health worker sitting with Maasai elders outside a rural clinic' },
+  ],
+  signoff: 'Exploring Tanzania, Supporting Its People.',
+};
+
 /* Day trips — short Arusha/Kilimanjaro-area excursions, migrated from the
    previous site. A single listing page (/day-trips), no per-trip detail
    routes — these are excursions, not multi-day journeys. */
@@ -1646,8 +1707,6 @@ export const destinations = [
 ];
 
 export const enquiry = {
-  image:
-    'https://images.unsplash.com/photo-1772224607566-13144baab071?w=1600&q=80&auto=format&fit=crop',
   title: 'Tell us when you can leave, and we will do the rest.',
   body: 'A first conversation takes about twenty minutes and costs nothing. You will speak with the person who designs the route, not a call centre.',
 };
@@ -1727,6 +1786,7 @@ export const footerLinks = [
     links: [
       { label: 'About us', href: '/about' },
       { label: 'Our guides', href: '/about#guides' },
+      { label: 'Our impact', href: '/impact' },
       { label: 'Reviews', href: '/#reviews' },
       { label: 'Refund Policy', href: '/refund-policy' },
       { label: 'Journal', href: '/blog' },
