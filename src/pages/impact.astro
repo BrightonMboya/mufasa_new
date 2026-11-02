@@ -3,8 +3,11 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Enquiry from '../components/Enquiry.astro';
-import { impact, site } from '../data/site';
+import { impact as impactData, site } from '../data/site';
+import { useI18n } from '../i18n';
 
+const { t, l } = useI18n(Astro);
+const impact = l(impactData);
 const title = `${impact.eyebrow} — ${site.name}`;
 const [lead, ...rest] = impact.intro;
 const [first, second] = impact.sections;
@@ -32,7 +35,7 @@ const [first, second] = impact.sections;
     </section>
 
     <!-- From the field — a portrait spanning two rows, four landscapes beside it. -->
-    <section class="field wrap" aria-label="From the field">
+    <section class="field wrap" aria-label={t('From the field')}>
       {impact.gallery.map((g) => (
         <figure><img src={g.image} alt={g.alt} loading="lazy" decoding="async" /></figure>
       ))}

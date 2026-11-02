@@ -4,22 +4,24 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PlannerFlow from '../../components/PlannerFlow.astro';
 import { migrationPlanner, site } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const title = `${migrationPlanner.title} — ${site.shortName}`;
+const { t } = useI18n(Astro);
+const title = `${t(migrationPlanner.title)} — ${site.shortName}`;
 ---
 
-<Base title={title} description={migrationPlanner.body}>
+<Base title={title} description={t(migrationPlanner.body)}>
   <Header />
   <PlannerFlow
     steps={migrationPlanner.steps}
-    srTitle={migrationPlanner.title}
-    contactTitle="Where should we send your migration routes?"
-    contactHint="Leave your details and a guide — not a call centre — will come back with camps that sit where the herds will be."
-    messageLabel="Anything else we should know?"
-    submitLabel="Send my enquiry"
+    srTitle={t(migrationPlanner.title)}
+    contactTitle={t('Where should we send your migration routes?')}
+    contactHint={t('Leave your details and a guide — not a call centre — will come back with camps that sit where the herds will be.')}
+    messageLabel={t('Anything else we should know?')}
+    submitLabel={t('Send my enquiry')}
     subject="New Great Migration enquiry"
     fromName="King Mufasa · Great Migration"
-    restartLabel="Start again"
+    restartLabel={t('Start again')}
   />
   <Footer />
 </Base>

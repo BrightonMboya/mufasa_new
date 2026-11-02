@@ -4,9 +4,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Enquiry from '../components/Enquiry.astro';
 import JourneyEnquiryModal from '../components/JourneyEnquiryModal.astro';
-import { trekking, site } from '../data/site';
+import { trekking as trekkingData, site } from '../data/site';
+import { useI18n } from '../i18n';
 
-const title = `Trekking — Kilimanjaro & Mount Meru | ${site.shortName}`;
+const { t, l } = useI18n(Astro);
+const trekking = l(trekkingData);
+const title = t('Trekking — Kilimanjaro & Mount Meru | {name}', { name: site.shortName });
 const description = trekking.intro.lead;
 ---
 
@@ -15,7 +18,7 @@ const description = trekking.intro.lead;
   <main>
     <!-- Hero -->
     <section class="thero">
-      <img class="thero__img" src={trekking.intro.heroImage} alt="Mount Kilimanjaro" fetchpriority="high" decoding="async" />
+      <img class="thero__img" src={trekking.intro.heroImage} alt={t('Mount Kilimanjaro')} fetchpriority="high" decoding="async" />
       <div class="thero__scrim"></div>
       <div class="thero__content wrap">
         <span class="eyebrow" style="color: var(--color-accent-soft)">{trekking.intro.eyebrow}</span>
@@ -31,9 +34,9 @@ const description = trekking.intro.lead;
 
     <!-- Routes -->
     <section class="troutes section wrap">
-      <h2 class="troutes__title">The routes</h2>
+      <h2 class="troutes__title">{t('The routes')}</h2>
       <div class="troutes__grid">
-        {trekking.routes.map((r) => (
+        {trekking.routes.map((r, i) => (
           <article class="trek">
             <div class="trek__frame">
               <img src={r.image} alt={r.name} loading="lazy" decoding="async" />
@@ -46,10 +49,10 @@ const description = trekking.intro.lead;
             </ul>
             <div class="trek__foot">
               <span class="trek__price">
-                <span class="trek__price-label">From / person</span>
+                <span class="trek__price-label">{t('From / person')}</span>
                 <span class="trek__price-value">{r.priceFrom}</span>
               </span>
-              <button type="button" class="pill pill--outline trek__cta" data-emodal-open data-journey={r.name}>Enquire</button>
+              <button type="button" class="pill pill--outline trek__cta" data-emodal-open data-journey={trekkingData.routes[i].name} data-journey-label={t(trekkingData.routes[i].name)}>{t('Enquire')}</button>
             </div>
           </article>
         ))}
@@ -58,7 +61,7 @@ const description = trekking.intro.lead;
 
     <!-- What's included -->
     <section class="tincl section wrap">
-      <h2>Every trek includes</h2>
+      <h2>{t('Every trek includes')}</h2>
       <ul class="tincl__list">
         {trekking.included.map((x) => <li>{x}</li>)}
       </ul>
@@ -68,7 +71,7 @@ const description = trekking.intro.lead;
   </main>
   <Footer />
 
-  <JourneyEnquiryModal journeyTitle={trekking.routes[0]?.name ?? 'Trekking'} />
+  <JourneyEnquiryModal journeyTitle={trekkingData.routes[0]?.name ?? 'Trekking'} />
 </Base>
 
 <style>

@@ -14,6 +14,7 @@
    side by side. `emailLabel` names the step's row in the lead email and falls
    back to the step title. */
 import { site, forms } from '../data/site';
+import { useI18n, LANG_NAMES_EN } from '../i18n';
 import PhoneField from './PhoneField.astro';
 
 interface Option { value: string; label: string }
@@ -51,17 +52,36 @@ interface Props {
   restartLabel?: string;
 }
 
+const { t, path, lang, tag } = useI18n(Astro);
+
 const {
   steps,
   srTitle,
-  contactTitle = 'Where should we send your ideas?',
-  contactHint = 'Leave your details and a guide \u2014 not a call centre \u2014 will come back with routes that fit.',
-  messageLabel = 'Anything else we should know?',
-  submitLabel = 'Send my enquiry',
+  contactTitle = t('Where should we send your ideas?'),
+  contactHint = t('Leave your details and a guide \u2014 not a call centre \u2014 will come back with routes that fit.'),
+  messageLabel = t('Anything else we should know?'),
+  submitLabel = t('Send my enquiry'),
   subject,
   fromName,
-  restartLabel = 'Plan another trip',
+  restartLabel = t('Plan another trip'),
 } = Astro.props;
+
+/* Visitor-facing strings the client script writes at runtime. Everything the
+   script sends to the inbox (row labels, "Not decided yet", the subject) stays
+   English for the team in Arusha, and reads off the English `steps`. */
+const msgs = {
+  day: t('day'),
+  days: t('days'),
+  sending: t('Sending…'),
+  needNameEmail: t('Please add your name and email so we can reply.'),
+  thanksNamed: t("Thank you, {name} — we've got your enquiry."),
+  failed: t('Something went wrong sending that. Please try again, or email us directly at {email}.', {
+    email: 'info@kingmufasaexpeditions.com',
+  }),
+};
+// English keeps its British long dates; other languages use their own.
+const dateLocale = lang === 'en' ? 'en-GB' : tag;
+const language = LANG_NAMES_EN[lang];
 
 const totalSteps = steps.length;
 
@@ -92,13 +112,13 @@ const minDate = new Date().toISOString().slice(0, 10);
       data-active={i === 0 ? '' : undefined}
     >
       <div class="wrap pl-step__inner">
-        <h2 class="pl-step__title">{step.title}</h2>
-        <p class="pl-step__hint">{step.hint}</p>
+        <h2 class="pl-step__title">{t(step.title)}</h2>
+        <p class="pl-step__hint">{t(step.hint)}</p>
 
         {step.kind === 'date' && (
           <div class="pl-date">
             <label class="pl-date__field">
-              <span class="pl-sr">Approximate travel date</span>
+              <span class="pl-sr">{t('Approximate travel date')}</span>
               <input type="date" min={minDate} class="pl-date__input" data-date-field />
               <span class="pl-date__icon" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -110,11 +130,11 @@ const minDate = new Date().toISOString().slice(0, 10);
             <p class="pl-date__pretty" data-date-pretty></p>
             {step.duration !== false && (
               <div class="pl-dur" data-dur data-step={step.id}>
-                <span class="pl-dur__label">{step.durationLabel ?? 'And how many days on safari?'}</span>
+                <span class="pl-dur__label">{step.durationLabel ? t(step.durationLabel) : t('And how many days on safari?')}</span>
                 <div class="pl-count pl-count--dur">
-                  <button type="button" class="pl-count__btn" data-days-step="-1" aria-label="One day fewer">&#8722;</button>
+                  <button type="button" class="pl-count__btn" data-days-step="-1" aria-label={t('One day fewer')}>&#8722;</button>
                   <label class="pl-count__field">
-                    <span class="pl-sr">Number of days</span>
+                    <span class="pl-sr">{t('Number of days')}</span>
                     <input
                       type="number"
                       class="pl-count__input"
@@ -125,8 +145,8 @@ const minDate = new Date().toISOString().slice(0, 10);
                       value={step.durationInitial ?? 7}
                     />
                   </label>
-                  <button type="button" class="pl-count__btn" data-days-step="1" aria-label="One day more">+</button>
-                  <span class="pl-dur__unit" data-days-unit>days</span>
+                  <button type="button" class="pl-count__btn" data-days-step="1" aria-label={t('One day more')}>+</button>
+                  <span class="pl-dur__unit" data-days-unit>{t('days')}</span>
                 </div>
                 <p class="pl-dur__span" data-days-span></p>
               </div>
@@ -136,9 +156,9 @@ const minDate = new Date().toISOString().slice(0, 10);
 
         {step.kind === 'number' && (
           <div class="pl-count">
-            <button type="button" class="pl-count__btn" data-count-step="-1" aria-label="One fewer">&#8722;</button>
+            <button type="button" class="pl-count__btn" data-count-step="-1" aria-label={t('One fewer')}>&#8722;</button>
             <label class="pl-count__field">
-              <span class="pl-sr">{step.title}</span>
+              <span class="pl-sr">{t(step.title)}</span>
               <input
                 type="number"
                 class="pl-count__input"
@@ -149,7 +169,7 @@ const minDate = new Date().toISOString().slice(0, 10);
                 value={step.initial ?? 2}
               />
             </label>
-            <button type="button" class="pl-count__btn" data-count-step="1" aria-label="One more">+</button>
+            <button type="button" class="pl-count__btn" data-count-step="1" aria-label={t('One more')}>+</button>
           </div>
         )}
 
@@ -165,19 +185,19 @@ const minDate = new Date().toISOString().slice(0, 10);
                 aria-pressed="false"
               >
                 <span class="pl-chip__dot" aria-hidden="true"></span>
-                <span class="pl-chip__label">{opt.label}</span>
+                <span class="pl-chip__label">{t(opt.label)}</span>
               </button>
             ))}
           </div>
         )}
 
         {step.skip && (
-          <button type="button" class="pl-skip" data-go-next data-skip>{step.skip}</button>
+          <button type="button" class="pl-skip" data-go-next data-skip>{t(step.skip)}</button>
         )}
         <div class="pl-nav">
-          {i > 0 && <button type="button" class="pl-back" data-go-back>Previous</button>}
+          {i > 0 && <button type="button" class="pl-back" data-go-back>{t('Previous')}</button>}
           <button type="button" class="pill pill--accent pl-next" data-go-next disabled>
-            {i === totalSteps - 1 ? 'Continue' : 'Next step'}
+            {i === totalSteps - 1 ? t('Continue') : t('Next step')}
           </button>
         </div>
       </div>
@@ -196,27 +216,27 @@ const minDate = new Date().toISOString().slice(0, 10);
 
         <div class="pl-form__row">
           <label class="pl-field">
-            <span>Your name</span>
+            <span>{t('Your name')}</span>
             <input type="text" name="name" autocomplete="name" required />
           </label>
           <label class="pl-field">
-            <span>Email</span>
+            <span>{t('Email')}</span>
             <input type="email" name="email" autocomplete="email" required />
           </label>
         </div>
         <PhoneField fieldClass="pl-field" tone="light" />
         <label class="pl-field">
-          <span>{messageLabel} <em>(optional)</em></span>
+          <span>{messageLabel} <em>{t('(optional)')}</em></span>
           <textarea name="note" rows="3"></textarea>
         </label>
 
         <p class="pl-form__error" data-form-error hidden></p>
 
         <div class="pl-nav pl-nav--form">
-          <button type="button" class="pl-back" data-go-back>Previous</button>
+          <button type="button" class="pl-back" data-go-back>{t('Previous')}</button>
           <button type="submit" class="pill pill--accent pl-submit" data-submit>{submitLabel}</button>
         </div>
-        <p class="pl-form__fineprint">We reply within a few hours, and never share your details.</p>
+        <p class="pl-form__fineprint">{t('We reply within a few hours, and never share your details.')}</p>
       </form>
     </div>
   </section>
@@ -224,18 +244,18 @@ const minDate = new Date().toISOString().slice(0, 10);
   <!-- Thank you -->
   <section class="pl-screen pl-thanks" data-screen="thanks">
     <div class="wrap pl-thanks__inner">
-      <span class="eyebrow">Enquiry received</span>
-      <h2 data-thanks-title>Thank you — we've got your enquiry.</h2>
-      <p>We will look at your request and get back to you within a few hours. If you'd rather talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
+      <span class="eyebrow">{t('Enquiry received')}</span>
+      <h2 data-thanks-title>{t("Thank you — we've got your enquiry.")}</h2>
+      <p><Fragment set:html={t("We will look at your request and get back to you within a few hours. If you'd rather talk sooner, we're on <a href=\"{href}\">{phone}</a>.", { href: `tel:${site.phone.replace(/\s/g, '')}`, phone: site.phone })} /></p>
       <div class="pl-thanks__cta">
-        <a href="/" class="pill pill--accent">Back to home</a>
+        <a href={path('/')} class="pill pill--accent">{t('Back to home')}</a>
         <button type="button" class="pill pill--ghost" data-restart>{restartLabel}</button>
       </div>
     </div>
   </section>
 </main>
 
-<script define:vars={{ steps, formsKey: forms.web3formsKey, endpoint: forms.endpoint, subject, fromName, submitLabel }}>
+<script define:vars={{ steps, formsKey: forms.web3formsKey, endpoint: forms.endpoint, subject, fromName, submitLabel, msgs, dateLocale, language }}>
   const root = document.querySelector('[data-planner]');
   if (root) {
     const screens = Array.from(root.querySelectorAll('[data-screen]'));
@@ -362,12 +382,13 @@ const minDate = new Date().toISOString().slice(0, 10);
     const datePretty = root.querySelector('[data-date-pretty]');
     const dateStep = steps.find((s) => s.kind === 'date');
 
-    /** "Friday, 12 June 2026", or '' if the value isn't a real date. */
-    function longDate(iso) {
+    /** "Friday, 12 June 2026", or '' if the value isn't a real date. Shown in
+        the visitor's language; the lead email passes 'en-GB'. */
+    function longDate(iso, locale = dateLocale) {
       if (!iso) return '';
       const when = new Date(iso + 'T00:00:00');
       if (Number.isNaN(when.getTime())) return '';
-      return when.toLocaleDateString('en-GB', {
+      return when.toLocaleDateString(locale, {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -417,7 +438,7 @@ const minDate = new Date().toISOString().slice(0, 10);
 
       function paint() {
         const days = Number(answers[key][0]);
-        if (unit) unit.textContent = days === 1 ? 'day' : 'days';
+        if (unit) unit.textContent = days === 1 ? msgs.day : msgs.days;
         if (span) span.textContent = daySpan();
         group.querySelectorAll('[data-days-step]').forEach((b) => {
           const dir = Number(b.dataset.daysStep);
@@ -522,7 +543,7 @@ const minDate = new Date().toISOString().slice(0, 10);
         const picked = answers[s.id] || [];
         let value;
         if (s.kind === 'date') {
-          value = picked.length ? longDate(picked[0]) || picked[0] : 'Not decided yet';
+          value = picked.length ? longDate(picked[0], 'en-GB') || picked[0] : 'Not decided yet';
         } else if (s.kind === 'number') {
           value = picked[0] || '—';
         } else {
@@ -551,7 +572,7 @@ const minDate = new Date().toISOString().slice(0, 10);
 
         formError.hidden = true;
         if (!name || !email) {
-          formError.textContent = 'Please add your name and email so we can reply.';
+          formError.textContent = msgs.needNameEmail;
           formError.hidden = false;
           return;
         }
@@ -563,7 +584,7 @@ const minDate = new Date().toISOString().slice(0, 10);
         const referrer = document.referrer || '—';
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending…';
+        submitBtn.textContent = msgs.sending;
 
         try {
           const res = await fetch(endpoint, {
@@ -580,6 +601,7 @@ const minDate = new Date().toISOString().slice(0, 10);
               Phone: phone || '—',
               ...answerRows(),
               Notes: note || '—',
+              Language: language,
               'Page URL': pageUrl,
               'Came from': referrer,
             }),
@@ -587,15 +609,13 @@ const minDate = new Date().toISOString().slice(0, 10);
           const json = await res.json();
           if (json && json.success) {
             const first = name.split(' ')[0];
-            thanksTitle.textContent = `Thank you, ${first} — we've got your enquiry.`;
+            thanksTitle.textContent = msgs.thanksNamed.replace('{name}', first);
             show(THANKS);
           } else {
             throw new Error((json && json.message) || 'Submission failed');
           }
         } catch (err) {
-          formError.textContent =
-            'Something went wrong sending that. Please try again, or email us directly at ' +
-            'info@kingmufasaexpeditions.com.';
+          formError.textContent = msgs.failed;
           formError.hidden = false;
         } finally {
           submitBtn.disabled = false;
@@ -1033,7 +1053,9 @@ const minDate = new Date().toISOString().slice(0, 10);
     color: var(--color-slate);
     line-height: 1.7;
   }
-  .pl-thanks p a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  /* :global — the link is rendered from a translated string via set:html,
+     so it carries no scope attribute. */
+  .pl-thanks p :global(a) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
   .pl-thanks__cta { display: flex; gap: 0.875rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
 
   @media (max-width: 640px) {

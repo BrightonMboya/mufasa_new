@@ -6,15 +6,19 @@ import Enquiry from '../../components/Enquiry.astro';
 import JourneyCard from '../../components/JourneyCard.astro';
 import { site, journeys } from '../../data/site';
 import { getCollection, render } from 'astro:content';
+import { useI18n } from '../../i18n';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
+const { t, path, tag } = useI18n(Astro);
 const { post } = Astro.props;
 const { Content } = await render(post);
 const title = `${post.data.title} — ${site.shortName}`;
+/* Post copy stays English; only the category label and date are localized. */
+const categoryLabels: Record<string, string> = { Safari: t('Safari'), Climbing: t('Climbing') };
 
 /* Readers finish a post wanting to go; hand them three bookable routes.
    Curated so the set spans the migration, a classic circuit and a short
@@ -40,7 +44,7 @@ const featured = FEATURED_SLUGS.map((slug) => {
       <img class="phero__img" src={post.data.image} alt={post.data.title} fetchpriority="high" decoding="async" />
       <div class="phero__scrim"></div>
       <div class="phero__content wrap">
-        <span class="phero__cat">{post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+        <span class="phero__cat">{categoryLabels[post.data.category] ?? post.data.category} · {post.data.date.toLocaleDateString(tag, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         <h1>{post.data.title}</h1>
       </div>
     </section>
@@ -52,9 +56,9 @@ const featured = FEATURED_SLUGS.map((slug) => {
       </div>
       <aside class="article__aside">
         <div class="asidebox">
-          <h2>Plan this yourself</h2>
-          <p>Speak to the person who designs the route, not a call centre. A first conversation costs nothing.</p>
-          <a href="/#enquiry" class="pill pill--accent">Make an enquiry</a>
+          <h2>{t('Plan this yourself')}</h2>
+          <p>{t('Speak to the person who designs the route, not a call centre. A first conversation costs nothing.')}</p>
+          <a href={path('/#enquiry')} class="pill pill--accent">{t('Make an enquiry')}</a>
         </div>
       </aside>
     </section>
@@ -62,8 +66,8 @@ const featured = FEATURED_SLUGS.map((slug) => {
     <!-- Featured itineraries -->
     <section class="featured section wrap">
       <div class="featured__head">
-        <h2>Featured Itineraries</h2>
-        <a href="/journeys" class="pill pill--accent">See all Itineraries</a>
+        <h2>{t('Featured Itineraries')}</h2>
+        <a href={path('/journeys')} class="pill pill--accent">{t('See all Itineraries')}</a>
       </div>
       <div class="featured__grid">
         {featured.map((j) => <JourneyCard journey={j} />)}

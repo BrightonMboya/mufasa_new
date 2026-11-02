@@ -1,0 +1,7 @@
+---
+/* Same page as /day-trips.astro, rendered under /{lang}/. */
+import Page from '../day-trips.astro';
+import { prefixedLangPaths } from '../../i18n';
+export const getStaticPaths = prefixedLangPaths;
+---
+<Page />

@@ -11,3 +11,7 @@ npm-debug.log*
 .env.production
 # macOS
 .DS_Store
+
+# i18n tool output (regenerate with npm run i18n:check)
+src/i18n/catalog.json
+src/i18n/missing/

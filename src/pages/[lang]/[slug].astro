@@ -1,0 +1,7 @@
+---
+/* Same page as /[slug].astro, rendered under /{lang}/. */
+import Page, { getStaticPaths as base } from '../[slug].astro';
+import { expandPaths } from '../../i18n';
+export const getStaticPaths = () => expandPaths(base);
+---
+<Page {...Astro.props} />

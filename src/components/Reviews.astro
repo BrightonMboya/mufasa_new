@@ -1,12 +1,15 @@
 ---
 import { reviews } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t } = useI18n(Astro);
 ---
 
 <section id="reviews" class="reviews section wrap">
   <div class="reviews__head">
-    <span class="eyebrow">{reviews.eyebrow}</span>
-    <h2>{reviews.title}</h2>
-    <p class="reviews__lead">{reviews.lead}</p>
+    <span class="eyebrow">{t(reviews.eyebrow)}</span>
+    <h2>{t(reviews.title)}</h2>
+    <p class="reviews__lead">{t(reviews.lead)}</p>
   </div>
 
   <!-- Platform logos, each linking to the live reviews -->
@@ -17,7 +20,7 @@ import { reviews } from '../data/site';
         href={r.href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Read our reviews on ${r.platform}`}
+        aria-label={t('Read our reviews on {platform}', { platform: r.platform })}
       >
         <img
           class:list={[
@@ -25,14 +28,14 @@ import { reviews } from '../data/site';
             { 'rating__logo--invert': r.invert, 'rating__logo--badge': r.badge },
           ]}
           src={r.logo}
-          alt={r.alt}
+          alt={t(r.alt)}
           width={r.logoWidth}
           height={r.logoHeight}
           loading="lazy"
           decoding="async"
         />
         {r.pending ? (
-          <span class="rating__link">Read reviews →</span>
+          <span class="rating__link">{t('Read reviews →')}</span>
         ) : (
           <span class="rating__meta">
             <span class="rating__stars" aria-hidden="true">

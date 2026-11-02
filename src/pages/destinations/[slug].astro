@@ -4,16 +4,20 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import { destinations, journeys, site } from '../../data/site';
+import { useI18n } from '../../i18n';
 
 export function getStaticPaths() {
   return destinations.map((d) => ({ params: { slug: d.slug }, props: { destination: d } }));
 }
 
-const { destination } = Astro.props;
+const { t, l, path } = useI18n(Astro);
+/* Filtering runs on the English data; only the rendered copies are localized. */
+const { destination: destinationData } = Astro.props;
+const destination = l(destinationData);
 const title = `${destination.name} — ${site.shortName}`;
-const related = journeys.filter((j) => j.category === destination.region).slice(0, 3);
-const idx = destinations.findIndex((d) => d.slug === destination.slug);
-const next = destinations[(idx + 1) % destinations.length];
+const related = l(journeys.filter((j) => j.category === destinationData.region).slice(0, 3));
+const idx = destinations.findIndex((d) => d.slug === destinationData.slug);
+const next = l(destinations[(idx + 1) % destinations.length]);
 ---
 
 <Base title={title} description={destination.summary}>
@@ -55,11 +59,11 @@ const next = destinations[(idx + 1) % destinations.length];
     {destination.gallery?.length ? (
       <section class:list={['gallery wrap', { 'gallery--single': destination.gallery.length === 1 }]}>
         <div class="gallery__frame gallery__frame--wide">
-          <img src={destination.gallery[0]} alt={`${destination.name} — landscape`} loading="lazy" decoding="async" />
+          <img src={destination.gallery[0]} alt={t('{name} — landscape', { name: destination.name })} loading="lazy" decoding="async" />
         </div>
         {destination.gallery[1] && (
           <div class="gallery__frame gallery__frame--tall">
-            <img src={destination.gallery[1]} alt={`${destination.name} — wildlife`} loading="lazy" decoding="async" />
+            <img src={destination.gallery[1]} alt={t('{name} — wildlife', { name: destination.name })} loading="lazy" decoding="async" />
           </div>
         )}
       </section>
@@ -68,12 +72,12 @@ const next = destinations[(idx + 1) % destinations.length];
     <section class="details section wrap">
       <div class="details__col">
         <span class="details__num">01</span>
-        <h2>Best time to visit</h2>
+        <h2>{t('Best time to visit')}</h2>
         <p>{destination.bestTime}</p>
       </div>
       <div class="details__col">
         <span class="details__num">02</span>
-        <h2>Activities</h2>
+        <h2>{t('Activities')}</h2>
         <ul class="details__list">
           {destination.activities.map((a: string) => <li>{a}</li>)}
         </ul>
@@ -83,12 +87,12 @@ const next = destinations[(idx + 1) % destinations.length];
     {related.length > 0 && (
       <section class="related section wrap">
         <div class="related__head">
-          <h2 class="related__title">Journeys through here</h2>
-          <a href="/journeys" class="related__all">See all journeys &rarr;</a>
+          <h2 class="related__title">{t('Journeys through here')}</h2>
+          <a href={path('/journeys')} class="related__all">{t('See all journeys')} &rarr;</a>
         </div>
         <div class="related__grid">
           {related.map((j) => (
-            <a class="rcard" href={`/journeys/${j.slug}`}>
+            <a class="rcard" href={path(`/journeys/${j.slug}`)}>
               <div class="rcard__frame"><img src={j.image} alt={j.title} loading="lazy" decoding="async" /></div>
               <span class="rcard__meta">{j.meta}</span>
               <h3 class="rcard__title">{j.title}</h3>
@@ -99,8 +103,8 @@ const next = destinations[(idx + 1) % destinations.length];
     )}
 
     <section class="nextpark wrap">
-      <a class="nextpark__link" href={`/destinations/${next.slug}`}>
-        <span class="nextpark__label">Next park</span>
+      <a class="nextpark__link" href={path(`/destinations/${next.slug}`)}>
+        <span class="nextpark__label">{t('Next park')}</span>
         <span class="nextpark__name">{next.name} <span aria-hidden="true">&rarr;</span></span>
       </a>
     </section>

@@ -5,9 +5,12 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import { journeys as allJourneys, site, COUNTRIES, journeyCountry } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const title = `All Journeys — ${site.shortName}`;
-const description = 'Every safari and itinerary we run across Tanzania, Kenya and Rwanda, from short crater fly-ins to gorilla treks in the Virunga volcanoes.';
+const { t } = useI18n(Astro);
+
+const title = t('All Journeys — {name}', { name: site.shortName });
+const description = t('Every safari and itinerary we run across Tanzania, Kenya and Rwanda, from short crater fly-ins to gorilla treks in the Virunga volcanoes.');
 
 /* "North to Sea" is the collection the northern packages sit inside, not a
    route of its own, so the catalogue lists its contents instead of the
@@ -32,25 +35,25 @@ const categoryCountries = (category: string) =>
   <main>
     <section class="jhero">
       <div class="jhero__content wrap">
-        <span class="eyebrow" style="color: var(--color-accent-soft)">All Journeys</span>
-        <h1>Every route we run</h1>
-        <p class="jhero__lead">Tanzania, Kenya and Rwanda — from short crater fly-ins to the Masai Mara and the gorillas of the Virunga volcanoes. The complete library, not just the highlights.</p>
+        <span class="eyebrow" style="color: var(--color-accent-soft)">{t('All Journeys')}</span>
+        <h1>{t('Every route we run')}</h1>
+        <p class="jhero__lead">{t('Tanzania, Kenya and Rwanda — from short crater fly-ins to the Masai Mara and the gorillas of the Virunga volcanoes. The complete library, not just the highlights.')}</p>
       </div>
     </section>
 
     <section class="journeys section wrap">
-      <div class="countries" role="group" aria-label="Filter by country">
+      <div class="countries" role="group" aria-label={t('Filter by country')}>
         <button type="button" class="country country--active" aria-pressed="true" data-country="All">
-          All countries <span class="country__count">{journeys.length}</span>
+          {t('All countries')} <span class="country__count">{journeys.length}</span>
         </button>
         {countries.map((c) => (
           <button type="button" class="country" aria-pressed="false" data-country={c.name}>
-            {c.name} <span class="country__count">{c.count}</span>
+            {t(c.name)} <span class="country__count">{c.count}</span>
           </button>
         ))}
       </div>
 
-      <div class="journeys__tabs" role="tablist" aria-label="Journey categories">
+      <div class="journeys__tabs" role="tablist" aria-label={t('Journey categories')}>
         {filters.map((f, i) => (
           <button
             class:list={['tab', { 'tab--active': i === 0 }]}
@@ -59,7 +62,7 @@ const categoryCountries = (category: string) =>
             data-filter={f}
             data-countries={f === 'All' ? undefined : categoryCountries(f)}
           >
-            {f}
+            {f === 'All' ? t('All') : t(f)}
           </button>
         ))}
       </div>

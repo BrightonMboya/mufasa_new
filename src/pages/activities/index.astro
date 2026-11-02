@@ -3,10 +3,13 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
-import { activities, site } from '../../data/site';
+import { activities as activitiesData, site } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const title = `Add-On Activities — ${site.shortName}`;
-const description = 'Balloon safaris, canoeing, cultural visits and more — bookable extras that layer onto any Tanzania safari.';
+const { t, l, path } = useI18n(Astro);
+const activities = l(activitiesData);
+const title = t('Add-On Activities — {name}', { name: site.shortName });
+const description = t('Balloon safaris, canoeing, cultural visits and more — bookable extras that layer onto any Tanzania safari.');
 ---
 
 <Base title={title} description={description}>
@@ -14,22 +17,22 @@ const description = 'Balloon safaris, canoeing, cultural visits and more — boo
   <main>
     <section class="ahero">
       <div class="ahero__content wrap">
-        <span class="eyebrow" style="color: var(--color-accent-soft)">Add-On Activities</span>
-        <h1>Make the safari your own</h1>
-        <p class="ahero__lead">Bookable extras that layer onto any itinerary — a dawn balloon flight, a canoe past elephant, a night drive for the nocturnal hunters. Add one, or several.</p>
+        <span class="eyebrow" style="color: var(--color-accent-soft)">{t('Add-On Activities')}</span>
+        <h1>{t('Make the safari your own')}</h1>
+        <p class="ahero__lead">{t('Bookable extras that layer onto any itinerary — a dawn balloon flight, a canoe past elephant, a night drive for the nocturnal hunters. Add one, or several.')}</p>
       </div>
     </section>
 
     <section class="agrid section wrap">
       {activities.map((a, i) => (
-        <a class:list={['acard', { 'acard--featured': i === 0 }]} href={`/activities/${a.slug}`}>
+        <a class:list={['acard', { 'acard--featured': i === 0 }]} href={path(`/activities/${a.slug}`)}>
           <div class="acard__frame">
             <img src={a.image} alt={a.title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
           </div>
           <div class="acard__body">
             <h3 class="acard__title">{a.title}</h3>
             <p class="acard__tagline">{a.tagline}</p>
-            <span class="acard__cta">Learn more <span aria-hidden="true">&rarr;</span></span>
+            <span class="acard__cta">{t('Learn more')} <span aria-hidden="true">&rarr;</span></span>
           </div>
         </a>
       ))}

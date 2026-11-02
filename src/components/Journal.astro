@@ -1,39 +1,48 @@
 ---
 import { getCollection } from 'astro:content';
+import { useI18n } from '../i18n';
+
+const { t, path, tag } = useI18n(Astro);
 
 // The three most recent pieces. Posts live in the `blog` collection, which
 // /blog and the article pages read from too.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
+
+// Post titles and descriptions stay English; the category label is chrome.
+const categoryLabels: Record<string, string> = {
+  Safari: t('Safari'),
+  Climbing: t('Climbing'),
+};
 ---
 
 <section id="journal" class="journal section wrap">
   <div class="journal__intro">
-    <p class="eyebrow">Field Notes</p>
-    <h2>From the Journal</h2>
+    <p class="eyebrow">{t('Field Notes')}</p>
+    <h2>{t('From the Journal')}</h2>
     <p class="journal__lead">
-      Safari planning, Kilimanjaro prep, and the small details that make a trip — written by the guides and planners behind them.
+      {t('Safari planning, Kilimanjaro prep, and the small details that make a trip — written by the guides and planners behind them.')}
     </p>
   </div>
 
   <div class="journal__grid">
     {posts.map((post, i) => (
-      <a class="pcard" href={`/blog/${post.id}`}>
+      <a class="pcard" href={path(`/blog/${post.id}`)}>
         <div class="pcard__frame">
           <img src={post.data.image} alt={post.data.title} loading="lazy" decoding="async" />
         </div>
         <span class="pcard__meta">
-          {post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          {categoryLabels[post.data.category] ?? post.data.category} · {post.data.date.toLocaleDateString(tag, { month: 'short', year: 'numeric' })}
         </span>
         <h3 class="pcard__title">{post.data.title}</h3>
         <p class="pcard__desc">{post.data.description}</p>
-        <span class="pcard__cta">Read the story <span aria-hidden="true">&rarr;</span></span>
+        <span class="pcard__cta">{t('Read the story')} <span aria-hidden="true">&rarr;</span></span>
       </a>
     ))}
   </div>
 
-  <a href="/blog" class="pill pill--outline journal__all">Read the Journal</a>
+  <a href={path('/blog')} class="pill pill--outline journal__all">{t('Read the Journal')}</a>
 </section>
 
 <style>

@@ -3,10 +3,13 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
-import { destinations, site } from '../../data/site';
+import { destinations as destinationsData, site } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const title = `Destinations — ${site.shortName}`;
-const description = 'The parks and reserves our journeys are built from — the Serengeti, Ngorongoro, Tarangire, Lake Manyara, Ruaha, and Arusha National Park.';
+const { t, l, path } = useI18n(Astro);
+const destinations = l(destinationsData);
+const title = t('Destinations — {name}', { name: site.shortName });
+const description = t('The parks and reserves our journeys are built from — the Serengeti, Ngorongoro, Tarangire, Lake Manyara, Ruaha, and Arusha National Park.');
 ---
 
 <Base title={title} description={description}>
@@ -14,20 +17,20 @@ const description = 'The parks and reserves our journeys are built from — the 
   <main>
     <section class="dhero">
       <div class="dhero__content wrap">
-        <span class="eyebrow" style="color: var(--color-accent-soft)">Destinations</span>
-        <h1>The ground our routes are drawn on</h1>
-        <p class="dhero__lead">Every journey we build is a route through a small number of parks our guides know by heart. Six grounds, one country, no two alike.</p>
+        <span class="eyebrow" style="color: var(--color-accent-soft)">{t('Destinations')}</span>
+        <h1>{t('The ground our routes are drawn on')}</h1>
+        <p class="dhero__lead">{t('Every journey we build is a route through a small number of parks our guides know by heart. Six grounds, one country, no two alike.')}</p>
         <div class="dhero__stats">
-          <div class="dstat"><span class="dstat__value">06</span><span class="dstat__label">Parks &amp; reserves</span></div>
-          <div class="dstat"><span class="dstat__value">02</span><span class="dstat__label">Circuits, north &amp; south</span></div>
-          <div class="dstat"><span class="dstat__value">∞</span><span class="dstat__label">Routes drawn between them</span></div>
+          <div class="dstat"><span class="dstat__value">06</span><span class="dstat__label">{t('Parks & reserves')}</span></div>
+          <div class="dstat"><span class="dstat__value">02</span><span class="dstat__label">{t('Circuits, north & south')}</span></div>
+          <div class="dstat"><span class="dstat__value">∞</span><span class="dstat__label">{t('Routes drawn between them')}</span></div>
         </div>
       </div>
     </section>
 
     <section class="dindex section wrap">
       {destinations.map((d, i) => (
-        <a class="drow" href={`/destinations/${d.slug}`} data-index={i}>
+        <a class="drow" href={path(`/destinations/${d.slug}`)} data-index={i}>
           <div class="drow__media">
             <div class="drow__frame">
               <img src={d.image} alt={d.name} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
@@ -46,7 +49,7 @@ const description = 'The parks and reserves our journeys are built from — the 
                 </div>
               ))}
             </div>
-            <span class="drow__cta">Explore the park <span aria-hidden="true">&rarr;</span></span>
+            <span class="drow__cta">{t('Explore the park')} <span aria-hidden="true">&rarr;</span></span>
           </div>
         </a>
       ))}

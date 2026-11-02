@@ -1,0 +1,7 @@
+---
+/* Same page as /about.astro, rendered under /{lang}/. */
+import Page from '../about.astro';
+import { prefixedLangPaths } from '../../i18n';
+export const getStaticPaths = prefixedLangPaths;
+---
+<Page />

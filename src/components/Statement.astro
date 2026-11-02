@@ -1,12 +1,14 @@
 ---
 import { statement } from '../data/site';
+import { useI18n } from '../i18n';
+const { t } = useI18n(Astro);
 ---
 
 <section class="statement section wrap">
   <div class="statement__inner">
-    <p class="statement__lead">{statement.lead}</p>
+    <p class="statement__lead">{t(statement.lead)}</p>
     <div class="statement__body">
-      {statement.body.map((paragraph) => <p>{paragraph}</p>)}
+      {statement.body.map((paragraph) => <p>{t(paragraph)}</p>)}
     </div>
   </div>
 </section>

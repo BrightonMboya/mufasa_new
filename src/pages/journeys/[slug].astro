@@ -8,6 +8,7 @@ import JourneyEnquiryModal from '../../components/JourneyEnquiryModal.astro';
 import LodgeLightbox from '../../components/LodgeLightbox.astro';
 import { journeys, site, accommodationDirectory, journeyCountry } from '../../data/site';
 import { journeyPhoto } from '../../data/journey-cards';
+import { useI18n } from '../../i18n';
 
 export function getStaticPaths() {
   return journeys.map((j) => ({ params: { slug: j.slug }, props: { journey: j } }));
@@ -21,11 +22,22 @@ function lodgeFor(images?: string[]) {
   return match ? accommodationDirectory[match[1]] : undefined;
 }
 
+const { t, l, path } = useI18n(Astro);
 const { journey } = Astro.props;
+// Display copy only — slugs, filters and lodge lookups stay on `journey`.
+const lj = l(journey);
 // Same frame the listing card shows, so clicking a card doesn't swap the photo.
 const hero = journeyPhoto(journey.slug, journey.image);
-const stops = journey.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
-const title = `${journey.title} — ${journey.nights + 1} Days / ${journey.nights} ${journey.nights === 1 ? 'Night' : 'Nights'} in ${journeyCountry(journey)} | ${site.shortName}`;
+const stops = lj.days.map((d) => ({ days: d.days, place: d.place, note: d.note, optional: d.optional }));
+const durationVars = { days: journey.nights + 1, nights: journey.nights };
+const duration = journey.nights === 1
+  ? t('{days} Days / {nights} Night', durationVars)
+  : t('{days} Days / {nights} Nights', durationVars);
+const titleVars = { ...durationVars, title: lj.title, country: t(journeyCountry(journey)), site: site.shortName };
+const title = journey.nights === 1
+  ? t('{title} — {days} Days / {nights} Night in {country} | {site}', titleVars)
+  : t('{title} — {days} Days / {nights} Nights in {country} | {site}', titleVars);
+const nightsLabel = (n: number) => (n === 1 ? t('{n} night', { n }) : t('{n} nights', { n }));
 
 // north-to-sea is our packages hub: hero only, then every priced package
 // split by how you reach it — overland from Arusha, or flown in from Zanzibar.
@@ -50,27 +62,27 @@ const sameCountry = country === 'Tanzania'
 const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
 ---
 
-<Base title={title} description={journey.summary}>
+<Base title={title} description={lj.summary}>
   <Header />
   <main>
     <!-- Cinematic hero -->
     <section class="dhero">
-      <img class="dhero__img" src={hero.src} style={{ objectPosition: hero.position }} alt={journey.title} fetchpriority="high" data-hero-img decoding="async" />
+      <img class="dhero__img" src={hero.src} style={{ objectPosition: hero.position }} alt={lj.title} fetchpriority="high" data-hero-img decoding="async" />
       <div class="dhero__scrim"></div>
 
       <div class="dhero__top wrap">
       </div>
 
       <div class="dhero__content wrap">
-        <span class="dhero__cat">{journey.category}</span>
-        <h1>{journey.title}</h1>
+        <span class="dhero__cat">{lj.category}</span>
+        <h1>{lj.title}</h1>
         <div class="dhero__meta">
           <span class="dhero__meta-item">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <rect x="2" y="3.2" width="12" height="10.3" rx="1" stroke="currentColor" stroke-width="1.2"/>
               <path d="M2 6.3h12M5.3 1.5v2.6M10.7 1.5v2.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
-            {journey.nights + 1} Days / {journey.nights} {journey.nights === 1 ? 'Night' : 'Nights'}
+            {duration}
           </span>
           <span class="dhero__dot"></span>
           <span class="dhero__meta-item">
@@ -78,14 +90,14 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
               <path d="M8 14.5s5-4.6 5-8.3A5 5 0 0 0 3 6.2c0 3.7 5 8.3 5 8.3Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
               <circle cx="8" cy="6.1" r="1.8" stroke="currentColor" stroke-width="1.2"/>
             </svg>
-            {site.region}
+            {t(site.region)}
           </span>
         </div>
       </div>
 
       {!isPackagesHub && (
         <div class="dhero__scroll" aria-hidden="true">
-          <span>Scroll</span>
+          <span>{t('Scroll')}</span>
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3.5 6 8 11l4.5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -97,26 +109,28 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
       <Fragment>
         <!-- Introduction + trip stats -->
         <section class="intro section wrap">
-          <p class="eyebrow" data-reveal>The Journey</p>
-          <p class="intro__summary" data-reveal>{journey.summary}</p>
+          <p class="eyebrow" data-reveal>{t('The Journey')}</p>
+          <p class="intro__summary" data-reveal>{lj.summary}</p>
           <div class="intro__stats" data-reveal>
             <div class="stat">
-              <span class="stat__label">Duration</span>
-              <span class="stat__value">{journey.nights + 1} Days / {journey.nights} {journey.nights === 1 ? 'Night' : 'Nights'}</span>
+              <span class="stat__label">{t('Duration')}</span>
+              <span class="stat__value">{duration}</span>
             </div>
             <span class="stat__divider"></span>
             <div class="stat">
-              <span class="stat__label">Route</span>
-              <span class="stat__value">{journey.days.filter((d) => !d.optional).length} grounds{journey.days.some((d) => d.optional) ? ' + extension' : ''}</span>
+              <span class="stat__label">{t('Route')}</span>
+              <span class="stat__value">{journey.days.some((d) => d.optional)
+                ? t('{n} grounds + extension', { n: journey.days.filter((d) => !d.optional).length })
+                : t('{n} grounds', { n: journey.days.filter((d) => !d.optional).length })}</span>
             </div>
             <span class="stat__divider"></span>
             <div class="stat">
-              <span class="stat__label">From / Person</span>
+              <span class="stat__label">{t('From / Person')}</span>
               <span class="stat__value stat__value--price">{journey.priceFrom}</span>
             </div>
           </div>
           <button type="button" class="pill pill--accent intro__cta" data-emodal-open>
-            Enquire about this journey
+            {t('Enquire about this journey')}
             <svg class="cta-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path d="M6 3.5 11 8l-5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -126,11 +140,11 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
         <!-- Route -->
         <section class="rstrip section wrap">
           <div class="rstrip__head">
-            <h2 class="rstrip__title" data-reveal>Your Route</h2>
+            <h2 class="rstrip__title" data-reveal>{t('Your Route')}</h2>
             <div class="itin__legend">
-              <span class="legend"><span class="legend__line legend__line--solid"></span>Core route</span>
+              <span class="legend"><span class="legend__line legend__line--solid"></span>{t('Core route')}</span>
               {journey.days.some((d) => d.optional) && (
-                <span class="legend"><span class="legend__line legend__line--dashed"></span>Extension</span>
+                <span class="legend"><span class="legend__line legend__line--dashed"></span>{t('Extension')}</span>
               )}
             </div>
           </div>
@@ -140,13 +154,14 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
         <!-- Day by day -->
         <section class="dbd">
           <div class="dbd__head wrap">
-            <p class="eyebrow" data-reveal>Day by Day</p>
-            <h2 class="dbd__title" data-reveal>The Full Itinerary</h2>
+            <p class="eyebrow" data-reveal>{t('Day by Day')}</p>
+            <h2 class="dbd__title" data-reveal>{t('The Full Itinerary')}</h2>
           </div>
 
           {journey.days.map((d, i) => {
             const bandImage = d.bandImage || (d.images && d.images[0]) || journey.image;
             const lodge = lodgeFor(d.images);
+            const ld = lj.days[i];
             return (
               <Fragment>
                 <article class="day">
@@ -154,7 +169,7 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
                     <img
                       class="day__band-img"
                       src={bandImage}
-                      alt={d.place}
+                      alt={ld.place}
                       loading={i === 0 ? 'eager' : 'lazy'}
                     decoding="async" />
                     <div class="day__band-scrim"></div>
@@ -163,18 +178,18 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
                         <span class="day__num">{String(i + 1).padStart(2, '0')}</span>
                         <div class="day__band-meta">
                           <p class="day__range">
-                            {d.days}
-                            {d.optional && <span class="day__tag">Optional</span>}
+                            {ld.days}
+                            {d.optional && <span class="day__tag">{t('Optional')}</span>}
                           </p>
-                          <p class="day__nights">{d.nights} {d.nights === 1 ? 'night' : 'nights'}</p>
+                          <p class="day__nights">{nightsLabel(d.nights)}</p>
                         </div>
                       </div>
-                      <h3 class="day__place" data-reveal>{d.place}</h3>
+                      <h3 class="day__place" data-reveal>{ld.place}</h3>
                     </div>
                   </div>
 
                   <div class="day__narrative wrap">
-                    <p class="day__note" data-reveal>{d.note}</p>
+                    <p class="day__note" data-reveal>{ld.note}</p>
                   </div>
 
                   {d.images && d.images.length > 0 && (
@@ -183,7 +198,7 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
                         {d.images.map((src, gi) => (
                           <img
                             src={src}
-                            alt={lodge?.name ?? d.place}
+                            alt={lodge?.name ?? ld.place}
                             loading="lazy"
                             class:list={['day__gallery-img', { 'is-active': gi === 0 }]}
                             data-gallery-slide
@@ -191,15 +206,15 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
                         ))}
                         {d.images.length > 1 && (
                           <Fragment>
-                            <button type="button" class="day__gallery-nav day__gallery-nav--prev" data-gallery-prev aria-label="Previous photo">&#8249;</button>
-                            <button type="button" class="day__gallery-nav day__gallery-nav--next" data-gallery-next aria-label="Next photo">&#8250;</button>
+                            <button type="button" class="day__gallery-nav day__gallery-nav--prev" data-gallery-prev aria-label={t('Previous photo')}>&#8249;</button>
+                            <button type="button" class="day__gallery-nav day__gallery-nav--next" data-gallery-next aria-label={t('Next photo')}>&#8250;</button>
                             <div class="day__gallery-dots" data-gallery-dots>
                               {d.images.map((_, gi) => (
                                 <button
                                   type="button"
                                   class:list={['day__gallery-dot', { 'is-active': gi === 0 }]}
                                   data-gallery-dot
-                                  aria-label={`Photo ${gi + 1}`}
+                                  aria-label={t('Photo {n}', { n: gi + 1 })}
                                 ></button>
                               ))}
                             </div>
@@ -209,20 +224,20 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
                           type="button"
                           class="day__gallery-expand"
                           data-lodge-gallery={JSON.stringify(d.images)}
-                          aria-label={`View all ${d.images.length} photos`}
+                          aria-label={t('View all {n} photos', { n: d.images.length })}
                         >
-                          {d.images.length} photos
+                          {t('{n} photos', { n: d.images.length })}
                         </button>
                       </div>
                       <div class="day__stay-content">
-                        <p class="eyebrow" data-reveal>Where You'll Stay</p>
-                        <h4 class="day__stay-title" data-reveal>{lodge?.name ?? d.place}</h4>
+                        <p class="eyebrow" data-reveal>{t("Where You'll Stay")}</p>
+                        <h4 class="day__stay-title" data-reveal>{lodge?.name ?? ld.place}</h4>
                         {lodge?.description && (
-                          <p class="day__stay-desc" data-reveal>{lodge.description}</p>
+                          <p class="day__stay-desc" data-reveal>{t(lodge.description)}</p>
                         )}
                         <p class="day__stay-meta" data-reveal>
-                          {lodge?.name && <Fragment>{d.place} · </Fragment>}
-                          {d.nights} {d.nights === 1 ? 'night' : 'nights'}{d.optional ? ' · Optional extension' : ''}
+                          {lodge?.name && <Fragment>{ld.place} · </Fragment>}
+                          {nightsLabel(d.nights)}{d.optional ? ` · ${t('Optional extension')}` : ''}
                         </p>
                       </div>
                     </div>
@@ -245,13 +260,13 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
         <section class="pricing">
           <div class="wrap pricing__grid">
             <div class="pricing__price" data-reveal>
-              <p class="eyebrow pricing__eyebrow">Investment</p>
+              <p class="eyebrow pricing__eyebrow">{t('Investment')}</p>
               <p class="pricing__amount">{journey.priceFrom}</p>
               <p class="pricing__caption">
-                Per person, sharing — full board, park fees, and a private guide for the whole route.
+                {t('Per person, sharing — full board, park fees, and a private guide for the whole route.')}
               </p>
               <button type="button" class="pill pill--accent pricing__cta" data-emodal-open>
-                Enquire about this journey
+                {t('Enquire about this journey')}
                 <svg class="cta-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none">
                   <path d="M6 3.5 11 8l-5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -262,19 +277,19 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
               <div class="pricing__col" data-reveal>
                 <div class="pricing__col-head">
                   <span class="pricing__badge pricing__badge--yes">&#10003;</span>
-                  <h3>Included</h3>
+                  <h3>{t('Included')}</h3>
                 </div>
                 <ul>
-                  {journey.included.map((x) => <li>{x}</li>)}
+                  {lj.included.map((x) => <li>{x}</li>)}
                 </ul>
               </div>
               <div class="pricing__col" data-reveal>
                 <div class="pricing__col-head">
                   <span class="pricing__badge pricing__badge--no">&#10005;</span>
-                  <h3>Not Included</h3>
+                  <h3>{t('Not Included')}</h3>
                 </div>
                 <ul>
-                  {journey.excluded.map((x) => <li>{x}</li>)}
+                  {lj.excluded.map((x) => <li>{x}</li>)}
                 </ul>
               </div>
             </div>
@@ -286,37 +301,37 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
     {/* Packages hub: every priced route, grouped by how you reach it */}
     {isPackagesHub ? (
       <section class="related related--hub section wrap">
-        <h2 class="related__title">Popular Packages</h2>
+        <h2 class="related__title">{t('Popular Packages')}</h2>
 
         <div class="pkg-group">
-          <h3 class="pkg-group__title">Northern Circuit</h3>
+          <h3 class="pkg-group__title">{t('Northern Circuit')}</h3>
           <div class="related__grid">
             {northernCircuitPackages.map((r) => (
-              <a class="rcard" href={`/journeys/${r.slug}`}>
+              <a class="rcard" href={path(`/journeys/${r.slug}`)}>
                 <div class="rcard__frame">
-                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.packageTitle ?? r.title} loading="lazy" decoding="async" />
-                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={t(r.packageTitle ?? r.title)} loading="lazy" decoding="async" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">{t('/ person')}</span></span>
                 </div>
-                <span class="rcard__meta">{r.meta}</span>
-                <h3 class="rcard__title">{r.packageTitle ?? r.title}</h3>
-                <span class="rcard__cta">View itinerary</span>
+                <span class="rcard__meta">{t(r.meta)}</span>
+                <h3 class="rcard__title">{t(r.packageTitle ?? r.title)}</h3>
+                <span class="rcard__cta">{t('View itinerary')}</span>
               </a>
             ))}
           </div>
         </div>
 
         <div class="pkg-group">
-          <h3 class="pkg-group__title">Fly-In, Fly-Out from Zanzibar</h3>
+          <h3 class="pkg-group__title">{t('Fly-In, Fly-Out from Zanzibar')}</h3>
           <div class="related__grid">
             {flyInPackages.map((r) => (
-              <a class="rcard" href={`/journeys/${r.slug}`}>
+              <a class="rcard" href={path(`/journeys/${r.slug}`)}>
                 <div class="rcard__frame">
-                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.packageTitle ?? r.title} loading="lazy" decoding="async" />
-                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={t(r.packageTitle ?? r.title)} loading="lazy" decoding="async" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">{t('/ person')}</span></span>
                 </div>
-                <span class="rcard__meta">{r.meta}</span>
-                <h3 class="rcard__title">{r.packageTitle ?? r.title}</h3>
-                <span class="rcard__cta">View itinerary</span>
+                <span class="rcard__meta">{t(r.meta)}</span>
+                <h3 class="rcard__title">{t(r.packageTitle ?? r.title)}</h3>
+                <span class="rcard__cta">{t('View itinerary')}</span>
               </a>
             ))}
           </div>
@@ -325,17 +340,17 @@ const related = [...sameCountry, ...featured].slice(0, FEATURED_SLUGS.length);
     ) : (
       related.length > 0 && (
         <section class="related section wrap">
-          <h2 class="related__title">Popular Packages</h2>
+          <h2 class="related__title">{t('Popular Packages')}</h2>
           <div class="related__grid">
             {related.map((r) => (
-              <a class="rcard" href={`/journeys/${r.slug}`}>
+              <a class="rcard" href={path(`/journeys/${r.slug}`)}>
                 <div class="rcard__frame">
-                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={r.title} loading="lazy" decoding="async" />
-                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">/ person</span></span>
+                  <img src={journeyPhoto(r.slug, r.image).src} style={{ objectPosition: journeyPhoto(r.slug, r.image).position }} alt={t(r.title)} loading="lazy" decoding="async" />
+                  <span class="rcard__price">{r.priceFrom} <span class="rcard__price-unit">{t('/ person')}</span></span>
                 </div>
-                <span class="rcard__meta">{r.meta}</span>
-                <h3 class="rcard__title">{r.title}</h3>
-                <span class="rcard__cta">View itinerary</span>
+                <span class="rcard__meta">{t(r.meta)}</span>
+                <h3 class="rcard__title">{t(r.title)}</h3>
+                <span class="rcard__cta">{t('View itinerary')}</span>
               </a>
             ))}
           </div>

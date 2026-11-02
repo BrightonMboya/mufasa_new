@@ -1,16 +1,19 @@
 ---
 import { enquiry, site } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
 ---
 
 <!-- A plain band, no photo: the footer below is a full-bleed scene, and two
      photo sections back to back fight each other. -->
 <section id="enquiry" class="enquiry section">
   <div class="enquiry__content wrap">
-    <h2>{enquiry.title}</h2>
-    <p>{enquiry.body}</p>
+    <h2>{t(enquiry.title)}</h2>
+    <p>{t(enquiry.body)}</p>
     <div class="enquiry__cta">
-      <a href="/trip-planner" class="pill pill--accent">Start the conversation</a>
-      <a href={`mailto:${site.email}`} class="pill pill--outline">Email us</a>
+      <a href={path('/trip-planner')} class="pill pill--accent">{t('Start the conversation')}</a>
+      <a href={`mailto:${site.email}`} class="pill pill--outline">{t('Email us')}</a>
     </div>
   </div>
 </section>

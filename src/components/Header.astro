@@ -1,19 +1,30 @@
 ---
 import { site, nav } from '../data/site';
+import { useI18n, LANGS, LANG_NAMES, LANG_TAGS, localizePath, stripLang } from '../i18n';
+
+const { t, path, lang } = useI18n(Astro);
+/* Each language option points at this same page in that language. */
+const basePath = stripLang(Astro.url.pathname);
+const languages = LANGS.map((l) => ({
+  code: l,
+  name: LANG_NAMES[l],
+  href: localizePath(basePath, l) + Astro.url.search,
+  current: l === lang,
+}));
 
 /* wa.me wants the number in full international form, digits only. The message
    is pre-filled so an enquiry arrives with context rather than just "hi". */
 const whatsappNumber = site.phone.replace(/\D/g, '');
-const whatsappText = encodeURIComponent('Hello ' + site.shortName + ", I'd like to plan a trip to Tanzania.");
+const whatsappText = encodeURIComponent(t("Hello {name}, I'd like to plan a trip to Tanzania.", { name: site.shortName }));
 const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText;
 ---
 
 <header class="header">
-  <a href="/" class="brand" aria-label={`${site.name} — home`}>
+  <a href={path('/')} class="brand" aria-label={t('{name} — home', { name: site.name })}>
     <img src={site.logo} alt={site.name} width="1263" height="350" decoding="async" />
   </a>
 
-  <nav class="nav" aria-label="Primary">
+  <nav class="nav" aria-label={t('Primary')}>
     <ul class="nav__links" data-nav-links>
       {nav.map((item, i) => (
         item.children ? (
@@ -25,19 +36,19 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
               aria-controls={`nav-menu-${i}`}
               data-nav-parent
             >
-              {item.label}
+              {t(item.label)}
               <svg class="nav__chev" width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true">
                 <path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
             <ul class="nav__menu" id={`nav-menu-${i}`}>
               {item.children.map((child) => (
-                <li><a href={child.href}>{child.label}</a></li>
+                <li><a href={path(child.href)}>{t(child.label)}</a></li>
               ))}
             </ul>
           </li>
         ) : (
-          <li><a href={item.href}>{item.label}</a></li>
+          <li><a href={path(item.href)}>{t(item.label)}</a></li>
         )
       ))}
     </ul>
@@ -49,15 +60,50 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
       class="callus"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Message ${site.shortName} on WhatsApp`}
+      aria-label={t('Message {name} on WhatsApp', { name: site.shortName })}
     >
       <svg class="callus__icon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.347-.347.52-.52.174-.174.232-.298.347-.497.115-.198.057-.371-.03-.52-.086-.148-.66-1.594-.904-2.183-.24-.579-.486-.5-.667-.51-.174-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
       </svg>
       <span class="callus__number">{site.phone}</span>
     </a>
-    <a href="/trip-planner" class="pill pill--accent actions__cta">Contact Us</a>
-    <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+    <div class="lang" data-lang>
+      <button
+        type="button"
+        class="lang__btn"
+        aria-expanded="false"
+        aria-controls="lang-menu"
+        aria-label={t('Language: {name}', { name: LANG_NAMES[lang] })}
+        data-lang-btn
+      >
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.4" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M1.8 8h12.4M8 1.6c1.7 1.8 2.6 4 2.6 6.4S9.7 12.6 8 14.4C6.3 12.6 5.4 10.4 5.4 8S6.3 3.4 8 1.6Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+        <span class="lang__code">{lang.toUpperCase()}</span>
+        <svg class="lang__chev" width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true">
+          <path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <ul class="lang__menu" id="lang-menu">
+        {languages.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              hreflang={LANG_TAGS[l.code]}
+              lang={LANG_TAGS[l.code]}
+              aria-current={l.current ? 'true' : undefined}
+              data-lang-link={l.code}
+            >
+              <span class="lang__name">{l.name}</span>
+              <span class="lang__abbr">{l.code.toUpperCase()}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <a href={path('/trip-planner')} class="pill pill--accent actions__cta">{t('Contact Us')}</a>
+    <button class="nav__toggle" type="button" aria-label={t('Open menu')} aria-expanded="false" data-nav-toggle>
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -201,6 +247,70 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
     padding: 0.8rem 1.7rem;
   }
 
+  /* Language switcher. Same panel language as the Journeys menu. */
+  .lang { position: relative; }
+  .lang__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    color: var(--color-ink);
+    padding-block: 0.4rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .lang__btn:hover,
+  .lang__btn[aria-expanded='true'] { color: var(--color-accent); }
+  .lang__chev { transition: transform 0.2s ease; }
+  .lang__btn[aria-expanded='true'] .lang__chev { transform: rotate(180deg); }
+  .lang__menu {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    right: -1rem;
+    min-width: 10.5rem;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    list-style: none;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 14px 34px rgba(20, 24, 21, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+    z-index: 40;
+  }
+  .lang__menu[data-open='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .lang__menu a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.6rem;
+    border-radius: calc(var(--radius-sm) - 2px);
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .lang__menu a:hover { background-color: var(--color-ground); color: var(--color-accent); }
+  .lang__menu a[aria-current='true'] { color: var(--color-accent); font-weight: var(--fw-medium); }
+  .lang__abbr {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-slate);
+  }
+
   .nav__toggle {
     display: none;
     flex-direction: column;
@@ -310,10 +420,29 @@ const whatsappHref = 'https://wa.me/' + whatsappNumber + '?text=' + whatsappText
       else menu?.setAttribute('data-open', 'true');
     });
   });
+  /* Language switcher: click to open; a choice carries the current #hash
+     across so a switch mid-page lands on the same section. */
+  const langBtn = document.querySelector('[data-lang-btn]');
+  const langMenu = document.getElementById('lang-menu');
+  function setLangOpen(open) {
+    langBtn?.setAttribute('aria-expanded', String(open));
+    if (open) langMenu?.setAttribute('data-open', 'true');
+    else langMenu?.removeAttribute('data-open');
+  }
+  langBtn?.addEventListener('click', () => {
+    setLangOpen(langBtn.getAttribute('aria-expanded') !== 'true');
+  });
+  document.querySelectorAll('[data-lang-link]').forEach((a) => {
+    a.addEventListener('click', () => {
+      if (location.hash && a instanceof HTMLAnchorElement && !a.hash) a.hash = location.hash;
+    });
+  });
+
   document.addEventListener('click', (e) => {
     if (!(e.target instanceof Element) || !e.target.closest('[data-nav-group]')) closeMenus(null);
+    if (!(e.target instanceof Element) || !e.target.closest('[data-lang]')) setLangOpen(false);
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenus(null);
+    if (e.key === 'Escape') { closeMenus(null); setLangOpen(false); }
   });
 </script>

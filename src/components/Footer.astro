@@ -1,23 +1,26 @@
 ---
 import { site, footerLinks } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
 ---
 
 <footer class="footer section wrap">
   <div class="footer__inner">
     <div class="footer__brand">
       <img class="footer__mark" src={site.logo} alt={site.name} width="1263" height="350" loading="lazy" decoding="async" />
-      <p>{site.address[0]}<br />{site.address[1]}</p>
+      <p>{site.address[0]}<br />{t(site.address[1])}</p>
     </div>
 
     <div class="footer__cols">
       {footerLinks.map((col) => (
         <div class="footer__col">
-          <span class="footer__heading">{col.heading}</span>
-          {col.links.map((link) => <a href={link.href}>{link.label}</a>)}
+          <span class="footer__heading">{t(col.heading)}</span>
+          {col.links.map((link) => <a href={path(link.href)}>{t(link.label)}</a>)}
         </div>
       ))}
       <div class="footer__col">
-        <span class="footer__heading">Reach Us</span>
+        <span class="footer__heading">{t('Reach Us')}</span>
         <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>
         <a href={`mailto:${site.email}`}>{site.email}</a>
       </div>

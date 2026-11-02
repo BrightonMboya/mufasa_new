@@ -1,27 +1,30 @@
 ---
 import { beyondTanzania } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
 
 const cards = beyondTanzania.countries;
 ---
 
 <section id="beyond" class="beyond section wrap">
   <div class="beyond__head">
-    <h2>{beyondTanzania.title}</h2>
-    <p>{beyondTanzania.body}</p>
+    <h2>{t(beyondTanzania.title)}</h2>
+    <p>{t(beyondTanzania.body)}</p>
   </div>
 
   <div class="beyond__grid">
     {cards.map((c) => (
-      <a class="bcard" href={c.href}>
+      <a class="bcard" href={path(c.href)}>
         <div class="bcard__media">
           <img src={c.image} alt="" loading="lazy" decoding="async" />
         </div>
         <div class="bcard__body">
-          <h3 class="bcard__name">{c.name}</h3>
+          <h3 class="bcard__name">{t(c.name)}</h3>
           <div class="bcard__foot">
-            <p class="bcard__line">{c.line}</p>
+            <p class="bcard__line">{t(c.line)}</p>
             <span class="bcard__cta">
-              View journeys
+              {t('View journeys')}
               <svg width="16" height="11" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M1 5h12M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
           </div>

@@ -1,26 +1,28 @@
 ---
 import { experiences } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
 ---
 
 <section id="experiences" class="exp section wrap">
   <div class="exp__head">
-    <h2>The experiences people come for</h2>
+    <h2>{t('The experiences people come for')}</h2>
     <p>
-      The Great Migration, the cats, the coast, the roof of Africa — the
-      journeys below are built around these.
+      {t('The Great Migration, the cats, the coast, the roof of Africa — the journeys below are built around these.')}
     </p>
   </div>
 
   <div class="exp__grid">
     {experiences.map((x) => (
-      <a class="excard" href={x.href}>
+      <a class="excard" href={path(x.href)}>
         <div class="excard__media">
-          <img src={x.image} alt={x.title} loading="lazy" decoding="async" />
+          <img src={x.image} alt={t(x.title)} loading="lazy" decoding="async" />
         </div>
         <div class="excard__body">
-          <span class="excard__place">{x.place} · {x.season}</span>
-          <h3 class="excard__title">{x.title}</h3>
-          <span class="excard__cta">Explore this</span>
+          <span class="excard__place">{t(x.place)} · {t(x.season)}</span>
+          <h3 class="excard__title">{t(x.title)}</h3>
+          <span class="excard__cta">{t('Explore this')}</span>
         </div>
       </a>
     ))}

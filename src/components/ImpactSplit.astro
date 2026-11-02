@@ -1,20 +1,23 @@
 ---
 import { impact } from '../data/site';
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
 ---
 
 <!-- Half copy on deep green, half photograph. Below 860px the photo moves
      under the copy rather than shrinking to a sliver. -->
 <section id="impact" class="impact">
   <div class="impact__text">
-    <span class="eyebrow">{impact.eyebrow}</span>
-    <h2>{impact.title}</h2>
-    <p>{impact.teaser.body}</p>
-    <a href={impact.teaser.cta.href} class="pill pill--sand">{impact.teaser.cta.label}</a>
+    <span class="eyebrow">{t(impact.eyebrow)}</span>
+    <h2>{t(impact.title)}</h2>
+    <p>{t(impact.teaser.body)}</p>
+    <a href={path(impact.teaser.cta.href)} class="pill pill--sand">{t(impact.teaser.cta.label)}</a>
   </div>
   <img
     class="impact__img"
     src={impact.teaser.image}
-    alt={impact.teaser.imageAlt}
+    alt={t(impact.teaser.imageAlt)}
     loading="lazy"
     decoding="async"
   />

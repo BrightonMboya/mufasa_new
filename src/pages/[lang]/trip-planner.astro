@@ -1,0 +1,7 @@
+---
+/* Same page as /trip-planner.astro, rendered under /{lang}/. */
+import Page from '../trip-planner.astro';
+import { prefixedLangPaths } from '../../i18n';
+export const getStaticPaths = prefixedLangPaths;
+---
+<Page />

@@ -5,14 +5,20 @@ import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import { site } from '../../data/site';
 import { getCollection } from 'astro:content';
+import { useI18n } from '../../i18n';
+
+const { t, path, tag } = useI18n(Astro);
 
 const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
-const title = `Journal — ${site.shortName}`;
-const description = 'Field notes on Tanzania safaris, Kilimanjaro, and the wild south — written by the people who plan the journeys.';
+const title = t('Journal — {name}', { name: site.shortName });
+const description = t('Field notes on Tanzania safaris, Kilimanjaro, and the wild south — written by the people who plan the journeys.');
 const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.category)))];
+/* Labels are translated for display; data-filter/data-category keep the English value. */
+const categoryLabels: Record<string, string> = { All: t('All'), Safari: t('Safari'), Climbing: t('Climbing') };
+const categoryLabel = (c: string) => categoryLabels[c] ?? c;
 ---
 
 <Base title={title} description={description}>
@@ -21,15 +27,15 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
     <!-- Hero -->
     <section class="jhero">
       <div class="jhero__content wrap">
-        <span class="eyebrow" style="color: var(--color-accent-soft)">Journal</span>
-        <h1>Field notes from Tanzania</h1>
-        <p class="jhero__lead">Safari planning, Kilimanjaro prep, and the small details that make a trip — written by the guides and planners behind them.</p>
+        <span class="eyebrow" style="color: var(--color-accent-soft)">{t('Journal')}</span>
+        <h1>{t('Field notes from Tanzania')}</h1>
+        <p class="jhero__lead">{t('Safari planning, Kilimanjaro prep, and the small details that make a trip — written by the guides and planners behind them.')}</p>
       </div>
     </section>
 
     <!-- Posts -->
     <section class="jposts section wrap">
-      <div class="jposts__tabs" role="tablist" aria-label="Journal categories">
+      <div class="jposts__tabs" role="tablist" aria-label={t('Journal categories')}>
         {filters.map((f, i) => (
           <button
             class:list={['tab', { 'tab--active': i === 0 }]}
@@ -37,7 +43,7 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
             aria-selected={i === 0}
             data-filter={f}
           >
-            {f}
+            {categoryLabel(f)}
           </button>
         ))}
       </div>
@@ -46,17 +52,17 @@ const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.categor
         {allPosts.map((post, i) => (
           <a
             class:list={['pcard', { 'pcard--featured': i === 0 }]}
-            href={`/blog/${post.id}`}
+            href={path(`/blog/${post.id}`)}
             data-category={post.data.category}
           >
             <div class="pcard__frame">
               <img src={post.data.image} alt={post.data.title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
             </div>
             <div class="pcard__body">
-              <span class="pcard__meta">{post.data.category} · {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              <span class="pcard__meta">{categoryLabel(post.data.category)} · {post.data.date.toLocaleDateString(tag, { month: 'short', year: 'numeric' })}</span>
               <h3 class="pcard__title">{post.data.title}</h3>
               <p class="pcard__desc">{post.data.description}</p>
-              <span class="pcard__cta">Read {i === 0 ? 'the story' : ''} <span aria-hidden="true">&rarr;</span></span>
+              <span class="pcard__cta">{i === 0 ? t('Read the story') : t('Read')} <span aria-hidden="true">&rarr;</span></span>
             </div>
           </a>
         ))}

@@ -1,5 +1,7 @@
 ---
 import { hero } from '../data/site';
+import { useI18n } from '../i18n';
+const { t, path } = useI18n(Astro);
 
 
 ---
@@ -25,10 +27,10 @@ import { hero } from '../data/site';
   <div class="hero__scrim"></div>
 
   <div class="hero__headline wrap">
-    <h1>{hero.title}</h1>
-    <p>{hero.subtitle}</p>
-    <a href={hero.cta.href} class="hero__cta">
-      {hero.cta.label}
+    <h1>{t(hero.title)}</h1>
+    <p>{t(hero.subtitle)}</p>
+    <a href={path(hero.cta.href)} class="hero__cta">
+      {t(hero.cta.label)}
       <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
         <path d="M1 6h13m0 0-4.5-4.5M14 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>

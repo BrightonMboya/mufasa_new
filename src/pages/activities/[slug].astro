@@ -4,12 +4,14 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import { activities, site } from '../../data/site';
+import { useI18n } from '../../i18n';
 
 export function getStaticPaths() {
   return activities.map((a) => ({ params: { slug: a.slug }, props: { activity: a } }));
 }
 
-const { activity } = Astro.props;
+const { t, l, path } = useI18n(Astro);
+const activity = l(Astro.props.activity);
 const title = `${activity.title} — ${site.shortName}`;
 const d = activity.details as {
   location?: string[];
@@ -36,23 +38,23 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
       <div class="overview__lead">
         <p class="overview__summary">{activity.lead}</p>
         {activity.body.map((p: string) => <p class="overview__p">{p}</p>)}
-        <a href="/trip-planner" class="pill pill--accent">Add this to my safari</a>
+        <a href={path('/trip-planner')} class="pill pill--accent">{t('Add this to my safari')}</a>
       </div>
 
       {hasFacts && (
         <aside class="facts">
           {d.duration && (
-            <div class="fact"><span class="fact__label">Duration</span><span class="fact__value">{d.duration}</span></div>
+            <div class="fact"><span class="fact__label">{t('Duration')}</span><span class="fact__value">{d.duration}</span></div>
           )}
           {d.bestTime && (
-            <div class="fact"><span class="fact__label">Best time</span><span class="fact__value">{d.bestTime}</span></div>
+            <div class="fact"><span class="fact__label">{t('Best time')}</span><span class="fact__value">{d.bestTime}</span></div>
           )}
           {d.price && (
-            <div class="fact"><span class="fact__label">Price</span><span class="fact__value">{d.price}</span></div>
+            <div class="fact"><span class="fact__label">{t('Price')}</span><span class="fact__value">{d.price}</span></div>
           )}
           {d.requirements?.length ? (
             <div class="fact">
-              <span class="fact__label">Good to know</span>
+              <span class="fact__label">{t('Good to know')}</span>
               <ul class="fact__list">
                 {d.requirements.map((r) => <li>{r}</li>)}
               </ul>
@@ -63,7 +65,7 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
     </section>
 
     <section class="highlights section wrap">
-      <h2>Why add this</h2>
+      <h2>{t('Why add this')}</h2>
       <ul class="highlights__list">
         {activity.highlights.map((h: string) => <li>{h}</li>)}
       </ul>
@@ -71,7 +73,7 @@ const hasFacts = Boolean(d.bestTime || d.price || d.duration || d.requirements?.
 
     {d.location?.length ? (
       <section class="locations section wrap">
-        <h2>Where to do it</h2>
+        <h2>{t('Where to do it')}</h2>
         <ul class="locations__list">
           {d.location.map((loc) => <li>{loc}</li>)}
         </ul>

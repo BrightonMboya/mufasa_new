@@ -2,49 +2,53 @@
 // Homepage segment: reframes the same journeys around who is coming along.
 // Simple centered layout — image, plain caption, one shared CTA into the
 // trip planner, which already opens with "who is travelling?".
+import { useI18n } from '../i18n';
+
+const { t, path } = useI18n(Astro);
+
 const types = [
   {
-    title: 'Family Safaris',
+    title: t('Family Safaris'),
     image: '/media/travelers/family.jpg',
-    alt: 'A Maasai guide walking a family through open grassland, zebra grazing behind them',
+    alt: t('A Maasai guide walking a family through open grassland, zebra grazing behind them'),
   },
   {
-    title: 'Honeymoons & Celebrations',
+    title: t('Honeymoons & Celebrations'),
     image: '/media/travelers/honeymoon.jpg',
-    alt: 'A couple embracing beside a sundowner table at sunset, champagne in hand',
+    alt: t('A couple embracing beside a sundowner table at sunset, champagne in hand'),
   },
   {
-    title: 'Friends & Large Groups',
+    title: t('Friends & Large Groups'),
     image: '/media/travelers/friends.jpg',
-    alt: 'Maasai dancers and a group of laughing guests together on a lantern-lit camp deck',
+    alt: t('Maasai dancers and a group of laughing guests together on a lantern-lit camp deck'),
   },
   {
-    title: 'Solo Journeys',
+    title: t('Solo Journeys'),
     image: '/media/travelers/solo.jpg',
-    alt: 'A woman sitting alone above a fire bowl at dusk with a glass of wine, looking out over the bush',
+    alt: t('A woman sitting alone above a fire bowl at dusk with a glass of wine, looking out over the bush'),
   },
 ];
 ---
 
 <section class="trav section wrap">
   <div class="trav__head">
-    <h2>Who's coming with you?</h2>
-    <p>Every route on this site can be shaped around any of these.</p>
+    <h2>{t("Who's coming with you?")}</h2>
+    <p>{t('Every route on this site can be shaped around any of these.')}</p>
   </div>
 
   <div class="trav__grid">
-    {types.map((t) => (
-      <a class="travcard" href="/trip-planner">
+    {types.map((type) => (
+      <a class="travcard" href={path('/trip-planner')}>
         <div class="travcard__frame">
-          <img src={t.image} alt={t.alt} loading="lazy" decoding="async" />
+          <img src={type.image} alt={type.alt} loading="lazy" decoding="async" />
         </div>
-        <h3 class="travcard__title">{t.title}</h3>
+        <h3 class="travcard__title">{type.title}</h3>
       </a>
     ))}
   </div>
 
   <div class="trav__foot">
-    <a href="/trip-planner" class="pill pill--accent">Tell us who's travelling</a>
+    <a href={path('/trip-planner')} class="pill pill--accent">{t("Tell us who's travelling")}</a>
   </div>
 </section>
 

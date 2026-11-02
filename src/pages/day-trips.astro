@@ -4,9 +4,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Enquiry from '../components/Enquiry.astro';
 import JourneyEnquiryModal from '../components/JourneyEnquiryModal.astro';
-import { dayTrips, site } from '../data/site';
+import { dayTrips as dayTripsData, site } from '../data/site';
+import { useI18n } from '../i18n';
 
-const title = `Day Trips — ${site.shortName}`;
+const { t, l } = useI18n(Astro);
+const dayTrips = l(dayTripsData);
+const title = t('Day Trips — {name}', { name: site.shortName });
 const description = dayTrips.intro.lead;
 ---
 
@@ -20,31 +23,31 @@ const description = dayTrips.intro.lead;
     </section>
 
     <section class="ddgrid section wrap">
-      {dayTrips.trips.map((t) => (
+      {dayTrips.trips.map((trip, i) => (
         <article class="ddcard">
           <div class="ddcard__frame">
             <img
-              src={t.image}
-              alt={t.title}
+              src={trip.image}
+              alt={trip.title}
               loading="lazy"
               decoding="async"
-              style={t.position ? `object-position: ${t.position}` : undefined}
+              style={trip.position ? `object-position: ${trip.position}` : undefined}
             />
-            {t.credit && (
-              <a class="ddcard__credit" href={t.credit.url} target="_blank" rel="noopener noreferrer nofollow">
-                Photo: {t.credit.name} / {t.credit.source}, {t.credit.license}
+            {trip.credit && (
+              <a class="ddcard__credit" href={trip.credit.url} target="_blank" rel="noopener noreferrer nofollow">
+                {t('Photo: {name} / {source}, {license}', { name: trip.credit.name, source: trip.credit.source, license: trip.credit.license })}
               </a>
             )}
           </div>
-          <span class="ddcard__meta">{t.duration} &middot; Ages {t.ages}</span>
-          <h3 class="ddcard__title">{t.title}</h3>
-          <p class="ddcard__price"><strong>{t.price}</strong><span> / person</span></p>
-          <p class="ddcard__summary">{t.summary}</p>
+          <span class="ddcard__meta">{trip.duration} &middot; {t('Ages {ages}', { ages: trip.ages })}</span>
+          <h3 class="ddcard__title">{trip.title}</h3>
+          <p class="ddcard__price"><strong>{trip.price}</strong><span> {t('/ person')}</span></p>
+          <p class="ddcard__summary">{trip.summary}</p>
           <ul class="ddcard__list">
-            {t.included.map((x) => <li>{x}</li>)}
+            {trip.included.map((x) => <li>{x}</li>)}
           </ul>
-          <p class="ddcard__guide">Live guide: {t.languages}</p>
-          <button type="button" class="pill pill--outline ddcard__cta" data-emodal-open data-journey={t.title}>Enquire</button>
+          <p class="ddcard__guide">{t('Live guide: {languages}', { languages: trip.languages })}</p>
+          <button type="button" class="pill pill--outline ddcard__cta" data-emodal-open data-journey={dayTripsData.trips[i].title} data-journey-label={t(dayTripsData.trips[i].title)}>{t('Enquire')}</button>
         </article>
       ))}
     </section>
@@ -52,7 +55,7 @@ const description = dayTrips.intro.lead;
     <Enquiry />
   </main>
   <Footer />
-  <JourneyEnquiryModal journeyTitle={dayTrips.trips[0].title} />
+  <JourneyEnquiryModal journeyTitle={dayTripsData.trips[0].title} />
 </Base>
 
 <style>

@@ -1,0 +1,7 @@
+---
+/* Same page as /impact.astro, rendered under /{lang}/. */
+import Page from '../impact.astro';
+import { prefixedLangPaths } from '../../i18n';
+export const getStaticPaths = prefixedLangPaths;
+---
+<Page />

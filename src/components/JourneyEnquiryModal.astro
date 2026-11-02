@@ -1,47 +1,60 @@
 ---
 import { forms, site } from '../data/site';
 import PhoneField from './PhoneField.astro';
+import { useI18n, LANG_NAMES_EN } from '../i18n';
 
 interface Props {
   journeyTitle: string;
 }
 const { journeyTitle } = Astro.props;
+const { t, lang } = useI18n(Astro);
+/* The script can't call t(), so its messages ride along on the form. The
+   inbox copy (subject, field names, journey title) stays English for the team. */
+const msgs = {
+  send: t('Send enquiry'),
+  sending: t('Sending…'),
+  sent: t('Sent'),
+  incomplete: t('Please fill in every field so we can put together a quote.'),
+  failed: t('Something went wrong sending that. Please try again, or email us directly at {email}.', { email: 'info@kingmufasaexpeditions.com' }),
+  thanks: t("Thank you, {name} — we've got your enquiry."),
+};
 ---
 
 <div class="jem" data-emodal hidden>
   <div class="jem__backdrop" data-emodal-close></div>
   <div class="jem__panel" role="dialog" aria-modal="true" aria-labelledby="jem-title">
-    <button type="button" class="jem__close" data-emodal-close aria-label="Close">&times;</button>
+    <button type="button" class="jem__close" data-emodal-close aria-label={t('Close')}>&times;</button>
 
-    <span class="eyebrow">Enquire</span>
-    <h2 id="jem-title">Let's plan your trip</h2>
-    <p class="jem__journey">{journeyTitle}</p>
+    <span class="eyebrow">{t('Enquire')}</span>
+    <h2 id="jem-title">{t("Let's plan your trip")}</h2>
+    <p class="jem__journey">{t(journeyTitle)}</p>
 
-    <form class="jem__form" data-emodal-form novalidate>
+    <form class="jem__form" data-emodal-form data-i18n={JSON.stringify(msgs)} novalidate>
       <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
       <input type="hidden" name="journey" value={journeyTitle} />
+      <input type="hidden" name="Language" value={LANG_NAMES_EN[lang]} />
 
       <label class="jem__field">
-        <span>Full name</span>
+        <span>{t('Full name')}</span>
         <input type="text" name="name" autocomplete="name" required />
       </label>
       <label class="jem__field">
-        <span>Email</span>
+        <span>{t('Email')}</span>
         <input type="email" name="email" autocomplete="email" required />
       </label>
       <div class="jem__row">
         <label class="jem__field">
-          <span>Number of travellers</span>
+          <span>{t('Number of travellers')}</span>
           <input type="number" name="travellers" min="1" value="2" required />
         </label>
         <label class="jem__field">
-          <span>Travel date</span>
+          <span>{t('Travel date')}</span>
           <input type="date" name="date" required />
         </label>
       </div>
       <PhoneField fieldClass="jem__field" tone="light" />
       <div class="jem__field">
-        <span>Preferred contact <em>(optional)</em></span>
+        <span>{t('Preferred contact')} <em>{t('(optional)')}</em></span>
         <div class="jem__checks">
           <label class="jem__check">
             <input type="checkbox" name="prefer_whatsapp" value="WhatsApp" />
@@ -49,27 +62,26 @@ const { journeyTitle } = Astro.props;
           </label>
           <label class="jem__check">
             <input type="checkbox" name="prefer_email" value="Email" />
-            Email
+            {t('Email')}
           </label>
         </div>
       </div>
       <label class="jem__field">
-        <span>Message <em>(optional)</em></span>
+        <span>{t('Message')} <em>{t('(optional)')}</em></span>
         <textarea name="message" rows="3"></textarea>
       </label>
 
       <p class="jem__error" data-emodal-error hidden></p>
 
-      <button type="submit" class="pill pill--accent jem__submit" data-emodal-submit>Send enquiry</button>
-      <p class="jem__fineprint">We reply within a few hours, and never share your details.</p>
+      <button type="submit" class="pill pill--accent jem__submit" data-emodal-submit>{t('Send enquiry')}</button>
+      <p class="jem__fineprint">{t('We reply within a few hours, and never share your details.')}</p>
     </form>
 
     <div class="jem__thanks" data-emodal-thanks hidden>
-      <span class="eyebrow">Enquiry received</span>
-      <h3 data-emodal-thanks-title>Thank you — we've got your enquiry.</h3>
-      <p>We will look at your request and get back to you within a few hours. If you'd rather
-        talk sooner, we're on <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>.</p>
-      <button type="button" class="pill pill--ghost jem__thanks-close" data-emodal-close>Close</button>
+      <span class="eyebrow">{t('Enquiry received')}</span>
+      <h3 data-emodal-thanks-title>{t("Thank you — we've got your enquiry.")}</h3>
+      <p><Fragment set:html={t("We will look at your request and get back to you within a few hours. If you'd rather talk sooner, we're on <a href=\"{href}\">{phone}</a>.", { href: `tel:${site.phone.replace(/\s/g, '')}`, phone: site.phone })} /></p>
+      <button type="button" class="pill pill--ghost jem__thanks-close" data-emodal-close>{t('Close')}</button>
     </div>
   </div>
 </div>
@@ -81,26 +93,36 @@ const { journeyTitle } = Astro.props;
     const errorEl = modal.querySelector('[data-emodal-error]');
     const thanksEl = modal.querySelector('[data-emodal-thanks]');
     const submitBtn = modal.querySelector('[data-emodal-submit]');
+    // Visitor-facing messages, rendered in the page's language server-side.
+    let msgs = {};
+    try {
+      msgs = JSON.parse(form.dataset.i18n || '{}');
+    } catch {
+      /* fall back to English below */
+    }
+    const msg = (key, fallback) => msgs[key] || fallback;
 
     function open(e) {
       const journey = e?.currentTarget?.dataset?.journey;
       if (journey) {
         const label = modal.querySelector('.jem__journey');
         const input = form.querySelector('input[name="journey"]');
-        if (label) label.textContent = journey;
+        // data-journey is the English title for the inbox; data-journey-label
+        // is the visitor's-language version for display, when the page has one.
+        if (label) label.textContent = e.currentTarget.dataset.journeyLabel || journey;
         if (input) input.value = journey;
       }
       modal.hidden = false;
       document.body.style.overflow = 'hidden';
       sent = false;
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Send enquiry';
+      submitBtn.textContent = msg('send', 'Send enquiry');
       form.hidden = false;
       thanksEl.hidden = true;
       errorEl.hidden = true;
       // The form keeps its values between opens, so clear the phone field's
       // own validation message too — otherwise a stale one sits there.
-      form.querySelectorAll<HTMLElement>('[data-phf-error]').forEach((el) => {
+      form.querySelectorAll('[data-phf-error]').forEach((el) => {
         el.hidden = true;
         el.textContent = '';
       });
@@ -130,6 +152,7 @@ const { journeyTitle } = Astro.props;
       const phone = (data.get('phone') || '').toString().trim();
       const message = (data.get('message') || '').toString().trim();
       const journey = (data.get('journey') || '').toString().trim();
+      const language = (data.get('Language') || 'English').toString();
       const preferred = [data.get('prefer_whatsapp'), data.get('prefer_email')].filter(Boolean).join(' & ');
       // The modal is shared across every journey page, so the URL is what tells
       // us which page the enquiry actually came from — plus any utm_*/gclid the
@@ -140,13 +163,13 @@ const { journeyTitle } = Astro.props;
 
       errorEl.hidden = true;
       if (!name || !email || !travellers || !date) {
-        errorEl.textContent = 'Please fill in every field so we can put together a quote.';
+        errorEl.textContent = msg('incomplete', 'Please fill in every field so we can put together a quote.');
         errorEl.hidden = false;
         return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending…';
+      submitBtn.textContent = msg('sending', 'Sending…');
 
       try {
         const res = await fetch(endpoint, {
@@ -166,6 +189,7 @@ const { journeyTitle } = Astro.props;
             'Travel date': date,
             'Preferred contact': preferred || '—',
             Message: message || '—',
+            Language: language,
           }),
         });
         const json = await res.json();
@@ -173,7 +197,7 @@ const { journeyTitle } = Astro.props;
           sent = true;
           const first = name.split(' ')[0];
           const thanksTitle = modal.querySelector('[data-emodal-thanks-title]');
-          if (thanksTitle && first) thanksTitle.textContent = `Thank you, ${first} — we've got your enquiry.`;
+          if (thanksTitle && first) thanksTitle.textContent = msg('thanks', "Thank you, {name} — we've got your enquiry.").replace('{name}', first);
           form.hidden = true;
           thanksEl.hidden = false;
           // The panel scrolls; without this the confirmation can land above
@@ -183,16 +207,18 @@ const { journeyTitle } = Astro.props;
           throw new Error((json && json.message) || 'Submission failed');
         }
       } catch (err) {
-        errorEl.textContent =
-          'Something went wrong sending that. Please try again, or email us directly at info@kingmufasaexpeditions.com.';
+        errorEl.textContent = msg(
+          'failed',
+          'Something went wrong sending that. Please try again, or email us directly at info@kingmufasaexpeditions.com.',
+        );
         errorEl.hidden = false;
       } finally {
         // Only give the button back when there's something left to retry.
         if (!sent) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Send enquiry';
+          submitBtn.textContent = msg('send', 'Send enquiry');
         } else {
-          submitBtn.textContent = 'Sent';
+          submitBtn.textContent = msg('sent', 'Sent');
         }
       }
     });
@@ -342,7 +368,8 @@ const { journeyTitle } = Astro.props;
     margin-bottom: 0.75rem;
   }
   .jem__thanks p { color: var(--color-slate); line-height: 1.6; }
-  .jem__thanks p a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  /* :global — the link comes from a translated string via set:html. */
+  .jem__thanks p :global(a) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
   .jem__thanks-close { margin-top: 1.5rem; }
 
   @media (max-width: 480px) {

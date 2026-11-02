@@ -1,19 +1,32 @@
 ---
 import '../styles/global.css';
+import { useI18n, LANGS, LANG_TAGS, DEFAULT_LANG, localizePath, stripLang, isTranslatedPath } from '../i18n';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
+const { t, lang, tag } = useI18n(Astro);
 const {
-  title = 'Mufasa — Private Safaris in Tanzania',
-  description = 'Deeply personal journeys through Tanzania, drawn by hand in Arusha and carried by the guides who walk them.',
+  title = t('Mufasa — Private Safaris in Tanzania'),
+  description = t('Deeply personal journeys through Tanzania, drawn by hand in Arusha and carried by the guides who walk them.'),
 } = Astro.props;
+
+/* Every translated page lists its siblings for search engines. Pages whose
+   body is still English-only (articles, legal) canonicalise to the English
+   original instead, so the prefixed copies don't compete with it. */
+const basePath = stripLang(Astro.url.pathname);
+const translated = isTranslatedPath(Astro.url.pathname);
+const abs = (p: string) => new URL(p, Astro.site ?? Astro.url).href;
+const canonical = abs(translated ? localizePath(basePath, lang) : basePath);
+const alternates = translated
+  ? LANGS.map((l) => ({ hreflang: LANG_TAGS[l], href: abs(localizePath(basePath, l)) }))
+  : [];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={tag}>
   <head>
     <!-- Google tag (gtag.js) -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-DB59F1K5WC"></script>
@@ -34,11 +47,15 @@ const {
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+    {translated && <link rel="alternate" hreflang="x-default" href={abs(basePath)} />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang === DEFAULT_LANG ? 'en_GB' : `${lang}_${lang.toUpperCase()}`} />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

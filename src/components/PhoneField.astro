@@ -7,10 +7,13 @@
    All phone-number knowledge — dial codes, trunk-prefix stripping, per-country
    validity, formatting — comes from libphonenumber-js. Nothing about numbering
    plans is hand-written here; the country list itself is derived from the
-   library at runtime, and country names come from Intl.DisplayNames.
+   library at runtime, and country names come from Intl.DisplayNames in the
+   page's language.
 
    `tone` picks the palette: 'dark' for the trip-planner's dark panel,
    'light' for the journey modal. */
+import { useI18n } from '../i18n';
+
 interface Props {
   name?: string;
   label?: string;
@@ -20,9 +23,11 @@ interface Props {
   fieldClass?: string;
 }
 
+const { t, tag } = useI18n(Astro);
+
 const {
   name = 'phone',
-  label = 'Phone / WhatsApp',
+  label = t('Phone / WhatsApp'),
   optional = false,
   defaultCountry = 'TZ',
   tone = 'dark',
@@ -30,6 +35,17 @@ const {
 } = Astro.props;
 
 const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
+
+/* Strings the client script writes at runtime; {country} and {dial} are
+   filled in there. The script falls back to English if any is missing. */
+const msgs = {
+  countryCode: t('Country code: {country} +{dial}'),
+  required: t('Please add a phone number so we can reach you.'),
+  tooShort: t('That looks a few digits short for {country}. Please check the number.'),
+  tooLong: t('That looks a few digits too long for {country}. Please check the number.'),
+  invalidOptional: t('That does not look like a valid {country} number. Please check it, or leave the field blank.'),
+  invalid: t('That does not look like a valid {country} number. Please check it.'),
+};
 ---
 
 <div
@@ -38,8 +54,10 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
   data-default-country={defaultCountry}
   data-optional={optional ? 'true' : 'false'}
   data-phf-uid={uid}
+  data-lang-tag={tag}
+  data-i18n={JSON.stringify(msgs)}
 >
-  <span class="phf__label" id={`${uid}-label`}>{label} {optional && <em>(optional)</em>}</span>
+  <span class="phf__label" id={`${uid}-label`}>{label} {optional && <em>{t('(optional)')}</em>}</span>
 
   <div class="phf__control" data-phf-control>
     <button
@@ -75,8 +93,8 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
       type="text"
       class="phf__search"
       data-phf-search
-      placeholder="Search countries"
-      aria-label="Search countries"
+      placeholder={t('Search countries')}
+      aria-label={t('Search countries')}
       autocomplete="off"
       role="combobox"
       aria-expanded="true"
@@ -84,7 +102,7 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
       aria-controls={`${uid}-list`}
     />
     <ul class="phf__list" id={`${uid}-list`} role="listbox" data-phf-list aria-labelledby={`${uid}-label`}></ul>
-    <p class="phf__empty" data-phf-empty hidden>No match</p>
+    <p class="phf__empty" data-phf-empty hidden>{t('No match')}</p>
   </div>
 
   <p class="phf__error" id={`${uid}-error`} data-phf-error hidden role="alert"></p>
@@ -333,24 +351,48 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
 
   type Iso = ReturnType<typeof getCountries>[number];
 
-  // Country list derived from the library, named via the browser's own locale
-  // data — so there is no dial-code or country-name table to drift.
-  const regionNames = (() => {
-    try {
-      return new Intl.DisplayNames(['en'], { type: 'region' });
-    } catch {
-      return null;
-    }
-  })();
+  type Country = { iso: Iso; dial: string; name: string };
 
-  const collator = new Intl.Collator('en');
-  const COUNTRIES = getCountries()
-    .map((iso) => ({
-      iso,
-      dial: getCountryCallingCode(iso),
-      name: regionNames?.of(iso) ?? iso,
-    }))
-    .sort((a, b) => collator.compare(a.name, b.name));
+  // Country list derived from the library, named via the browser's own locale
+  // data in the page's language — so there is no dial-code or country-name
+  // table to drift. Built once per language tag.
+  const countryLists = new Map<string, Country[]>();
+  function countriesFor(tag: string): Country[] {
+    const cached = countryLists.get(tag);
+    if (cached) return cached;
+    const regionNames = (() => {
+      try {
+        return new Intl.DisplayNames([tag, 'en'], { type: 'region' });
+      } catch {
+        return null;
+      }
+    })();
+    const collator = new Intl.Collator([tag, 'en']);
+    const list = getCountries()
+      .map((iso) => ({
+        iso,
+        dial: getCountryCallingCode(iso),
+        name: regionNames?.of(iso) ?? iso,
+      }))
+      .sort((a, b) => collator.compare(a.name, b.name));
+    countryLists.set(tag, list);
+    return list;
+  }
+
+  // English fallbacks for the strings the component renders into data-i18n.
+  const EN_MSGS = {
+    countryCode: 'Country code: {country} +{dial}',
+    required: 'Please add a phone number so we can reach you.',
+    tooShort: 'That looks a few digits short for {country}. Please check the number.',
+    tooLong: 'That looks a few digits too long for {country}. Please check the number.',
+    invalidOptional: 'That does not look like a valid {country} number. Please check it, or leave the field blank.',
+    invalid: 'That does not look like a valid {country} number. Please check it.',
+  };
+  type MsgKey = keyof typeof EN_MSGS;
+
+  function fill(text: string, vars: Record<string, string>) {
+    return text.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  }
 
   function flagOf(iso: string) {
     return String.fromCodePoint(
@@ -380,6 +422,14 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
     const errorEl = root.querySelector<HTMLElement>('[data-phf-error]')!;
     const hidden = root.querySelector<HTMLInputElement>('[data-phf-value]')!;
     const uid = root.dataset.phfUid || 'phf';
+    const COUNTRIES = countriesFor(root.dataset.langTag || 'en');
+    let given: Partial<Record<MsgKey, string>> = {};
+    try {
+      given = JSON.parse(root.dataset.i18n || '{}');
+    } catch {
+      given = {};
+    }
+    const msg = (key: MsgKey, vars: Record<string, string> = {}) => fill(given[key] || EN_MSGS[key], vars);
 
     const isOptional = root.dataset.optional === 'true';
     let country = guessCountry(root.dataset.defaultCountry || 'TZ');
@@ -390,7 +440,7 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
       flagEl.textContent = flagOf(country);
       dialEl.textContent = '+' + getCountryCallingCode(country);
       const c = COUNTRIES.find((x) => x.iso === country);
-      toggle.setAttribute('aria-label', `Country code: ${c?.name ?? country} +${c?.dial ?? ''}`);
+      toggle.setAttribute('aria-label', msg('countryCode', { country: c?.name ?? country, dial: c?.dial ?? '' }));
 
       // Show the country's own national format as the placeholder.
       let hint = '';
@@ -577,7 +627,7 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
           clearError();
           return true;
         }
-        errorEl.textContent = 'Please add a phone number so we can reach you.';
+        errorEl.textContent = msg('required');
         errorEl.hidden = false;
         return false;
       }
@@ -588,14 +638,16 @@ const uid = 'phf-' + Math.random().toString(36).slice(2, 9);
       }
       const reason = validatePhoneNumberLength(raw, country);
       const name = COUNTRIES.find((c) => c.iso === country)?.name ?? country;
-      errorEl.textContent =
+      errorEl.textContent = msg(
         reason === 'TOO_SHORT'
-          ? `That looks a few digits short for ${name}. Please check the number.`
+          ? 'tooShort'
           : reason === 'TOO_LONG'
-            ? `That looks a few digits too long for ${name}. Please check the number.`
+            ? 'tooLong'
             : isOptional
-              ? `That does not look like a valid ${name} number. Please check it, or leave the field blank.`
-              : `That does not look like a valid ${name} number. Please check it.`;
+              ? 'invalidOptional'
+              : 'invalid',
+        { country: name },
+      );
       errorEl.hidden = false;
       return false;
     }

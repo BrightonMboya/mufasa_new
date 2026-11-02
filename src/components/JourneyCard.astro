@@ -1,6 +1,7 @@
 ---
 import type { journeys } from '../data/site';
 import { cardPhotos, introductions, journeyPhoto } from '../data/journey-cards';
+import { useI18n } from '../i18n';
 
 interface Props {
   journey: (typeof journeys)[number];
@@ -13,36 +14,43 @@ interface Props {
 }
 const { journey: j, showPrice = false, filterGroup, country } = Astro.props;
 const photo = journeyPhoto(j.slug, j.image);
+const { t, l, path, lang } = useI18n(Astro);
+// Display copy only — data-category and the slug stay on the English original.
+const lj = l(j);
+const intro = introductions[j.slug];
+// Search matches the English text, plus the visitor's language off the root.
+const searchText = (x: typeof j) => `${x.title} ${x.category} ${x.summary} ${x.days.map((d) => d.place).join(' ')}`;
+const search = (lang === 'en' ? searchText(j) : `${searchText(j)} ${searchText(lj)}`).toLowerCase();
 ---
 
 <a
         class:list={['jcard', { 'jcard--catalog': showPrice }]}
-        href={`/journeys/${j.slug}`}
+        href={path(`/journeys/${j.slug}`)}
         data-category={filterGroup ?? j.category}
         data-country={country}
-        data-search={`${j.title} ${j.category} ${j.summary} ${j.days.map((d) => d.place).join(' ')}`.toLowerCase()}
+        data-search={search}
       >
         <div class="jcard__frame">
           <img src={photo.src} style={{ objectPosition: photo.position }} alt="" loading="lazy" decoding="async" />
           {/* Days, not nights: the titles and detail pages count days, and a
               traveller thinks in days away. `nights` stays the stored value. */}
-          <span class:list={['jcard__duration', { 'jcard__duration--left': !!cardPhotos[j.slug] }]}>{j.nights + 1} days</span>
-          <h3 class="jcard__title">{j.title}</h3>
+          <span class:list={['jcard__duration', { 'jcard__duration--left': !!cardPhotos[j.slug] }]}>{t('{n} days', { n: j.nights + 1 })}</span>
+          <h3 class="jcard__title">{lj.title}</h3>
         </div>
         <div class="jcard__body">
-          <p class="jcard__intro">{introductions[j.slug] ?? j.summary}</p>
+          <p class="jcard__intro">{intro ? t(intro) : lj.summary}</p>
           {showPrice && (
             <p class="jcard__price">
-              {j.priceFrom.startsWith('$') ? <><span>From </span><strong>{j.priceFrom}</strong><span> / person</span></> : <strong>{j.priceFrom}</strong>}
+              {j.priceFrom.startsWith('$') ? <Fragment set:html={t('From <strong>{price}</strong> / person', { price: j.priceFrom })} /> : <strong>{j.priceFrom}</strong>}
             </p>
           )}
           <div class="jcard__footer">
             <div class="jcard__season">
-              <span>Best time to go</span>
-              <strong>{j.season}</strong>
+              <span>{t('Best time to go')}</span>
+              <strong>{lj.season}</strong>
             </div>
             <span class="jcard__cta">
-              View itinerary
+              {t('View itinerary')}
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -182,7 +190,8 @@ const photo = journeyPhoto(j.slug, j.image);
     color: #535d55;
     font-size: 0.8125rem;
   }
-  .jcard__price strong {
+  /* :global — the <strong> comes from a translated string via set:html. */
+  .jcard__price :global(strong) {
     color: var(--color-ink);
     font-size: 1.25rem;
     font-weight: var(--fw-medium);
