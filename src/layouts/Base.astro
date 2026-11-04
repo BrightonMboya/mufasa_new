@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { useI18n, LANGS, LANG_TAGS, DEFAULT_LANG, localizePath, stripLang, isTranslatedPath } from '../i18n';
+import { useI18n, LANGS, LANG_TAGS, OG_LOCALES, localizePath, stripLang, isTranslatedPath } from '../i18n';
 
 interface Props {
   title?: string;
@@ -55,7 +55,7 @@ const alternates = translated
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:locale" content={lang === DEFAULT_LANG ? 'en_GB' : `${lang}_${lang.toUpperCase()}`} />
+    <meta property="og:locale" content={OG_LOCALES[lang]} />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -64,6 +64,12 @@ const alternates = translated
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Petrona:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    {lang === 'zh' && (
+      <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    )}
   </head>
   <body>
     <slot />

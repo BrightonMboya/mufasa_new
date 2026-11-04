@@ -15,9 +15,10 @@ import it from './locales/it.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
 import es from './locales/es.json';
+import zh from './locales/zh.json';
 
 export const DEFAULT_LANG = 'en' as const;
-export const LANGS = ['en', 'it', 'fr', 'de', 'es'] as const;
+export const LANGS = ['en', 'it', 'fr', 'de', 'es', 'zh'] as const;
 export type Lang = (typeof LANGS)[number];
 /** Languages that get a /{lang}/ prefix. */
 export const PREFIXED_LANGS = LANGS.filter((l) => l !== DEFAULT_LANG) as Exclude<Lang, 'en'>[];
@@ -28,6 +29,7 @@ export const LANG_NAMES: Record<Lang, string> = {
   fr: 'Français',
   de: 'Deutsch',
   es: 'Español',
+  zh: '中文',
 };
 
 /** English names, for anything the team in Arusha reads (enquiry emails). */
@@ -37,6 +39,7 @@ export const LANG_NAMES_EN: Record<Lang, string> = {
   fr: 'French',
   de: 'German',
   es: 'Spanish',
+  zh: 'Chinese',
 };
 
 /** BCP 47 tags for <html lang>, hreflang and Intl formatting. */
@@ -46,9 +49,20 @@ export const LANG_TAGS: Record<Lang, string> = {
   fr: 'fr',
   de: 'de',
   es: 'es',
+  zh: 'zh-Hans',
 };
 
-const DICTIONARIES: Record<Lang, Record<string, string>> = { en: {}, it, fr, de, es };
+/** Open Graph locales (language_TERRITORY). */
+export const OG_LOCALES: Record<Lang, string> = {
+  en: 'en_GB',
+  it: 'it_IT',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  es: 'es_ES',
+  zh: 'zh_CN',
+};
+
+const DICTIONARIES: Record<Lang, Record<string, string>> = { en: {}, it, fr, de, es, zh };
 
 /* Sections whose body copy is English-only for now (articles and legal text).
    They still render under every prefix so the header and footer stay in the

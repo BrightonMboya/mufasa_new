@@ -18,7 +18,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const LANGS = ['it', 'fr', 'de', 'es'];
+const LANGS = ['it', 'fr', 'de', 'es', 'zh'];
 
 /* Keys whose values are never shown as prose. */
 const SKIP_KEYS = new Set([

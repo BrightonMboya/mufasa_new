@@ -209,3 +209,31 @@ h3 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Simplified Chinese. Latin glyphs (names, numbers) keep the brand faces;
+   CJK falls through to Noto SC, loaded only on /zh/ pages (see Base.astro).
+   Chinese has no true italic, so never let the browser slant it. Headings
+   get extra leading — the Latin 1.05 crowds stacked ideographs.
+   The Latin faces draw — and … narrow, so a Chinese 破折号 (——) breaks into
+   two dashes; the ZH Punct faces hand just those two glyphs to a CJK font. */
+@font-face {
+  font-family: 'ZH Punct Serif';
+  src: local('Songti SC Regular'), local('STSongti-SC-Regular'), local('STSong'), local('SimSun'),
+    local('Noto Serif CJK SC'), local('Source Han Serif SC');
+  unicode-range: U+2014, U+2026;
+}
+@font-face {
+  font-family: 'ZH Punct Sans';
+  src: local('PingFang SC Regular'), local('PingFangSC-Regular'), local('Hiragino Sans GB'),
+    local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  unicode-range: U+2014, U+2026;
+}
+:root:lang(zh) {
+  --font-display: 'ZH Punct Serif', 'Petrona', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-ui: 'ZH Punct Sans', 'DM Sans', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'Space Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', monospace;
+  font-synthesis: none;
+}
+:lang(zh) :is(h1, h2, h3) {
+  line-height: 1.3;
+}
