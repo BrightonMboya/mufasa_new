@@ -82,8 +82,6 @@ For example:
 
 Working with a local team makes it easier to receive practical advice when selecting destinations and planning the best route.
 
-![Two safari vehicles with pop-up roofs parked on the green plains during a game drive](/media/blog/safari-vehicles-serengeti.webp)
-
 ### More Direct Support During Your Safari
 
 Your safari experience does not end when you make a booking.
