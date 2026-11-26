@@ -832,40 +832,70 @@ export const trekking = {
   },
   routes: [
     {
-      name: 'Kilimanjaro — Lemosho',
-      meta: 'Kilimanjaro · 8 Days',
-      days: 8,
-      priceFrom: '$3,450',
-      image: '/media/trekking/moorland-traverse.webp',
+      name: 'Mount Meru — 3-Day Expedition',
+      meta: 'Arusha N.P. · 3 Days',
+      days: 3,
+      priceFrom: '$980',
+      image: '/media/trekking/crater-rim-ascent.webp',
       summary:
-        'The long western approach, and the one with the highest success rate. Eight days lets you sleep low and climb high across the Shira Plateau before the summit night.',
-      highlights: ['Highest success rate', 'Quietest first days', 'Best acclimatisation profile'],
-    },
-    {
-      name: 'Kilimanjaro — Machame',
-      meta: 'Kilimanjaro · 7 Days',
-      days: 7,
-      priceFrom: '$3,900',
-      image: '/media/trekking/summit-day-scramble.webp',
-      summary:
-        'The classic "Whiskey" route — steeper and more direct than Lemosho, through five climate zones from rainforest to the roof of Africa. Seven days for walkers who are fit and short on time.',
-      highlights: ['Five climate zones', 'Dramatic Barranco Wall', 'Well-supported classic'],
+        "A shorter, more intense version of Meru — wildlife on the lower slopes, then a steep 1:30am summit push to the 4,566m Ash Tray crater rim for sunrise. A genuine technical challenge in a fraction of the time.",
+      highlights: ['1:30am summit push', 'Sunrise over the Ash Tray crater', 'Half the time of the standard route'],
     },
     {
       name: 'Mount Meru',
       meta: 'Arusha N.P. · 4 Days',
       days: 4,
-      priceFrom: '$2,100',
+      priceFrom: '$1,310',
       image: '/media/trekking/meru-crater-slopes.webp',
       summary:
         'A wild, quiet 4,566m volcano through Arusha National Park — walked with an armed ranger past buffalo and giraffe. The best acclimatisation there is before Kilimanjaro, and a fine trek in its own right.',
       highlights: ['Wildlife on the walk', 'Perfect Kili warm-up', 'Knife-edge summit ridge'],
     },
     {
+      name: 'Kilimanjaro — Lemosho (7 Days)',
+      meta: 'Kilimanjaro · 7 Days',
+      days: 7,
+      priceFrom: '$2,050',
+      image: '/media/trekking/moorland-traverse.webp',
+      summary:
+        "One of Kilimanjaro's most scenic and remote approaches, from the west — pristine rainforest, giant heather moorland, and Mount Meru appearing to float above the clouds. Built-in extra days lift the summit success rate.",
+      highlights: ['Remote western approach', 'Extra acclimatisation days', 'Dawn summit from Barafu Camp'],
+    },
+    {
+      name: 'Kilimanjaro — Lemosho',
+      meta: 'Kilimanjaro · 8 Days',
+      days: 8,
+      priceFrom: '$2,350',
+      image: '/media/trekking/moorland-traverse.webp',
+      summary:
+        'The long western approach, and the one with the highest success rate. Eight days lets you sleep low and climb high across the Shira Plateau before the summit night.',
+      highlights: ['Highest success rate', 'Quietest first days', 'Best acclimatisation profile'],
+    },
+    {
+      name: 'Kilimanjaro — Machame (6 Days)',
+      meta: 'Kilimanjaro · 6 Days',
+      days: 6,
+      priceFrom: '$1,730',
+      image: '/media/trekking/steep-scree-ascent.webp',
+      summary:
+        'The classic "Whiskey" route in its 6-day form, through rainforest, heather and alpine desert to Stella Point and on to Uhuru Peak — with views across all three of Kilimanjaro\'s peaks.',
+      highlights: ['Multiple ecological zones', 'Crosses Stella Point', 'Views of Kibo, Mawenzi & Shira'],
+    },
+    {
+      name: 'Kilimanjaro — Machame',
+      meta: 'Kilimanjaro · 7 Days',
+      days: 7,
+      priceFrom: '$2,050',
+      image: '/media/trekking/summit-day-scramble.webp',
+      summary:
+        'The classic "Whiskey" route — steeper and more direct than Lemosho, through five climate zones from rainforest to the roof of Africa. Seven days for walkers who are fit and short on time.',
+      highlights: ['Five climate zones', 'Dramatic Barranco Wall', 'Well-supported classic'],
+    },
+    {
       name: 'Kilimanjaro — Marangu (5 Days)',
       meta: 'Kilimanjaro · 5 Days',
       days: 5,
-      priceFrom: '$2,400',
+      priceFrom: '$1,550',
       image: '/media/trekking/summit-glacier-wall.webp',
       summary:
         'The only Kilimanjaro route with hut accommodation — no camping. A gradual, scenic climb through rainforest, moorland and alpine desert, with two nights at Horombo before the summit push.',
@@ -875,41 +905,11 @@ export const trekking = {
       name: 'Kilimanjaro — Marangu (6 Days)',
       meta: 'Kilimanjaro · 6 Days',
       days: 6,
-      priceFrom: '$2,700',
+      priceFrom: '$1,800',
       image: '/media/trekking/snowline-ascent.webp',
       summary:
         'The 6-day Marangu, with an extra acclimatisation day at Horombo Hut (3,720m) added to the direct, moderate path — for walkers who want the hut route with a better shot at the summit.',
       highlights: ['Extra night at Horombo Hut', 'No camping required', 'Colobus monkeys along the trail'],
-    },
-    {
-      name: 'Kilimanjaro — Machame (6 Days)',
-      meta: 'Kilimanjaro · 6 Days',
-      days: 6,
-      priceFrom: '$1,590',
-      image: '/media/trekking/steep-scree-ascent.webp',
-      summary:
-        'The classic "Whiskey" route in its 6-day form, through rainforest, heather and alpine desert to Stella Point and on to Uhuru Peak — with views across all three of Kilimanjaro\'s peaks.',
-      highlights: ['Multiple ecological zones', 'Crosses Stella Point', 'Views of Kibo, Mawenzi & Shira'],
-    },
-    {
-      name: 'Kilimanjaro — Lemosho (7 Days)',
-      meta: 'Kilimanjaro · 7 Days',
-      days: 7,
-      priceFrom: '$2,700',
-      image: '/media/trekking/moorland-traverse.webp',
-      summary:
-        "One of Kilimanjaro's most scenic and remote approaches, from the west — pristine rainforest, giant heather moorland, and Mount Meru appearing to float above the clouds. Built-in extra days lift the summit success rate.",
-      highlights: ['Remote western approach', 'Extra acclimatisation days', 'Dawn summit from Barafu Camp'],
-    },
-    {
-      name: 'Mount Meru — 3-Day Expedition',
-      meta: 'Arusha N.P. · 3 Days',
-      days: 3,
-      priceFrom: '$1,400',
-      image: '/media/trekking/crater-rim-ascent.webp',
-      summary:
-        "A shorter, more intense version of Meru — wildlife on the lower slopes, then a steep 1:30am summit push to the 4,566m Ash Tray crater rim for sunrise. A genuine technical challenge in a fraction of the time.",
-      highlights: ['1:30am summit push', 'Sunrise over the Ash Tray crater', 'Half the time of the standard route'],
     },
   ],
   included: [
@@ -919,6 +919,12 @@ export const trekking = {
     'All meals on the mountain and a private chef',
     'Pre- and post-trek nights in Arusha',
   ],
+};
+
+const trekRoute = (name: string) => {
+  const r = trekking.routes.find((route) => route.name === name);
+  if (!r) throw new Error(`Unknown trekking route: ${name}`);
+  return r;
 };
 
 /* Trip Planner — a client-side quiz (modelled on jacadatravel.com's) that
@@ -1034,10 +1040,10 @@ export const planner = {
       },
     },
     {
-      title: trekking.routes[0].name,
-      meta: trekking.routes[0].meta,
-      price: trekking.routes[0].priceFrom,
-      image: trekking.routes[0].image,
+      title: trekRoute('Kilimanjaro — Lemosho').name,
+      meta: trekRoute('Kilimanjaro — Lemosho').meta,
+      price: trekRoute('Kilimanjaro — Lemosho').priceFrom,
+      image: trekRoute('Kilimanjaro — Lemosho').image,
       href: '/trekking',
       blurb: 'The long western approach up Kilimanjaro, and the route with the highest success rate. Eight days, sleep low and climb high.',
       tags: {
@@ -1048,10 +1054,10 @@ export const planner = {
       },
     },
     {
-      title: trekking.routes[1].name,
-      meta: trekking.routes[1].meta,
-      price: trekking.routes[1].priceFrom,
-      image: trekking.routes[1].image,
+      title: trekRoute('Kilimanjaro — Machame').name,
+      meta: trekRoute('Kilimanjaro — Machame').meta,
+      price: trekRoute('Kilimanjaro — Machame').priceFrom,
+      image: trekRoute('Kilimanjaro — Machame').image,
       href: '/trekking',
       blurb: 'The classic "Whiskey" route — steeper and more direct, through five climate zones from rainforest to the roof of Africa.',
       tags: {
@@ -1062,10 +1068,10 @@ export const planner = {
       },
     },
     {
-      title: trekking.routes[2].name,
-      meta: trekking.routes[2].meta,
-      price: trekking.routes[2].priceFrom,
-      image: trekking.routes[2].image,
+      title: trekRoute('Mount Meru').name,
+      meta: trekRoute('Mount Meru').meta,
+      price: trekRoute('Mount Meru').priceFrom,
+      image: trekRoute('Mount Meru').image,
       href: '/trekking',
       blurb: 'A wild, quiet 4,566m volcano walked with an armed ranger past buffalo and giraffe — and the best warm-up there is for Kilimanjaro.',
       tags: {
