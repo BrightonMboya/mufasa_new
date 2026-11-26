@@ -1,10 +1,14 @@
 ---
 import '../styles/global.css';
-import { useI18n, LANGS, LANG_TAGS, OG_LOCALES, localizePath, stripLang, isTranslatedPath } from '../i18n';
+import { useI18n, LANGS, LANG_TAGS, OG_LOCALES, localizePath, stripLang, isTranslatedPath, type Lang } from '../i18n';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Override the path-based check for pages translated per entry (blog posts). */
+  translated?: boolean;
+  /** Languages this page exists in, for hreflang. Defaults to all of them. */
+  langs?: readonly Lang[];
 }
 
 const { t, lang, tag } = useI18n(Astro);
@@ -17,11 +21,12 @@ const {
    body is still English-only (articles, legal) canonicalise to the English
    original instead, so the prefixed copies don't compete with it. */
 const basePath = stripLang(Astro.url.pathname);
-const translated = isTranslatedPath(Astro.url.pathname);
+const translated = Astro.props.translated ?? isTranslatedPath(Astro.url.pathname);
+const pageLangs = Astro.props.langs ?? LANGS;
 const abs = (p: string) => new URL(p, Astro.site ?? Astro.url).href;
 const canonical = abs(translated ? localizePath(basePath, lang) : basePath);
 const alternates = translated
-  ? LANGS.map((l) => ({ hreflang: LANG_TAGS[l], href: abs(localizePath(basePath, l)) }))
+  ? pageLangs.map((l) => ({ hreflang: LANG_TAGS[l], href: abs(localizePath(basePath, l)) }))
   : [];
 ---
 

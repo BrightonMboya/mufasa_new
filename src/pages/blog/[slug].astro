@@ -7,17 +7,20 @@ import JourneyCard from '../../components/JourneyCard.astro';
 import { site, journeys } from '../../data/site';
 import { getCollection, render } from 'astro:content';
 import { useI18n } from '../../i18n';
+import { localizePost, postLangs } from '../../lib/blog';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
-const { t, path, tag } = useI18n(Astro);
+const { t, path, tag, lang } = useI18n(Astro);
 const { post } = Astro.props;
-const { Content } = await render(post);
-const title = `${post.data.title} — ${site.shortName}`;
-/* Post copy stays English; only the category label and date are localized. */
+/* The translated post when there is one for this language, else English. */
+const localized = await localizePost(post, lang);
+const langs = await postLangs(post);
+const { Content } = await render(localized.entry);
+const title = `${localized.title} — ${site.shortName}`;
 const categoryLabels: Record<string, string> = { Safari: t('Safari'), Climbing: t('Climbing') };
 
 /* Readers finish a post wanting to go; hand them three bookable routes.
@@ -36,16 +39,16 @@ const featured = FEATURED_SLUGS.map((slug) => {
 });
 ---
 
-<Base title={title} description={post.data.description}>
+<Base title={title} description={localized.description} translated={localized.translated} langs={langs}>
   <Header />
   <main>
     <!-- Detail hero -->
     <section class="phero">
-      <img class="phero__img" src={post.data.image} alt={post.data.title} fetchpriority="high" decoding="async" />
+      <img class="phero__img" src={post.data.image} alt={localized.title} fetchpriority="high" decoding="async" />
       <div class="phero__scrim"></div>
       <div class="phero__content wrap">
         <span class="phero__cat">{categoryLabels[post.data.category] ?? post.data.category} · {post.data.date.toLocaleDateString(tag, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-        <h1>{post.data.title}</h1>
+        <h1>{localized.title}</h1>
       </div>
     </section>
 

@@ -64,10 +64,12 @@ export const OG_LOCALES: Record<Lang, string> = {
 
 const DICTIONARIES: Record<Lang, Record<string, string>> = { en: {}, it, fr, de, es, zh };
 
-/* Sections whose body copy is English-only for now (articles and legal text).
+/* Sections whose body copy is English-only for now (legal text).
    They still render under every prefix so the header and footer stay in the
-   reader's language, but they point search engines at the English original. */
-const ENGLISH_ONLY = [/^\/blog\/.+/, /^\/(contact|our-booking-process|our-vehicle|privacy-policy|refund-policy|terms-conditions|tipping-guideline)\/?$/];
+   reader's language, but they point search engines at the English original.
+   Blog posts are translated per post (src/content/blog-i18n) and tell the
+   layout themselves whether a translation exists. */
+const ENGLISH_ONLY = [/^\/(contact|our-booking-process|our-vehicle|privacy-policy|refund-policy|terms-conditions|tipping-guideline)\/?$/];
 
 export function isLang(value: unknown): value is Lang {
   return typeof value === 'string' && (LANGS as readonly string[]).includes(value);

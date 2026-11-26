@@ -1,16 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
 import { useI18n } from '../i18n';
+import { getLocalizedPosts } from '../lib/blog';
 
-const { t, path, tag } = useI18n(Astro);
+const { t, path, tag, lang } = useI18n(Astro);
 
-// The three most recent pieces. Posts live in the `blog` collection, which
-// /blog and the article pages read from too.
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
+// The three most recent pieces, titled in the reader's language where the
+// post has been translated (src/content/blog-i18n), else in English.
+const posts = (await getLocalizedPosts(lang)).slice(0, 3);
 
-// Post titles and descriptions stay English; the category label is chrome.
 const categoryLabels: Record<string, string> = {
   Safari: t('Safari'),
   Climbing: t('Climbing'),
@@ -27,16 +24,16 @@ const categoryLabels: Record<string, string> = {
   </div>
 
   <div class="journal__grid">
-    {posts.map((post, i) => (
+    {posts.map(({ post, title, description }, i) => (
       <a class="pcard" href={path(`/blog/${post.id}`)}>
         <div class="pcard__frame">
-          <img src={post.data.image} alt={post.data.title} loading="lazy" decoding="async" />
+          <img src={post.data.image} alt={title} loading="lazy" decoding="async" />
         </div>
         <span class="pcard__meta">
           {categoryLabels[post.data.category] ?? post.data.category} · {post.data.date.toLocaleDateString(tag, { month: 'short', year: 'numeric' })}
         </span>
-        <h3 class="pcard__title">{post.data.title}</h3>
-        <p class="pcard__desc">{post.data.description}</p>
+        <h3 class="pcard__title">{title}</h3>
+        <p class="pcard__desc">{description}</p>
         <span class="pcard__cta">{t('Read the story')} <span aria-hidden="true">&rarr;</span></span>
       </a>
     ))}

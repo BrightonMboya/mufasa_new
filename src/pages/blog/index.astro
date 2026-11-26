@@ -4,18 +4,16 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import { site } from '../../data/site';
-import { getCollection } from 'astro:content';
 import { useI18n } from '../../i18n';
+import { getLocalizedPosts } from '../../lib/blog';
 
-const { t, path, tag } = useI18n(Astro);
+const { t, path, tag, lang } = useI18n(Astro);
 
-const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const allPosts = await getLocalizedPosts(lang);
 
 const title = t('Journal — {name}', { name: site.shortName });
 const description = t('Field notes on Tanzania safaris, Kilimanjaro, and the wild south — written by the people who plan the journeys.');
-const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.data.category)))];
+const filters = ['All', ...Array.from(new Set(allPosts.map((p) => p.post.data.category)))];
 /* Labels are translated for display; data-filter/data-category keep the English value. */
 const categoryLabels: Record<string, string> = { All: t('All'), Safari: t('Safari'), Climbing: t('Climbing') };
 const categoryLabel = (c: string) => categoryLabels[c] ?? c;
@@ -49,19 +47,19 @@ const categoryLabel = (c: string) => categoryLabels[c] ?? c;
       </div>
 
       <div class="jposts__grid" data-posts-grid>
-        {allPosts.map((post, i) => (
+        {allPosts.map(({ post, title, description }, i) => (
           <a
             class:list={['pcard', { 'pcard--featured': i === 0 }]}
             href={path(`/blog/${post.id}`)}
             data-category={post.data.category}
           >
             <div class="pcard__frame">
-              <img src={post.data.image} alt={post.data.title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+              <img src={post.data.image} alt={title} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
             </div>
             <div class="pcard__body">
               <span class="pcard__meta">{categoryLabel(post.data.category)} · {post.data.date.toLocaleDateString(tag, { month: 'short', year: 'numeric' })}</span>
-              <h3 class="pcard__title">{post.data.title}</h3>
-              <p class="pcard__desc">{post.data.description}</p>
+              <h3 class="pcard__title">{title}</h3>
+              <p class="pcard__desc">{description}</p>
               <span class="pcard__cta">{i === 0 ? t('Read the story') : t('Read')} <span aria-hidden="true">&rarr;</span></span>
             </div>
           </a>

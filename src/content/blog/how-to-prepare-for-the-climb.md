@@ -112,7 +112,7 @@ Our team will also need your passport details to process the entry permits for t
 
 Proper nutrition is key to having a comfortable and safe Kilimanjaro adventure. Your body will need extra calories to reach the summit of Kilimanjaro, as energy consumption on the hike is about double your usual amount. Eating well is crucial for maintaining strength and stamina.
 
-At King Mufasa Expedition, we've created a special Kilimanjaro menu that's both delicious and energy-packed. Our mountain chefs, trained by professional restaurant cooks, will surprise you with a variety of meals served daily in the dining tent. We typically offer beef, chicken, salads, vegetables, fruits, mushrooms, potatoes, beans, spaghetti, cheese, and other popular continental dishes.
+At King Mufasa Expeditions, we've created a special Kilimanjaro menu that's both delicious and energy-packed. Our mountain chefs, trained by professional restaurant cooks, will surprise you with a variety of meals served daily in the dining tent. We typically offer beef, chicken, salads, vegetables, fruits, mushrooms, potatoes, beans, spaghetti, cheese, and other popular continental dishes.
 
 We also provide halal, vegetarian, vegan, and gluten-free meal options at no extra charge.
 
