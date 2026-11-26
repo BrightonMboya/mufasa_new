@@ -826,7 +826,9 @@ export const trekking = {
   intro: {
     eyebrow: 'Trekking',
     title: 'Climb Kilimanjaro & Mount Meru',
-    heroImage: '/media/trekking/kibo-from-the-saddle.webp',
+    heroImage: '/media/experiences/kilimanjaro-sunrise-camp.webp',
+    /* Keep the trekker (right of frame, head near the top) in the wide crop. */
+    heroPosition: '70% 15%',
     lead: 'Kilimanjaro is a walk, not a technical climb — what decides a summit is acclimatisation, guiding, and enough days on the mountain. We route every trek long, which is why most of our trekkers reach the top.',
     body: "Our mountain crews are the same year to year: lead guides with hundreds of summits, cooks who feed a camp at altitude, and porters paid and equipped to the KPAP standard. We never sell the shortest route, because the shortest route is where people fail.",
   },

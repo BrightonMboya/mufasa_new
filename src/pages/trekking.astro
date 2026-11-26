@@ -18,7 +18,7 @@ const description = trekking.intro.lead;
   <main>
     <!-- Hero -->
     <section class="thero">
-      <img class="thero__img" src={trekking.intro.heroImage} alt={t('Mount Kilimanjaro')} fetchpriority="high" decoding="async" />
+      <img class="thero__img" src={trekking.intro.heroImage} style={`object-position: ${trekkingData.intro.heroPosition}`} alt={t('Mount Kilimanjaro')} fetchpriority="high" decoding="async" />
       <div class="thero__scrim"></div>
       <div class="thero__content wrap">
         <span class="eyebrow" style="color: var(--color-accent-soft)">{trekking.intro.eyebrow}</span>
